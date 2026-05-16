@@ -1,0 +1,61 @@
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        headline: ['Manrope', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+        display: ['Manrope', 'sans-serif'],
+      },
+      colors: {
+        primary: '#00361a',
+        'primary-container': '#1a4d2e',
+        'primary-fixed': '#b8f0c5',
+        'primary-fixed-dim': '#9dd3aa',
+        'on-primary': '#ffffff',
+        'on-primary-container': '#88bd95',
+        'on-primary-fixed-variant': '#1d5031',
+        secondary: '#13677b',
+        'secondary-container': '#a1e7ff',
+        'secondary-fixed': '#b2ebff',
+        'on-secondary-container': '#18697e',
+        tertiary: '#4a2400',
+        'tertiary-container': '#6b3600',
+        'tertiary-fixed': '#ffdcc4',
+        'tertiary-fixed-dim': '#ffb780',
+        'on-tertiary-container': '#f09f5e',
+        'on-tertiary-fixed': '#2f1400',
+        surface: '#f8f9fa',
+        'surface-container-lowest': '#ffffff',
+        'surface-container-low': '#f3f4f5',
+        'surface-container': '#edeeef',
+        'surface-container-high': '#e7e8e9',
+        'surface-container-highest': '#e1e3e4',
+        'surface-variant': '#e1e3e4',
+        'on-surface': '#191c1d',
+        'on-surface-variant': '#414942',
+        outline: '#717971',
+        'outline-variant': '#c1c9bf',
+        error: '#ba1a1a',
+        'error-container': '#ffdad6',
+        'on-error-container': '#93000a',
+      },
+      borderRadius: {
+        DEFAULT: '0.5rem',
+        sm: '0.375rem',
+        lg: '0.75rem',
+        xl: '1rem',
+        '2xl': '1.5rem',
+        full: '9999px',
+      },
+    },
+  },
+  plugins: [],
+}
+export default config
