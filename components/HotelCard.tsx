@@ -49,7 +49,7 @@ export default function HotelCard({ hotel, index }: Props) {
         }}
       >
         {/* Card Header */}
-        <div style={{
+        <div className="hotel-card-header" style={{
           background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)',
           padding: '22px 24px 20px', position: 'relative', overflow: 'hidden',
         }}>
@@ -90,7 +90,7 @@ export default function HotelCard({ hotel, index }: Props) {
         </div>
 
         {/* Card Body */}
-        <div style={{ padding: '18px 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div className="hotel-card-body" style={{ padding: '18px 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8, fontSize: 11,
             color: '#717971', marginBottom: 14, fontFamily: 'Inter, sans-serif', fontWeight: 500,
@@ -142,7 +142,7 @@ export default function HotelCard({ hotel, index }: Props) {
         </div>
 
         {/* Card Footer */}
-        <div style={{
+        <div className="hotel-card-footer" style={{
           padding: '16px 24px', background: '#f3f4f5',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
         }}>
@@ -168,6 +168,7 @@ export default function HotelCard({ hotel, index }: Props) {
       {/* Enquire Modal */}
       {showEnquire && (
         <div
+          className="modal-wrap"
           style={{
             position: 'fixed', inset: 0, background: 'rgba(0,54,26,0.55)', zIndex: 500,
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,

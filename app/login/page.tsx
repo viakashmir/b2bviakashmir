@@ -81,10 +81,7 @@ export default function LoginPage() {
     <>
       <Header isLoggedIn={isLoggedIn} onLogout={handleLogout} />
 
-      <main style={{
-        minHeight: 'calc(100vh - 76px)', display: 'flex', alignItems: 'center',
-        justifyContent: 'center', padding: 40, background: '#f8f9fa',
-      }}>
+      <main className="login-shell">
         <div style={{ width: '100%', maxWidth: 460 }}>
 
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
@@ -92,10 +89,7 @@ export default function LoginPage() {
           </div>
 
           <div className="card-elevated" style={{ overflow: 'hidden' }}>
-            <div style={{
-              background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 60%, #004e5f 100%)',
-              padding: '36px 40px', textAlign: 'center', position: 'relative', overflow: 'hidden',
-            }}>
+            <div className="login-card-head">
               <i className="fi fi-rr-mountains" style={{
                 position: 'absolute', right: -24, bottom: -28,
                 fontSize: 180, color: 'rgba(184,240,197,0.08)', pointerEvents: 'none',
@@ -111,7 +105,7 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <div style={{ padding: '32px 40px' }}>
+            <div className="login-card-body">
               {error && (
                 <div style={{
                   background: '#ffdad6', borderRadius: 12,

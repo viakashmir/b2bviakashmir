@@ -31,7 +31,7 @@ export default function ViaKashmirLogo({ variant = 'light', size = 'md' }: Props
         }}>
           Via Kashmir
         </span>
-        <span style={{
+        <span className="logo-sub" style={{
           fontFamily: 'Inter, sans-serif',
           fontSize: s.subSize,
           fontWeight: 700,

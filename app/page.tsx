@@ -65,26 +65,15 @@ export default function PublicPage() {
     <>
       <Header isLoggedIn={isLoggedIn} onLogout={handleLogout} />
 
-      <main style={{ maxWidth: 1180, margin: '0 auto', padding: '48px 40px', position: 'relative' }}>
+      <main className="app-shell">
         {/* Hero */}
-        <section style={{
-          background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 60%, #004e5f 100%)',
-          borderRadius: 24, padding: '56px 64px',
-          marginBottom: 40, position: 'relative', overflow: 'hidden',
-        }}>
+        <section className="hero-section">
           <i className="fi fi-rr-mountains" style={{
             position: 'absolute', right: -30, top: -20,
             fontSize: 280, color: 'rgba(184,240,197,0.08)', pointerEvents: 'none',
           }} />
 
-          <div style={{
-            position: 'absolute', top: 24, right: 28,
-            display: 'flex', alignItems: 'center', gap: 8,
-            background: 'rgba(255,255,255,0.08)',
-            padding: '8px 16px', borderRadius: 9999, fontSize: 11, fontWeight: 700,
-            color: 'rgba(255,255,255,0.95)', fontFamily: 'Inter, sans-serif',
-            letterSpacing: '0.06em', textTransform: 'uppercase',
-          }}>
+          <div className="hero-live-badge">
             <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#b8f0c5', display: 'inline-block' }} />
             {hotelList.length} hotels live
           </div>
@@ -96,22 +85,15 @@ export default function PublicPage() {
             </span>
           </div>
 
-          <h1 style={{
-            fontFamily: 'Manrope, sans-serif', fontSize: 56, fontWeight: 900,
-            color: '#ffffff', lineHeight: 1.05, letterSpacing: '-0.03em',
-            margin: 0, maxWidth: 620,
-          }}>
+          <h1 className="hero-title">
             Kashmir Hotel Rates<br />
             <span style={{ color: '#9dd3aa' }}>for Travel Agents</span>
           </h1>
-          <p style={{
-            fontSize: 16, fontWeight: 400, color: 'rgba(255,255,255,0.7)',
-            marginTop: 18, maxWidth: 540, lineHeight: 1.65, fontFamily: 'Inter, sans-serif',
-          }}>
+          <p className="hero-subtitle">
             Direct B2B net rates from hotels across Srinagar, Dal Lake, Gulmarg, Pahalgam, Sonamarg and Gurez. Updated in real-time. No markup, no middleman.
           </p>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 28, flexWrap: 'wrap' }}>
+          <div className="hero-meta-row" style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 28, flexWrap: 'wrap' }}>
             {[
               { icon: 'fi-rr-clock', text: 'Live rates updated today' },
               { icon: 'fi-rr-shield-check', text: 'No login required' },
@@ -126,7 +108,7 @@ export default function PublicPage() {
         </section>
 
         {/* Filters */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 28, flexWrap: 'wrap' }}>
+        <div className="filter-row">
           <span className="t-overline" style={{ marginRight: 6 }}>
             <i className="fi fi-rr-filter" style={{ fontSize: 11, marginRight: 6, verticalAlign: 'middle' }} />
             Location
@@ -151,19 +133,19 @@ export default function PublicPage() {
             )
           })}
 
-          <div style={{ position: 'relative', marginLeft: 'auto' }}>
-            <i className="fi fi-rr-search" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: '#717971', pointerEvents: 'none' }} />
+          <div className="search-wrap">
+            <i className="fi fi-rr-search" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: '#717971', pointerEvents: 'none', zIndex: 1 }} />
             <input
               type="search"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search hotel…"
               className="input-field"
-              style={{ padding: '10px 14px 10px 42px', width: 240, fontSize: 13 }}
+              style={{ padding: '10px 14px 10px 42px', fontSize: 13 }}
             />
           </div>
 
-          <span style={{ fontSize: 12, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+          <span className="filter-count" style={{ fontSize: 12, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
             {filtered.length} of {hotelList.length}
           </span>
         </div>
@@ -176,7 +158,7 @@ export default function PublicPage() {
             <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Try adjusting your location filter or search term.</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 20 }}>
+          <div className="hotel-grid">
             {filtered.map((hotel, i) => (
               <HotelCard key={hotel.id} hotel={hotel} index={i} />
             ))}

@@ -151,22 +151,20 @@ export default function DashboardPage() {
     <>
       <Header isLoggedIn={true} onLogout={handleLogout} />
 
-      <main style={{ maxWidth: 1180, margin: '0 auto', padding: '40px', position: 'relative' }}>
+      <main className="app-shell">
 
         {/* Dash header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 36, gap: 20, flexWrap: 'wrap' }}>
+        <div className="dash-header">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 10 }}>
               <StarRating stars={hotel.stars} size={14} variant="dark" showLabel />
             </div>
-            <h1 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 44, fontWeight: 800, color: '#00361a', lineHeight: 1.05, letterSpacing: '-0.025em', margin: 0 }}>
-              {hotel.name}
-            </h1>
+            <h1 className="dash-title">{hotel.name}</h1>
             <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
               {hotel.locationLabel} · {STAR_LABELS[hotel.stars]} · {hotel.phone}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className="dash-actions">
             <div style={{
               display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600,
               color: '#414942', padding: '10px 18px', background: '#ffffff', borderRadius: 9999,
@@ -188,7 +186,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 36 }}>
+        <div className="stat-grid">
           {statCards.map((card, i) => (
             <div key={i} className="card-elevated" style={{ padding: '22px 24px', position: 'relative', overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -197,11 +195,7 @@ export default function DashboardPage() {
                   <i className={`fi ${card.icon}`} style={{ fontSize: 16, color: card.accent }} />
                 </div>
               </div>
-              <div style={{
-                fontFamily: 'Manrope, sans-serif',
-                fontSize: card.small ? 22 : 36,
-                fontWeight: 800, color: '#00361a', lineHeight: 1, letterSpacing: '-0.025em',
-              }}>
+              <div className={`stat-value${card.small ? ' small' : ''}`}>
                 {card.value}
               </div>
               <div style={{ fontSize: 12, color: '#717971', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>{card.sub}</div>
@@ -211,9 +205,9 @@ export default function DashboardPage() {
 
         {/* Rates table section */}
         <div style={{ marginBottom: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, gap: 12, flexWrap: 'wrap' }}>
             <div>
-              <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 26, fontWeight: 700, color: '#00361a', letterSpacing: '-0.02em' }}>
+              <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(20px, 4vw, 26px)', fontWeight: 700, color: '#00361a', letterSpacing: '-0.02em' }}>
                 Room Rates &amp; Inventory
               </div>
               <div style={{ fontSize: 13, color: '#717971', marginTop: 4, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
@@ -225,7 +219,7 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          <div className="card-elevated" style={{ overflow: 'hidden' }}>
+          <div className="card-elevated table-scroll" style={{ overflow: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
@@ -362,7 +356,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="card-elevated" style={{ padding: 28 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 1fr 1fr 1fr', gap: 14, alignItems: 'end', marginBottom: 18 }}>
+              <div className="form-grid">
                 {[
                   { label: 'Room Type *', field: 'type', type: 'text', placeholder: 'e.g. Deluxe Room' },
                   { label: 'Single ₹', field: 'single', type: 'number', placeholder: '4500' },
