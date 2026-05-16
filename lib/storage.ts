@@ -1,34 +1,72 @@
-import { Hotel, HotelsMap, SEED_HOTELS, STORE_KEY, LS_SYNC_KEY } from './data'
+import { Hotel, HotelsMap, AppStore, Concern, SEED_HOTELS, SEED_CONCERNS, STORE_KEY, LS_SYNC_KEY } from './data'
 export { LS_SYNC_KEY } from './data'
 
-export function loadHotels(): HotelsMap {
-  if (typeof window === 'undefined') return JSON.parse(JSON.stringify(SEED_HOTELS))
+const STORE_VERSION = 6
+
+function seedStore(): AppStore {
+  return {
+    hotels: JSON.parse(JSON.stringify(SEED_HOTELS)),
+    concerns: JSON.parse(JSON.stringify(SEED_CONCERNS)),
+    version: STORE_VERSION,
+  }
+}
+
+export function loadStore(): AppStore {
+  if (typeof window === 'undefined') return seedStore()
   try {
     const raw = localStorage.getItem(STORE_KEY)
     if (raw) {
-      const parsed: HotelsMap = JSON.parse(raw)
-      if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-        // merge new seed hotels
+      const parsed = JSON.parse(raw) as AppStore
+      if (parsed?.hotels && parsed?.version) {
+        // merge new seed hotels into existing store (so adding a seed doesn't wipe edits)
         for (const id in SEED_HOTELS) {
-          if (!parsed[id]) parsed[id] = SEED_HOTELS[id]
+          if (!parsed.hotels[id]) parsed.hotels[id] = SEED_HOTELS[id]
         }
+        if (!parsed.concerns) parsed.concerns = {}
         return parsed
       }
     }
   } catch {}
-  return JSON.parse(JSON.stringify(SEED_HOTELS))
+  return seedStore()
 }
 
-export function saveHotels(hotels: HotelsMap): void {
+export function saveStore(store: AppStore): void {
   if (typeof window === 'undefined') return
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(hotels))
+    localStorage.setItem(STORE_KEY, JSON.stringify(store))
     localStorage.setItem(LS_SYNC_KEY, Date.now().toString())
   } catch {}
 }
 
+/** Convenience reads for the public board and vendor portal. */
+export function loadHotels(): HotelsMap {
+  return loadStore().hotels
+}
+
+export function saveHotels(hotels: HotelsMap): void {
+  const s = loadStore()
+  s.hotels = hotels
+  saveStore(s)
+}
+
+export function loadConcerns(): Record<string, Concern> {
+  return loadStore().concerns
+}
+
+export function saveConcerns(concerns: Record<string, Concern>): void {
+  const s = loadStore()
+  s.concerns = concerns
+  saveStore(s)
+}
+
+export function upsertConcern(c: Concern): void {
+  const s = loadStore()
+  s.concerns[c.id] = c
+  saveStore(s)
+}
+
 export function fmtDate(ts: number): string {
-  if (!ts) return 'Not set'
+  if (!ts) return '—'
   const d = new Date(ts)
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
   let h = d.getHours()
@@ -40,7 +78,7 @@ export function fmtDate(ts: number): string {
 }
 
 export function timeAgo(ts: number): string {
-  if (!ts) return 'Unknown'
+  if (!ts) return '—'
   const diff = Date.now() - ts
   const mins = Math.floor(diff / 60000)
   if (mins < 1) return 'Just now'
@@ -56,6 +94,7 @@ export function fmtINR(n: number | null | undefined): string {
 }
 
 export function bestStatus(rooms: Hotel['rooms']): string {
+  if (!rooms.length) return 'Sold Out'
   if (rooms.some(r => r.status === 'Available')) return 'Available'
   if (rooms.some(r => r.status === 'Limited')) return 'Limited'
   return 'Sold Out'

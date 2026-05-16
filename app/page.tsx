@@ -1,26 +1,19 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@clerk/nextjs'
+import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import HotelCard from '@/components/HotelCard'
-import Toast, { ToastMessage } from '@/components/Toast'
 import { HotelsMap, LOCATIONS, Location } from '@/lib/data'
 import { loadHotels, LS_SYNC_KEY } from '@/lib/storage'
 
 export default function PublicPage() {
-  const router = useRouter()
-  const { isSignedIn, signOut } = useAuth()
   const [hotels, setHotels] = useState<HotelsMap>({})
   const [filter, setFilter] = useState<Location | 'all'>('all')
   const [search, setSearch] = useState('')
-  const [toasts, setToasts] = useState<ToastMessage[]>([])
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const h = loadHotels()
-    setHotels(h)
+    setHotels(loadHotels())
     setMounted(true)
 
     const onStorage = (e: StorageEvent) => {
@@ -30,24 +23,10 @@ export default function PublicPage() {
     return () => window.removeEventListener('storage', onStorage)
   }, [])
 
-  const addToast = useCallback((message: string, type: ToastMessage['type'] = 'info') => {
-    const id = Date.now().toString()
-    setToasts(prev => [...prev, { id, message, type }])
-  }, [])
-
-  const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id))
-  }, [])
-
-  const handleLogout = () => {
-    signOut(() => {
-      addToast('Signed out successfully', 'info')
-    })
-  }
-
-  const hotelList = Object.values(hotels)
+  // Public board only shows approved hotels
+  const hotelList = Object.values(hotels).filter(h => h.approved)
   const filtered = hotelList.filter(h => {
-    const locMatch = filter === 'all' || h.location === filter || h.locationLabel.toLowerCase().includes(filter)
+    const locMatch = filter === 'all' || h.location === filter
     const s = search.toLowerCase().trim()
     const searchMatch = !s || h.name.toLowerCase().includes(s) || h.locationLabel.toLowerCase().includes(s)
     return locMatch && searchMatch
@@ -63,10 +42,9 @@ export default function PublicPage() {
 
   return (
     <>
-      <Header isLoggedIn={!!isSignedIn} onLogout={handleLogout} />
+      <Header />
 
       <main className="app-shell">
-        {/* Hero */}
         <section className="hero-section">
           <i className="fi fi-rr-mountains" style={{
             position: 'absolute', right: -30, top: -20,
@@ -90,13 +68,13 @@ export default function PublicPage() {
             <span style={{ color: '#9dd3aa' }}>for Travel Agents</span>
           </h1>
           <p className="hero-subtitle">
-            Direct B2B net rates from hotels across Srinagar, Dal Lake, Gulmarg, Pahalgam, Sonamarg and Gurez. Updated in real-time. No markup, no middleman.
+            Direct B2B net rates from hotels across Srinagar, Houseboats, Gulmarg, Pahalgam, Sonamarg and Gurez. Updated in real-time. No markup, no middleman.
           </p>
 
           <div className="hero-meta-row" style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 28, flexWrap: 'wrap' }}>
             {[
               { icon: 'fi-rr-clock', text: 'Live rates updated today' },
-              { icon: 'fi-rr-shield-check', text: 'No login required' },
+              { icon: 'fi-rr-shield-check', text: 'No login required to browse' },
               { icon: 'fi-rr-phone-call', text: 'Direct hotel contact' },
             ].map((m, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.88)', fontFamily: 'Inter, sans-serif' }}>
@@ -107,7 +85,6 @@ export default function PublicPage() {
           </div>
         </section>
 
-        {/* Filters */}
         <div className="filter-row">
           <span className="t-overline" style={{ marginRight: 6 }}>
             <i className="fi fi-rr-filter" style={{ fontSize: 11, marginRight: 6, verticalAlign: 'middle' }} />
@@ -150,7 +127,6 @@ export default function PublicPage() {
           </span>
         </div>
 
-        {/* Hotel Grid */}
         {filtered.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
             <i className="fi fi-rr-search" style={{ fontSize: 40, color: '#c1c9bf', marginBottom: 12, display: 'block' }} />
@@ -165,8 +141,6 @@ export default function PublicPage() {
           </div>
         )}
       </main>
-
-      <Toast toasts={toasts} onRemove={removeToast} />
     </>
   )
 }

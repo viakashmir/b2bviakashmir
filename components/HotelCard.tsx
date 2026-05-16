@@ -1,21 +1,12 @@
 'use client'
 
-import { Hotel } from '@/lib/data'
+import { Hotel, STAR_LABELS } from '@/lib/data'
 import { fmtINR, fmtDate, bestStatus, availableInventory } from '@/lib/storage'
-import StarRating from './StarRating'
 import { useState } from 'react'
 
 interface Props {
   hotel: Hotel
   index: number
-}
-
-const STAR_CATEGORY_LABEL: Record<number, string> = {
-  1: '1 Star',
-  2: '2 Star',
-  3: '3 Star',
-  4: '4 Star',
-  5: '5 Star Deluxe',
 }
 
 export default function HotelCard({ hotel, index }: Props) {
@@ -48,7 +39,6 @@ export default function HotelCard({ hotel, index }: Props) {
           ;(e.currentTarget as HTMLElement).style.boxShadow = '0 4px 40px rgba(25,28,29,0.06)'
         }}
       >
-        {/* Card Header */}
         <div className="hotel-card-header" style={{
           background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)',
           padding: '22px 24px 20px', position: 'relative', overflow: 'hidden',
@@ -62,14 +52,16 @@ export default function HotelCard({ hotel, index }: Props) {
             <span className={`badge ${statusBadge}`}>{status}</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-            <StarRating stars={hotel.stars} size={12} variant="light" />
+          <div style={{ marginBottom: 10 }}>
             <span style={{
-              fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 700,
-              letterSpacing: '0.12em', textTransform: 'uppercase',
+              display: 'inline-block',
+              fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 800,
+              letterSpacing: '0.14em', textTransform: 'uppercase',
               color: '#b8f0c5',
+              background: 'rgba(184,240,197,0.1)',
+              padding: '4px 10px', borderRadius: 9999,
             }}>
-              {STAR_CATEGORY_LABEL[hotel.stars]}
+              {STAR_LABELS[hotel.stars]}
             </span>
           </div>
 
@@ -89,7 +81,6 @@ export default function HotelCard({ hotel, index }: Props) {
           </div>
         </div>
 
-        {/* Card Body */}
         <div className="hotel-card-body" style={{ padding: '18px 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8, fontSize: 11,
@@ -100,7 +91,7 @@ export default function HotelCard({ hotel, index }: Props) {
               display: 'inline-block',
             }} />
             <i className="fi fi-rr-clock" style={{ fontSize: 11, opacity: 0.6 }} />
-            Rates updated: <strong style={{ color: '#414942', fontWeight: 700 }}>{fmtDate(hotel.updatedAt)}</strong>
+            Updated: <strong style={{ color: '#414942', fontWeight: 700 }}>{fmtDate(hotel.updatedAt)}</strong>
           </div>
 
           <div style={{ flex: 1 }}>
@@ -112,7 +103,7 @@ export default function HotelCard({ hotel, index }: Props) {
               }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: '#191c1d', fontFamily: 'Inter, sans-serif' }}>{r.type}</div>
-                  <div style={{ fontSize: 11, color: '#717971', fontWeight: 500, marginTop: 3, fontFamily: 'Inter, sans-serif' }}>{r.meal}</div>
+                  <div style={{ fontSize: 11, color: '#717971', fontWeight: 500, marginTop: 3, fontFamily: 'Inter, sans-serif' }}>{r.category} · {r.meal}</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', lineHeight: 1, letterSpacing: '-0.02em' }}>
@@ -141,7 +132,6 @@ export default function HotelCard({ hotel, index }: Props) {
           </div>
         </div>
 
-        {/* Card Footer */}
         <div className="hotel-card-footer" style={{
           padding: '16px 24px', background: '#f3f4f5',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
@@ -165,7 +155,6 @@ export default function HotelCard({ hotel, index }: Props) {
         </div>
       </article>
 
-      {/* Enquire Modal */}
       {showEnquire && (
         <div
           className="modal-wrap"
@@ -177,7 +166,7 @@ export default function HotelCard({ hotel, index }: Props) {
           onClick={e => { if (e.target === e.currentTarget) setShowEnquire(false) }}
         >
           <div className="card-elevated" style={{
-            width: '100%', maxWidth: 480, overflow: 'hidden',
+            width: '100%', maxWidth: 520, overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column',
             animation: 'fade-up 0.25s ease',
           }}>
             <div style={{
@@ -185,8 +174,17 @@ export default function HotelCard({ hotel, index }: Props) {
               padding: '24px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
             }}>
               <div>
-                <StarRating stars={hotel.stars} size={12} variant="light" showLabel />
-                <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 24, color: '#ffffff', fontWeight: 800, margin: '8px 0 4px', letterSpacing: '-0.02em' }}>{hotel.name}</h3>
+                <span style={{
+                  display: 'inline-block',
+                  fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 800,
+                  letterSpacing: '0.14em', textTransform: 'uppercase',
+                  color: '#b8f0c5',
+                  background: 'rgba(184,240,197,0.1)',
+                  padding: '4px 10px', borderRadius: 9999, marginBottom: 8,
+                }}>
+                  {STAR_LABELS[hotel.stars]}
+                </span>
+                <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 24, color: '#ffffff', fontWeight: 800, margin: '4px 0', letterSpacing: '-0.02em' }}>{hotel.name}</h3>
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', margin: 0, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>{hotel.locationLabel}</p>
               </div>
               <button
@@ -197,11 +195,17 @@ export default function HotelCard({ hotel, index }: Props) {
                 <i className="fi fi-rr-cross-small" style={{ fontSize: 18 }} />
               </button>
             </div>
-            <div style={{ padding: 28 }}>
+            <div style={{ padding: 28, overflowY: 'auto' }}>
+              {hotel.description && (
+                <p style={{ fontSize: 13, color: '#414942', fontFamily: 'Inter, sans-serif', lineHeight: 1.6, margin: '0 0 18px' }}>
+                  {hotel.description}
+                </p>
+              )}
               {[
                 { icon: 'fi-rr-phone-call', label: 'Phone', value: hotel.phone },
                 { icon: 'fi-rr-envelope', label: 'Email', value: hotel.email },
-                { icon: 'fi-rr-map-marker', label: 'Location', value: hotel.locationLabel },
+                { icon: 'fi-rr-marker', label: 'Address', value: hotel.address || hotel.locationLabel },
+                { icon: 'fi-rr-globe', label: 'Website', value: hotel.website || '—' },
                 { icon: 'fi-rr-clock', label: 'Rates Updated', value: fmtDate(hotel.updatedAt) },
                 { icon: 'fi-rr-bed-alt', label: 'Available Today', value: `${availInv} rooms across ${hotel.rooms.length} types` },
               ].map((row, i, arr) => (
@@ -216,12 +220,24 @@ export default function HotelCard({ hotel, index }: Props) {
                   }}>
                     <i className={`fi ${row.icon}`} style={{ fontSize: 15 }} />
                   </div>
-                  <div>
+                  <div style={{ minWidth: 0, flex: 1 }}>
                     <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', fontFamily: 'Inter, sans-serif' }}>{row.label}</div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#191c1d', marginTop: 3, fontFamily: 'Inter, sans-serif' }}>{row.value}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#191c1d', marginTop: 3, fontFamily: 'Inter, sans-serif', overflowWrap: 'anywhere' }}>{row.value}</div>
                   </div>
                 </div>
               ))}
+              {hotel.amenities?.length > 0 && (
+                <div style={{ marginTop: 18 }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', fontFamily: 'Inter, sans-serif', marginBottom: 8 }}>
+                    Amenities
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {hotel.amenities.map(a => (
+                      <span key={a} className="badge badge-neutral" style={{ fontSize: 10 }}>{a}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

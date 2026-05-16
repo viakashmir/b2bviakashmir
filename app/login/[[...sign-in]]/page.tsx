@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 export default function LoginPage() {
-  const { isSignedIn, isLoaded, signOut } = useAuth()
+  const { isSignedIn, isLoaded } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <Header isLoggedIn={!!isSignedIn} onLogout={() => signOut(() => router.push('/'))} />
+      <Header />
 
       <main className="login-shell">
         <div style={{ width: '100%', maxWidth: 460 }}>
