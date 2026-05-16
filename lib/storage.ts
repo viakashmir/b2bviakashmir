@@ -1,10 +1,5 @@
-import { Hotel, HotelsMap, SEED_HOTELS, STORE_KEY, SESSION_KEY, LS_SYNC_KEY } from './data'
+import { Hotel, HotelsMap, SEED_HOTELS, STORE_KEY, LS_SYNC_KEY } from './data'
 export { LS_SYNC_KEY } from './data'
-
-export interface Session {
-  hotelId: string
-  loginTime: number
-}
 
 export function loadHotels(): HotelsMap {
   if (typeof window === 'undefined') return JSON.parse(JSON.stringify(SEED_HOTELS))
@@ -30,32 +25,6 @@ export function saveHotels(hotels: HotelsMap): void {
     localStorage.setItem(STORE_KEY, JSON.stringify(hotels))
     localStorage.setItem(LS_SYNC_KEY, Date.now().toString())
   } catch {}
-}
-
-export function loadSession(): Session | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = sessionStorage.getItem(SESSION_KEY)
-    if (raw) return JSON.parse(raw) as Session
-  } catch {}
-  return null
-}
-
-export function saveSession(s: Session): void {
-  if (typeof window === 'undefined') return
-  try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(s)) } catch {}
-}
-
-export function clearSession(): void {
-  if (typeof window === 'undefined') return
-  try { sessionStorage.removeItem(SESSION_KEY) } catch {}
-}
-
-export function validateLogin(hotels: HotelsMap, username: string, password: string): Hotel | null {
-  const id = username.trim().toLowerCase()
-  const hotel = hotels[id]
-  if (hotel && hotel.password === password.trim()) return hotel
-  return null
 }
 
 export function fmtDate(ts: number): string {

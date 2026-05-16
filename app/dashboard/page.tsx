@@ -2,48 +2,62 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useUser, useAuth } from '@clerk/nextjs'
 import Header from '@/components/Header'
 import StarRating from '@/components/StarRating'
 import Toast, { ToastMessage } from '@/components/Toast'
 import { Hotel, Room, MealPlan, MEAL_LABELS } from '@/lib/data'
-import { loadHotels, saveHotels, loadSession, clearSession, fmtDate, timeAgo, fmtINR, availableInventory, totalInventory, LS_SYNC_KEY } from '@/lib/storage'
+import { loadHotels, saveHotels, fmtDate, timeAgo, fmtINR, availableInventory, totalInventory, LS_SYNC_KEY } from '@/lib/storage'
 
 const STAR_LABELS: Record<number, string> = { 1: '1 Star', 2: '2 Star', 3: '3 Star', 4: '4 Star', 5: '5 Star Deluxe' }
 
 export default function DashboardPage() {
   const router = useRouter()
+  const { user, isLoaded } = useUser()
+  const { signOut } = useAuth()
   const [hotel, setHotel] = useState<Hotel | null>(null)
   const [hotels, setHotels] = useState<ReturnType<typeof loadHotels>>({})
   const [toasts, setToasts] = useState<ToastMessage[]>([])
   const [pendingChanges, setPendingChanges] = useState<Set<number>>(new Set())
   const [savedRows, setSavedRows] = useState<Set<number>>(new Set())
   const [mounted, setMounted] = useState(false)
+  const [missingHotel, setMissingHotel] = useState<string | null>(null)
 
   const [newRoom, setNewRoom] = useState({ type: '', meal: 'CP' as MealPlan, single: '', double: '', triple: '', inventory: '', status: 'Available' as Room['status'] })
   const [formError, setFormError] = useState('')
   const [showForm, setShowForm] = useState(false)
 
   useEffect(() => {
-    const session = loadSession()
-    if (!session) { router.push('/login'); return }
+    if (!isLoaded) return
+    if (!user) { router.push('/login'); return }
+
+    const hotelId = (user.publicMetadata?.hotelId as string | undefined)?.toLowerCase()
     const h = loadHotels()
-    const currentHotel = h[session.hotelId]
-    if (!currentHotel) { clearSession(); router.push('/login'); return }
     setHotels(h)
-    setHotel(currentHotel)
     setMounted(true)
+
+    if (!hotelId) {
+      setMissingHotel('No hotel is linked to your account. Ask an admin to set publicMetadata.hotelId in Clerk.')
+      return
+    }
+    const currentHotel = h[hotelId]
+    if (!currentHotel) {
+      setMissingHotel(`Linked hotel "${hotelId}" was not found in the rate portal.`)
+      return
+    }
+    setHotel(currentHotel)
 
     const onStorage = (e: StorageEvent) => {
       if (e.key === LS_SYNC_KEY) {
         const updated = loadHotels()
         setHotels(updated)
-        const updatedHotel = updated[session.hotelId]
+        const updatedHotel = updated[hotelId]
         if (updatedHotel) setHotel(updatedHotel)
       }
     }
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
-  }, [router])
+  }, [isLoaded, user, router])
 
   const addToast = useCallback((message: string, type: ToastMessage['type'] = 'info') => {
     const id = Date.now().toString()
@@ -51,8 +65,7 @@ export default function DashboardPage() {
   }, [])
 
   const handleLogout = () => {
-    clearSession()
-    router.push('/')
+    signOut(() => router.push('/'))
   }
 
   const persist = useCallback((updatedHotel: Hotel) => {
@@ -125,6 +138,28 @@ export default function DashboardPage() {
   }
 
   const statusClass = (s: string) => s === 'Available' ? 'avail' : s === 'Limited' ? 'limited' : 'sold'
+
+  if (missingHotel) {
+    return (
+      <>
+        <Header isLoggedIn={true} onLogout={handleLogout} />
+        <main className="login-shell">
+          <div className="card-elevated" style={{ padding: 40, maxWidth: 520, textAlign: 'center' }}>
+            <i className="fi fi-rr-exclamation" style={{ fontSize: 36, color: '#ba1a1a', display: 'block', marginBottom: 16 }} />
+            <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', margin: '0 0 12px' }}>
+              Hotel not linked
+            </h2>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#414942', lineHeight: 1.6, margin: 0 }}>
+              {missingHotel}
+            </p>
+            <button onClick={handleLogout} className="btn-secondary" style={{ marginTop: 20, padding: '10px 20px', fontSize: 13 }}>
+              Sign out
+            </button>
+          </div>
+        </main>
+      </>
+    )
+  }
 
   if (!mounted || !hotel) {
     return (

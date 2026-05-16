@@ -2,16 +2,17 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@clerk/nextjs'
 import Header from '@/components/Header'
 import HotelCard from '@/components/HotelCard'
 import Toast, { ToastMessage } from '@/components/Toast'
 import { HotelsMap, LOCATIONS, Location } from '@/lib/data'
-import { loadHotels, loadSession, clearSession, LS_SYNC_KEY } from '@/lib/storage'
+import { loadHotels, LS_SYNC_KEY } from '@/lib/storage'
 
 export default function PublicPage() {
   const router = useRouter()
+  const { isSignedIn, signOut } = useAuth()
   const [hotels, setHotels] = useState<HotelsMap>({})
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [filter, setFilter] = useState<Location | 'all'>('all')
   const [search, setSearch] = useState('')
   const [toasts, setToasts] = useState<ToastMessage[]>([])
@@ -20,7 +21,6 @@ export default function PublicPage() {
   useEffect(() => {
     const h = loadHotels()
     setHotels(h)
-    setIsLoggedIn(!!loadSession())
     setMounted(true)
 
     const onStorage = (e: StorageEvent) => {
@@ -40,9 +40,9 @@ export default function PublicPage() {
   }, [])
 
   const handleLogout = () => {
-    clearSession()
-    setIsLoggedIn(false)
-    addToast('Signed out successfully', 'info')
+    signOut(() => {
+      addToast('Signed out successfully', 'info')
+    })
   }
 
   const hotelList = Object.values(hotels)
@@ -63,7 +63,7 @@ export default function PublicPage() {
 
   return (
     <>
-      <Header isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      <Header isLoggedIn={!!isSignedIn} onLogout={handleLogout} />
 
       <main className="app-shell">
         {/* Hero */}

@@ -129,5 +129,4 @@ export const MEAL_LABELS: Record<MealPlan, string> = {
 }
 
 export const STORE_KEY = 'krp_hotels_v3'
-export const SESSION_KEY = 'krp_session_v3'
 export const LS_SYNC_KEY = 'krp_sync_v3'
