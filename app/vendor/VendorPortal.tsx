@@ -182,6 +182,11 @@ export default function VendorPortal() {
               <Clock size={12} strokeWidth={2} style={{ opacity: 0.6 }} />
               {fmtDate(hotel.updatedAt)}
             </div>
+            <a href="/vendor/inventory" style={{ textDecoration: 'none' }}>
+              <button className="btn-primary" style={{ padding: '10px 18px', fontSize: 13 }}>
+                <BedDouble size={13} strokeWidth={2.3} /> Inventory Calendar
+              </button>
+            </a>
             <a href="/" style={{ textDecoration: 'none' }}>
               <button className="btn-secondary" style={{ padding: '10px 18px', fontSize: 13 }}>
                 <Eye size={13} strokeWidth={2.2} /> View Live
