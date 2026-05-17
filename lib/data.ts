@@ -13,14 +13,12 @@ export type ConcernCategory =
 
 export interface Room {
   id: string
+  hotelId: string
   type: string
   category: RoomCategory
   meal: MealPlan
-  /** Per-night base rate for double occupancy. */
   double: number
-  /** Child No Bed surcharge (per child per night). */
   cnb: number
-  /** Extra Bed surcharge (per bed per night). */
   extraBed: number
   inventory: number
   status: RoomStatus
@@ -63,16 +61,7 @@ export interface Concern {
   adminResponseAt: number
 }
 
-export interface AppStore {
-  hotels: Record<string, Hotel>
-  concerns: Record<string, Concern>
-  version: number
-}
-
 export type HotelsMap = Record<string, Hotel>
-
-export const STORE_KEY = 'krp_v7_store'
-export const LS_SYNC_KEY = 'krp_v7_sync'
 
 export const LOCATIONS: { value: Location | 'all'; label: string }[] = [
   { value: 'all', label: 'All Locations' },
@@ -121,89 +110,107 @@ export const AMENITIES_LIST = [
   'Restaurant', 'Conference Room', 'Doctor on Call', '24h Reception',
 ]
 
-const NOW = Date.now()
+// =============================================================
+// Row ↔ Hotel/Room/Concern mappers (DB snake_case ↔ camelCase)
+// =============================================================
+import type { Hotel as HotelT, Room as RoomT, Concern as ConcernT } from './data'
 
-export const SEED_HOTELS: HotelsMap = {
-  grandpalace: {
-    id: 'grandpalace', name: 'Grand Palace Hotel', stars: 5, location: 'srinagar',
-    locationLabel: LOCATION_LABELS.srinagar, address: 'Residency Road, Srinagar 190001',
-    phone: '+91 194 245 6789', email: 'reservations@grandpalace.com',
-    website: 'www.grandpalacesrinagar.com',
-    description: 'Landmark 5-star property in the heart of Srinagar with panoramic views of the Zabarwan mountains.',
-    amenities: ['Free WiFi', 'Parking', 'Room Service', 'Restaurant', '24h Reception', 'Airport Transfer'],
-    approved: true, createdAt: NOW, updatedAt: NOW,
-    rooms: [
-      { id: 'r1', type: 'Deluxe Room', category: 'Deluxe', meal: 'CP', double: 6500, cnb: 1200, extraBed: 1800, inventory: 12, status: 'Available', updatedAt: NOW },
-      { id: 'r2', type: 'Executive Suite', category: 'Executive Suite', meal: 'MAP', double: 11000, cnb: 1800, extraBed: 2400, inventory: 5, status: 'Available', updatedAt: NOW },
-      { id: 'r3', type: 'Presidential Suite', category: 'Presidential Suite', meal: 'AP', double: 18000, cnb: 2400, extraBed: 3200, inventory: 2, status: 'Limited', updatedAt: NOW },
-    ],
-  },
-  dalview: {
-    id: 'dalview', name: 'Dal View Houseboats', stars: 4, location: 'houseboats',
-    locationLabel: LOCATION_LABELS.houseboats, address: 'Nagin Lake, Dal Lake, Srinagar',
-    phone: '+91 194 247 3456', email: 'book@dalviewhouseboats.com',
-    website: 'www.dalviewhouseboats.com',
-    description: 'Heritage cedar-wood houseboats on the serene Dal Lake with authentic Kashmiri hospitality.',
-    amenities: ['Free WiFi', 'Shikara Ride', 'Breakfast Included', 'Room Service', 'Hot Water'],
-    approved: true, createdAt: NOW, updatedAt: NOW,
-    rooms: [
-      { id: 'r1', type: 'Standard Houseboat', category: 'Houseboat Standard', meal: 'CP', double: 5200, cnb: 1000, extraBed: 1500, inventory: 8, status: 'Available', updatedAt: NOW },
-      { id: 'r2', type: 'Deluxe Houseboat', category: 'Houseboat Deluxe', meal: 'MAP', double: 7800, cnb: 1400, extraBed: 1900, inventory: 4, status: 'Available', updatedAt: NOW },
-      { id: 'r3', type: 'Royal Houseboat', category: 'Houseboat Royal', meal: 'AP', double: 13500, cnb: 2000, extraBed: 2600, inventory: 1, status: 'Limited', updatedAt: NOW },
-    ],
-  },
-  himalayancrest: {
-    id: 'himalayancrest', name: 'Himalayan Crest Resort', stars: 5, location: 'gulmarg',
-    locationLabel: LOCATION_LABELS.gulmarg, address: 'Main Road, Gulmarg 193403',
-    phone: '+91 194 254 2222', email: 'stay@himalayancrest.com',
-    website: 'www.himalayancrest.com',
-    description: 'Ski-in/ski-out luxury at 2650m in Gulmarg — the skiing capital of India.',
-    amenities: ['Free WiFi', 'Parking', 'Restaurant', 'Room Service', 'Heating', 'Conference Room'],
-    approved: true, createdAt: NOW, updatedAt: NOW,
-    rooms: [
-      { id: 'r1', type: 'Mountain View Room', category: 'Deluxe', meal: 'MAP', double: 8200, cnb: 1500, extraBed: 2200, inventory: 10, status: 'Available', updatedAt: NOW },
-      { id: 'r2', type: 'Premium Chalet', category: 'Suite', meal: 'AP', double: 15000, cnb: 2200, extraBed: 2900, inventory: 3, status: 'Limited', updatedAt: NOW },
-      { id: 'r3', type: 'Alpine Suite', category: 'Executive Suite', meal: 'AP', double: 24000, cnb: 3000, extraBed: 3800, inventory: 0, status: 'Sold Out', updatedAt: NOW },
-    ],
-  },
-  pinewood: {
-    id: 'pinewood', name: 'Pinewood Pahalgam', stars: 4, location: 'pahalgam',
-    locationLabel: LOCATION_LABELS.pahalgam, address: 'Lidder Valley, Pahalgam 192126',
-    phone: '+91 194 243 5678', email: 'info@pinewoodpahalgam.com',
-    website: 'www.pinewoodpahalgam.com',
-    description: 'Pine-forest retreat beside the Lidder river — ideal base for Amarnath Yatra groups.',
-    amenities: ['Free WiFi', 'Parking', 'Hot Water', 'Laundry', 'Doctor on Call', '24h Reception'],
-    approved: true, createdAt: NOW, updatedAt: NOW,
-    rooms: [
-      { id: 'r1', type: 'Forest Room', category: 'Standard', meal: 'CP', double: 4800, cnb: 900, extraBed: 1300, inventory: 15, status: 'Available', updatedAt: NOW },
-      { id: 'r2', type: 'Deluxe Forest Room', category: 'Deluxe', meal: 'MAP', double: 7200, cnb: 1300, extraBed: 1800, inventory: 6, status: 'Available', updatedAt: NOW },
-      { id: 'r3', type: 'Riverside Cottage', category: 'Cottage', meal: 'AP', double: 12000, cnb: 1800, extraBed: 2400, inventory: 0, status: 'Sold Out', updatedAt: NOW },
-    ],
-  },
-  sonamargalpine: {
-    id: 'sonamargalpine', name: 'Sonamarg Alpine Resort', stars: 3, location: 'sonamarg',
-    locationLabel: LOCATION_LABELS.sonamarg, address: 'Main Bazaar, Sonamarg 193503',
-    phone: '+91 194 261 4444', email: 'stay@sonamargalpine.com',
-    website: '',
-    description: 'Budget-friendly resort at the gateway to Thajiwas Glacier — ideal for trekkers.',
-    amenities: ['Free WiFi', 'Hot Water', 'Heating', 'Parking'],
-    approved: true, createdAt: NOW, updatedAt: NOW,
-    rooms: [
-      { id: 'r1', type: 'Standard Room', category: 'Standard', meal: 'CP', double: 4200, cnb: 700, extraBed: 1100, inventory: 20, status: 'Available', updatedAt: NOW },
-      { id: 'r2', type: 'Deluxe Room', category: 'Deluxe', meal: 'MAP', double: 5800, cnb: 1000, extraBed: 1500, inventory: 8, status: 'Available', updatedAt: NOW },
-    ],
-  },
+type HotelRow = {
+  id: string; name: string; stars: number; location: string; location_label: string
+  address: string; phone: string; email: string; website: string; description: string
+  amenities: string[]; approved: boolean; created_at: string; updated_at: string
+}
+type RoomRow = {
+  id: string; hotel_id: string; type: string; category: string; meal: string
+  double: number; cnb: number; extra_bed: number; inventory: number
+  status: string; updated_at: string
+}
+type ConcernRow = {
+  id: string; hotel_id: string; hotel_name: string; agent_name: string
+  agent_email: string; agent_company: string; category: string; subject: string
+  description: string; status: string; priority: string; admin_response: string
+  admin_response_at: string | null; created_at: string; updated_at: string
 }
 
-export const SEED_CONCERNS: Record<string, Concern> = {
-  con1: {
-    id: 'con1', hotelId: 'himalayancrest', hotelName: 'Himalayan Crest Resort',
-    agentName: 'Ahmed Khan', agentEmail: 'ahmed@gulfkashmir.com', agentCompany: 'Gulf Kashmir Tours',
-    category: 'Availability Error',
-    subject: 'Alpine Suite shown available but sold out on arrival',
-    description: 'We booked 2 pax for Alpine Suite based on portal showing 2 rooms available. On arrival hotel said sold out for 3 days. Major inconvenience for clients.',
-    status: 'open', priority: 'high',
-    createdAt: NOW - 86400000, updatedAt: NOW - 86400000,
-    adminResponse: '', adminResponseAt: 0,
-  },
+export function rowToHotel(row: HotelRow, rooms: RoomRow[] = []): HotelT {
+  return {
+    id: row.id, name: row.name, stars: row.stars as StarCategory,
+    location: row.location as Location, locationLabel: row.location_label,
+    address: row.address, phone: row.phone, email: row.email,
+    website: row.website, description: row.description, amenities: row.amenities,
+    approved: row.approved,
+    createdAt: new Date(row.created_at).getTime(),
+    updatedAt: new Date(row.updated_at).getTime(),
+    rooms: rooms.filter(r => r.hotel_id === row.id).map(rowToRoom),
+  }
+}
+
+export function rowToRoom(row: RoomRow): RoomT {
+  return {
+    id: row.id, hotelId: row.hotel_id, type: row.type,
+    category: row.category as RoomCategory, meal: row.meal as MealPlan,
+    double: row.double, cnb: row.cnb, extraBed: row.extra_bed,
+    inventory: row.inventory, status: row.status as RoomStatus,
+    updatedAt: new Date(row.updated_at).getTime(),
+  }
+}
+
+export function rowToConcern(row: ConcernRow): ConcernT {
+  return {
+    id: row.id, hotelId: row.hotel_id, hotelName: row.hotel_name,
+    agentName: row.agent_name, agentEmail: row.agent_email, agentCompany: row.agent_company,
+    category: row.category as ConcernCategory, subject: row.subject,
+    description: row.description, status: row.status as ConcernStatus,
+    priority: row.priority as 'low' | 'medium' | 'high',
+    adminResponse: row.admin_response,
+    adminResponseAt: row.admin_response_at ? new Date(row.admin_response_at).getTime() : 0,
+    createdAt: new Date(row.created_at).getTime(),
+    updatedAt: new Date(row.updated_at).getTime(),
+  }
+}
+
+// =============================================================
+// Display helpers (formerly in lib/storage.ts)
+// =============================================================
+export function fmtDate(ts: number): string {
+  if (!ts) return '—'
+  const d = new Date(ts)
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  let h = d.getHours()
+  const m = d.getMinutes()
+  const ampm = h >= 12 ? 'PM' : 'AM'
+  h = h % 12; if (!h) h = 12
+  const mm = m < 10 ? '0' + m : String(m)
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}, ${h}:${mm} ${ampm}`
+}
+
+export function timeAgo(ts: number): string {
+  if (!ts) return '—'
+  const diff = Date.now() - ts
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return 'Just now'
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  return `${Math.floor(hrs / 24)}d ago`
+}
+
+export function fmtINR(n: number | null | undefined): string {
+  if (!n) return '—'
+  return '₹' + Number(n).toLocaleString('en-IN')
+}
+
+export function bestStatus(rooms: Room[]): string {
+  if (!rooms.length) return 'Sold Out'
+  if (rooms.some(r => r.status === 'Available')) return 'Available'
+  if (rooms.some(r => r.status === 'Limited')) return 'Limited'
+  return 'Sold Out'
+}
+
+export function totalInventory(rooms: Room[]): number {
+  return rooms.reduce((a, r) => a + (r.inventory || 0), 0)
+}
+
+export function availableInventory(rooms: Room[]): number {
+  return rooms.filter(r => r.status === 'Available').reduce((a, r) => a + (r.inventory || 0), 0)
 }

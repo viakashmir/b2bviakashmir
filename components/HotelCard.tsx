@@ -1,7 +1,6 @@
 'use client'
 
-import { Hotel, STAR_LABELS } from '@/lib/data'
-import { fmtINR, fmtDate, bestStatus } from '@/lib/storage'
+import { Hotel, STAR_LABELS, fmtINR, fmtDate, bestStatus } from '@/lib/data'
 import { useState } from 'react'
 
 interface Props {

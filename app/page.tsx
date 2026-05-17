@@ -3,29 +3,45 @@
 import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import HotelCard from '@/components/HotelCard'
-import { HotelsMap, LOCATIONS, Location } from '@/lib/data'
-import { loadHotels, LS_SYNC_KEY } from '@/lib/storage'
+import { Hotel, LOCATIONS, Location } from '@/lib/data'
+import { browserSupabase } from '@/lib/supabase'
 
 export default function PublicPage() {
-  const [hotels, setHotels] = useState<HotelsMap>({})
+  const [hotels, setHotels] = useState<Hotel[]>([])
   const [filter, setFilter] = useState<Location | 'all'>('all')
   const [search, setSearch] = useState('')
   const [mounted, setMounted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const refresh = async () => {
+    try {
+      const res = await fetch('/api/hotels', { cache: 'no-store' })
+      if (!res.ok) throw new Error(await res.text())
+      const json = await res.json()
+      setHotels(json.hotels ?? [])
+      setError(null)
+    } catch (e) {
+      setError((e as Error).message)
+    }
+  }
 
   useEffect(() => {
-    setHotels(loadHotels())
     setMounted(true)
+    refresh()
 
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === LS_SYNC_KEY) setHotels(loadHotels())
-    }
-    window.addEventListener('storage', onStorage)
-    return () => window.removeEventListener('storage', onStorage)
+    // Real-time: any change to hotels or rooms triggers a refetch
+    let sb: ReturnType<typeof browserSupabase> | null = null
+    try { sb = browserSupabase() } catch { /* env vars missing in dev */ }
+    if (!sb) return
+
+    const channel = sb.channel('public-hotels')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'hotels' }, refresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms'  }, refresh)
+      .subscribe()
+    return () => { sb!.removeChannel(channel) }
   }, [])
 
-  // Public board only shows approved hotels
-  const hotelList = Object.values(hotels).filter(h => h.approved)
-  const filtered = hotelList.filter(h => {
+  const filtered = hotels.filter(h => {
     const locMatch = filter === 'all' || h.location === filter
     const s = search.toLowerCase().trim()
     const searchMatch = !s || h.name.toLowerCase().includes(s) || h.locationLabel.toLowerCase().includes(s)
@@ -53,7 +69,7 @@ export default function PublicPage() {
 
           <div className="hero-live-badge">
             <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#b8f0c5', display: 'inline-block' }} />
-            {hotelList.length} hotels live
+            {hotels.length} {hotels.length === 1 ? 'hotel' : 'hotels'} live
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
@@ -124,14 +140,27 @@ export default function PublicPage() {
           </div>
 
           <span className="filter-count" style={{ fontSize: 12, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
-            {filtered.length} of {hotelList.length}
+            {filtered.length} of {hotels.length}
           </span>
         </div>
 
-        {filtered.length === 0 ? (
+        {error && (
+          <div className="card" style={{ padding: '20px 24px', marginBottom: 24, borderLeft: '4px solid #ba1a1a', fontFamily: 'Inter, sans-serif', color: '#93000a' }}>
+            <strong style={{ display: 'block', marginBottom: 4 }}>Couldn&apos;t load hotels</strong>
+            <span style={{ fontSize: 13 }}>{error}</span>
+          </div>
+        )}
+
+        {hotels.length === 0 ? (
+          <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
+            <i className="fi fi-rr-mountains" style={{ fontSize: 40, color: '#c1c9bf', marginBottom: 12, display: 'block' }} />
+            <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels published yet</p>
+            <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Approved hotel listings will appear here in real-time.</p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
             <i className="fi fi-rr-search" style={{ fontSize: 40, color: '#c1c9bf', marginBottom: 12, display: 'block' }} />
-            <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No Hotels Found</p>
+            <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels found</p>
             <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Try adjusting your location filter or search term.</p>
           </div>
         ) : (

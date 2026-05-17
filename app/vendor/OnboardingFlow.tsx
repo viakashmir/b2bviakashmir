@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Hotel, Location, StarCategory, LOCATIONS, LOCATION_LABELS, AMENITIES_LIST, STAR_LABELS } from '@/lib/data'
-import { loadHotels, saveHotels } from '@/lib/storage'
+import { Location, StarCategory, LOCATIONS, LOCATION_LABELS, AMENITIES_LIST, STAR_LABELS } from '@/lib/data'
 
 interface Props {
-  hotelId: string
   defaultName: string
   defaultEmail: string
   onComplete: () => void
@@ -37,7 +35,7 @@ const STEPS = [
 ] as const
 type StepKey = (typeof STEPS)[number]['key']
 
-export default function OnboardingFlow({ hotelId, defaultName, defaultEmail, onComplete }: Props) {
+export default function OnboardingFlow({ defaultName, defaultEmail, onComplete }: Props) {
   const [stepIdx, setStepIdx] = useState(0)
   const [data, setData] = useState<FormData>({
     name: '', location: '', address: '', stars: 0,
@@ -84,30 +82,32 @@ export default function OnboardingFlow({ hotelId, defaultName, defaultEmail, onC
   }
   const back = () => setStepIdx(i => Math.max(i - 1, 0))
 
-  const submit = () => {
+  const submit = async () => {
     setSubmitting(true)
-    const now = Date.now()
-    const hotel: Hotel = {
-      id: hotelId,
-      name: data.name.trim(),
-      stars: (data.stars || 3) as StarCategory,
-      location: data.location as Location,
-      locationLabel: LOCATION_LABELS[data.location as Location],
-      address: data.address.trim(),
-      phone: data.phone.trim(),
-      email: data.email.trim(),
-      website: data.website.trim(),
-      description: data.description.trim(),
-      amenities: data.amenities,
-      approved: false, // admin must approve before public listing
-      createdAt: now,
-      updatedAt: now,
-      rooms: [],
+    setError('')
+    try {
+      const res = await fetch('/api/hotels/me', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          name: data.name.trim(),
+          stars: data.stars || 3,
+          location: data.location,
+          locationLabel: LOCATION_LABELS[data.location as Location],
+          address: data.address.trim(),
+          phone: data.phone.trim(),
+          email: data.email.trim(),
+          website: data.website.trim(),
+          description: data.description.trim(),
+          amenities: data.amenities,
+        }),
+      })
+      if (!res.ok) throw new Error(await res.text())
+      onComplete()
+    } catch (e) {
+      setError(`Couldn't save: ${(e as Error).message}`)
+      setSubmitting(false)
     }
-    const hotels = loadHotels()
-    hotels[hotelId] = hotel
-    saveHotels(hotels)
-    setTimeout(onComplete, 250)
   }
 
   return (

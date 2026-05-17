@@ -3,78 +3,95 @@
 import { useState, useEffect, useCallback } from 'react'
 import Header from '@/components/Header'
 import Toast, { ToastMessage } from '@/components/Toast'
-import { Concern, ConcernStatus, STAR_LABELS } from '@/lib/data'
-import { loadStore, saveStore, fmtDate, timeAgo, totalInventory, availableInventory, LS_SYNC_KEY } from '@/lib/storage'
+import {
+  Concern, ConcernStatus, Hotel, STAR_LABELS,
+  timeAgo, totalInventory, availableInventory,
+} from '@/lib/data'
+import { browserSupabase } from '@/lib/supabase'
 
 type Tab = 'overview' | 'hotels' | 'concerns'
 
 const STATUS_BADGE: Record<ConcernStatus, string> = {
-  'open': 'badge-error',
-  'in-progress': 'badge-tertiary',
-  'resolved': 'badge-success',
-  'closed': 'badge-neutral',
+  open: 'badge-error', 'in-progress': 'badge-tertiary',
+  resolved: 'badge-success', closed: 'badge-neutral',
 }
-
 const PRIORITY_BADGE: Record<'low' | 'medium' | 'high', string> = {
-  low: 'badge-neutral',
-  medium: 'badge-secondary',
-  high: 'badge-error',
+  low: 'badge-neutral', medium: 'badge-secondary', high: 'badge-error',
 }
 
 export default function AdminPortal() {
-  const [store, setStore] = useState<ReturnType<typeof loadStore> | null>(null)
+  const [hotels, setHotels] = useState<Hotel[]>([])
+  const [concerns, setConcerns] = useState<Concern[]>([])
   const [tab, setTab] = useState<Tab>('overview')
   const [toasts, setToasts] = useState<ToastMessage[]>([])
-  const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [replyId, setReplyId] = useState<string | null>(null)
   const [replyText, setReplyText] = useState('')
 
+  const refresh = useCallback(async () => {
+    try {
+      const [hRes, cRes] = await Promise.all([
+        fetch('/api/admin/hotels', { cache: 'no-store' }),
+        fetch('/api/concerns', { cache: 'no-store' }),
+      ])
+      if (hRes.ok) { const j = await hRes.json(); setHotels(j.hotels ?? []) }
+      if (cRes.ok) { const j = await cRes.json(); setConcerns(j.concerns ?? []) }
+    } finally { setLoading(false) }
+  }, [])
+
   useEffect(() => {
-    setStore(loadStore())
-    setMounted(true)
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === LS_SYNC_KEY) setStore(loadStore())
-    }
-    window.addEventListener('storage', onStorage)
-    return () => window.removeEventListener('storage', onStorage)
-  }, [])
+    refresh()
+    let sb: ReturnType<typeof browserSupabase> | null = null
+    try { sb = browserSupabase() } catch {}
+    if (!sb) return
+    const channel = sb.channel('admin-stream')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'hotels' }, refresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms'  }, refresh)
+      .subscribe()
+    return () => { sb!.removeChannel(channel) }
+  }, [refresh])
 
-  const addToast = useCallback((message: string, type: ToastMessage['type'] = 'info') => {
-    setToasts(prev => [...prev, { id: Date.now().toString() + Math.random(), message, type }])
-  }, [])
+  const addToast = useCallback((msg: string, type: ToastMessage['type'] = 'info') =>
+    setToasts(p => [...p, { id: Date.now().toString() + Math.random(), message: msg, type }]), [])
 
-  const mutate = (fn: (s: NonNullable<typeof store>) => void) => {
-    const s = loadStore()
-    fn(s)
-    saveStore(s)
-    setStore({ ...s })
-  }
-
-  const approveHotel = (id: string) => { mutate(s => { s.hotels[id].approved = true; s.hotels[id].updatedAt = Date.now() }); addToast('Hotel approved · Live on public board', 'success') }
-  const suspendHotel = (id: string) => { mutate(s => { s.hotels[id].approved = false; s.hotels[id].updatedAt = Date.now() }); addToast('Hotel suspended', 'info') }
-  const deleteHotel = (id: string) => {
-    if (!confirm('Permanently delete this hotel?')) return
-    mutate(s => { delete s.hotels[id] })
-    addToast('Hotel deleted', 'info')
-  }
-
-  const updateConcernStatus = (id: string, status: ConcernStatus) => {
-    mutate(s => { s.concerns[id].status = status; s.concerns[id].updatedAt = Date.now() })
-    addToast('Status updated', 'success')
-  }
-  const submitReply = (id: string) => {
-    if (!replyText.trim()) return
-    mutate(s => {
-      s.concerns[id].adminResponse = replyText.trim()
-      s.concerns[id].adminResponseAt = Date.now()
-      s.concerns[id].status = 'in-progress'
-      s.concerns[id].updatedAt = Date.now()
+  const patchHotel = async (id: string, body: object, success: string) => {
+    const res = await fetch(`/api/admin/hotels/${id}`, {
+      method: 'PATCH', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
     })
-    setReplyId(null); setReplyText('')
-    addToast('Response sent', 'success')
+    if (!res.ok) { addToast(await res.text(), 'error'); return }
+    addToast(success, 'success'); refresh()
   }
 
-  if (!mounted || !store) {
+  const approveHotel = (id: string) => patchHotel(id, { approved: true }, 'Hotel approved · Now live')
+  const suspendHotel = (id: string) => patchHotel(id, { approved: false }, 'Hotel suspended')
+
+  const deleteHotel = async (id: string) => {
+    if (!confirm('Permanently delete this hotel?')) return
+    const res = await fetch(`/api/admin/hotels/${id}`, { method: 'DELETE' })
+    if (!res.ok) { addToast(await res.text(), 'error'); return }
+    addToast('Hotel deleted', 'info'); refresh()
+  }
+
+  const patchConcern = async (id: string, body: object, success: string) => {
+    const res = await fetch(`/api/concerns/${id}`, {
+      method: 'PATCH', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    if (!res.ok) { addToast(await res.text(), 'error'); return }
+    addToast(success, 'success'); refresh()
+  }
+
+  const updateConcernStatus = (id: string, status: ConcernStatus) =>
+    patchConcern(id, { status }, 'Status updated')
+
+  const submitReply = async (id: string) => {
+    if (!replyText.trim()) return
+    await patchConcern(id, { adminResponse: replyText.trim() }, 'Response sent')
+    setReplyId(null); setReplyText('')
+  }
+
+  if (loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading admin…</div>
@@ -82,8 +99,6 @@ export default function AdminPortal() {
     )
   }
 
-  const hotels = Object.values(store.hotels)
-  const concerns = Object.values(store.concerns).sort((a, b) => b.updatedAt - a.updatedAt)
   const approved = hotels.filter(h => h.approved)
   const pending = hotels.filter(h => !h.approved)
   const openConcerns = concerns.filter(c => c.status === 'open' || c.status === 'in-progress')
@@ -110,25 +125,18 @@ export default function AdminPortal() {
           </div>
         </div>
 
-        {/* Tabs */}
         <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid #edeeef', flexWrap: 'wrap' }}>
           {TABS.map(t => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              style={{
-                padding: '12px 18px', border: 'none', background: 'transparent',
-                fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700,
-                color: tab === t.key ? '#00361a' : '#717971', cursor: 'pointer',
-                borderBottom: tab === t.key ? '3px solid #00361a' : '3px solid transparent',
-                marginBottom: -1, display: 'inline-flex', alignItems: 'center', gap: 8,
-              }}
-            >
+            <button key={t.key} onClick={() => setTab(t.key)} style={{
+              padding: '12px 18px', border: 'none', background: 'transparent',
+              fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700,
+              color: tab === t.key ? '#00361a' : '#717971', cursor: 'pointer',
+              borderBottom: tab === t.key ? '3px solid #00361a' : '3px solid transparent',
+              marginBottom: -1, display: 'inline-flex', alignItems: 'center', gap: 8,
+            }}>
               <i className={`fi ${t.icon}`} style={{ fontSize: 13 }} />
               {t.label}
-              {t.badge ? (
-                <span className="badge badge-error" style={{ padding: '2px 8px', fontSize: 9 }}>{t.badge}</span>
-              ) : null}
+              {t.badge ? <span className="badge badge-error" style={{ padding: '2px 8px', fontSize: 9 }}>{t.badge}</span> : null}
             </button>
           ))}
         </div>
@@ -161,11 +169,7 @@ export default function AdminPortal() {
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
                   {['Hotel', 'Location', 'Star', 'Inventory', 'Status', 'Created', 'Actions'].map(h => (
-                    <th key={h} style={{
-                      padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
-                      textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)',
-                      textAlign: 'left', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
-                    }}>{h}</th>
+                    <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -201,12 +205,7 @@ export default function AdminPortal() {
                             <i className="fi fi-rr-check" style={{ fontSize: 11 }} /> Approve
                           </button>
                         )}
-                        <button onClick={() => deleteHotel(h.id)}
-                          style={{ width: 32, height: 32, borderRadius: 9999, border: 'none', background: 'transparent', color: '#717971', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ffdad6'; (e.currentTarget as HTMLElement).style.color = '#93000a' }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#717971' }}
-                          aria-label="Delete"
-                        >
+                        <button onClick={() => deleteHotel(h.id)} style={{ width: 34, height: 34, borderRadius: 9999, border: 'none', background: '#ffdad6', color: '#93000a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Delete">
                           <i className="fi fi-rr-trash" style={{ fontSize: 13 }} />
                         </button>
                       </div>
@@ -231,98 +230,57 @@ export default function AdminPortal() {
               </div>
             )}
             {concerns.map(c => (
-              <ConcernCard
-                key={c.id}
-                c={c}
-                replying={replyId === c.id}
-                replyText={replyText}
-                setReplyText={setReplyText}
-                onStartReply={() => { setReplyId(c.id); setReplyText('') }}
-                onCancelReply={() => { setReplyId(null); setReplyText('') }}
-                onSubmitReply={() => submitReply(c.id)}
-                onUpdateStatus={s => updateConcernStatus(c.id, s)}
-              />
+              <div key={c.id} className="card-elevated" style={{ padding: 24 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 14, flexWrap: 'wrap', marginBottom: 14 }}>
+                  <div style={{ flex: 1, minWidth: 240 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+                      <span className={`badge ${STATUS_BADGE[c.status]}`}>{c.status.replace('-', ' ')}</span>
+                      <span className={`badge ${PRIORITY_BADGE[c.priority]}`}>{c.priority} priority</span>
+                      <span className="badge badge-neutral">{c.category}</span>
+                    </div>
+                    <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 17, fontWeight: 700, color: '#00361a', margin: 0 }}>{c.subject}</h3>
+                    <div style={{ fontSize: 12, color: '#717971', marginTop: 4, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                      <strong style={{ color: '#414942' }}>{c.hotelName}</strong> · {c.agentName} ({c.agentCompany}) · {timeAgo(c.createdAt)}
+                    </div>
+                  </div>
+                  <select value={c.status} onChange={e => updateConcernStatus(c.id, e.target.value as ConcernStatus)} className="input-field" style={{ padding: '8px 12px', fontSize: 12, width: 'auto' }}>
+                    <option value="open">Open</option>
+                    <option value="in-progress">In progress</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </div>
+
+                <p style={{ fontSize: 14, color: '#414942', fontFamily: 'Inter, sans-serif', lineHeight: 1.6, margin: '0 0 16px' }}>{c.description}</p>
+
+                {c.adminResponse && (
+                  <div className="card-section" style={{ padding: 14, marginBottom: 14 }}>
+                    <div className="t-overline" style={{ marginBottom: 6 }}>Admin response · {timeAgo(c.adminResponseAt)}</div>
+                    <div style={{ fontSize: 13, color: '#191c1d', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>{c.adminResponse}</div>
+                  </div>
+                )}
+
+                {replyId === c.id ? (
+                  <div>
+                    <textarea value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Write a response to the travel agent…" className="input-field" rows={3} style={{ padding: '11px 14px', fontSize: 13, resize: 'vertical', marginBottom: 10 }} />
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => submitReply(c.id)} className="btn-primary" style={{ padding: '9px 18px', fontSize: 12 }}>
+                        <i className="fi fi-rr-paper-plane" style={{ fontSize: 12 }} /> Send Response
+                      </button>
+                      <button onClick={() => { setReplyId(null); setReplyText('') }} className="btn-secondary" style={{ padding: '9px 16px', fontSize: 12 }}>Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button onClick={() => { setReplyId(c.id); setReplyText('') }} className="btn-secondary" style={{ padding: '9px 18px', fontSize: 12 }}>
+                    <i className="fi fi-rr-comment-alt" style={{ fontSize: 12 }} /> {c.adminResponse ? 'Update Response' : 'Respond'}
+                  </button>
+                )}
+              </div>
             ))}
           </div>
         )}
       </main>
       <Toast toasts={toasts} onRemove={id => setToasts(p => p.filter(t => t.id !== id))} />
     </>
-  )
-}
-
-function ConcernCard({
-  c, replying, replyText, setReplyText, onStartReply, onCancelReply, onSubmitReply, onUpdateStatus,
-}: {
-  c: Concern
-  replying: boolean
-  replyText: string
-  setReplyText: (v: string) => void
-  onStartReply: () => void
-  onCancelReply: () => void
-  onSubmitReply: () => void
-  onUpdateStatus: (s: ConcernStatus) => void
-}) {
-  return (
-    <div className="card-elevated" style={{ padding: 24 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 14, flexWrap: 'wrap', marginBottom: 14 }}>
-        <div style={{ flex: 1, minWidth: 240 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-            <span className={`badge ${STATUS_BADGE[c.status]}`}>{c.status.replace('-', ' ')}</span>
-            <span className={`badge ${PRIORITY_BADGE[c.priority]}`}>{c.priority} priority</span>
-            <span className="badge badge-neutral">{c.category}</span>
-          </div>
-          <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 17, fontWeight: 700, color: '#00361a', margin: 0, letterSpacing: '-0.01em' }}>
-            {c.subject}
-          </h3>
-          <div style={{ fontSize: 12, color: '#717971', marginTop: 4, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
-            <strong style={{ color: '#414942' }}>{c.hotelName}</strong> · raised by {c.agentName} ({c.agentCompany}) · {timeAgo(c.createdAt)}
-          </div>
-        </div>
-        <select
-          value={c.status}
-          onChange={e => onUpdateStatus(e.target.value as ConcernStatus)}
-          className="input-field"
-          style={{ padding: '8px 12px', fontSize: 12, width: 'auto' }}
-        >
-          <option value="open">Open</option>
-          <option value="in-progress">In progress</option>
-          <option value="resolved">Resolved</option>
-          <option value="closed">Closed</option>
-        </select>
-      </div>
-
-      <p style={{ fontSize: 14, color: '#414942', fontFamily: 'Inter, sans-serif', lineHeight: 1.6, margin: '0 0 16px' }}>{c.description}</p>
-
-      {c.adminResponse && (
-        <div className="card-section" style={{ padding: 14, marginBottom: 14 }}>
-          <div className="t-overline" style={{ marginBottom: 6 }}>Admin response · {timeAgo(c.adminResponseAt)}</div>
-          <div style={{ fontSize: 13, color: '#191c1d', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>{c.adminResponse}</div>
-        </div>
-      )}
-
-      {replying ? (
-        <div>
-          <textarea
-            value={replyText}
-            onChange={e => setReplyText(e.target.value)}
-            placeholder="Write a response to the travel agent…"
-            className="input-field"
-            rows={3}
-            style={{ padding: '11px 14px', fontSize: 13, resize: 'vertical', marginBottom: 10 }}
-          />
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={onSubmitReply} className="btn-primary" style={{ padding: '9px 18px', fontSize: 12 }}>
-              <i className="fi fi-rr-paper-plane" style={{ fontSize: 12 }} /> Send Response
-            </button>
-            <button onClick={onCancelReply} className="btn-secondary" style={{ padding: '9px 16px', fontSize: 12 }}>Cancel</button>
-          </div>
-        </div>
-      ) : (
-        <button onClick={onStartReply} className="btn-secondary" style={{ padding: '9px 18px', fontSize: 12 }}>
-          <i className="fi fi-rr-comment-alt" style={{ fontSize: 12 }} /> {c.adminResponse ? 'Update Response' : 'Respond'}
-        </button>
-      )}
-    </div>
   )
 }

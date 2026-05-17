@@ -9,77 +9,95 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run start` — run the built app
 - `npm run lint` — `next lint`
 
-No test runner is configured. There is no separate typecheck script — use `next build` or `npx tsc --noEmit`.
+No test runner. No separate typecheck — use `next build` or `npx tsc --noEmit`.
 
 ## Architecture
 
-**Next.js 14 App Router · TypeScript · Tailwind**. Auth is Clerk with three roles: `admin`, `vendor`, `customer`. Hotel + concern data lives entirely in browser `localStorage` (no database).
+**Next.js 14 App Router · TypeScript · Tailwind · Supabase · Clerk.** Hotel/room/concern data lives in a Supabase Postgres database. All client pages fetch via `/api/*` and subscribe to real-time `postgres_changes` channels for live updates. There are **no seeds** and **no localStorage** — the app starts empty and fills as real users sign up.
 
-### Auth / role routing (the only place this lives)
+### Roles (Clerk recipe — do not over-engineer)
 
-The role architecture follows Clerk's standard recipe exactly. **Do not reintroduce `currentUser()` or `clerkClient` mutations anywhere except `app/signup/complete/page.tsx`.**
-
-1. **Roles live in `publicMetadata.role`** on each Clerk user. Admin sets these manually in Clerk Dashboard → User → Metadata → Public.
-2. **Clerk session token MUST expose `publicMetadata`.** In Clerk Dashboard → Configure → Sessions → Customize session token, add:
+1. Roles live in `publicMetadata.role` on each Clerk user.
+2. Clerk session token MUST expose `publicMetadata`. In Clerk Dashboard → Configure → Sessions → Customize session token:
    ```json
    { "metadata": "{{user.public_metadata}}" }
    ```
-   Without this, `sessionClaims.metadata` is undefined and every authed user falls through to the default route.
-3. **[middleware.ts](middleware.ts)** is the single redirect router. On `/dashboard` it reads `sessionClaims.metadata.role` and forwards to `/admin`, `/vendor`, or `/customer`. **The default fallback (missing role) is `/vendor`** — because new sign-ups happen via `/signup` (hotel onboarding), and we default-route them to the hotel portal.
-4. **Each portal page** ([app/admin/page.tsx](app/admin/page.tsx), [app/vendor/page.tsx](app/vendor/page.tsx), [app/customer/page.tsx](app/customer/page.tsx)) is a server component that re-reads `sessionClaims.metadata.role` and redirects back to `/dashboard` if the role doesn't match. The vendor portal additionally lets users with **no role yet** through, so freshly-signed-up hotels see their portal immediately.
-5. The UI for each portal is a sibling client component: `AdminPortal.tsx`, `VendorPortal.tsx`, `CustomerPortal.tsx`.
+3. [middleware.ts](middleware.ts) reads `sessionClaims.metadata.role` and redirects `/dashboard` → `/admin` | `/vendor` | `/customer`. Default fallback is `/vendor` (new sign-ups go there).
+4. Each portal page double-checks `sessionClaims.metadata.role` server-side and bounces back to `/dashboard` if wrong.
+5. Sign-up flow: `/signup` → Clerk `<SignUp />` with `forceRedirectUrl=/signup/complete` → server route writes `publicMetadata.role = 'vendor'` via `clerkClient` (the **only** server-side metadata write in the app).
 
-### Sign-up flow
+### Database (Supabase)
 
-- `/signup` ([app/signup/[[...sign-up]]/page.tsx](app/signup/%5B%5B...sign-up%5D%5D/page.tsx)) hosts Clerk's `<SignUp />` for hotel registration. Clerk's `forceRedirectUrl` points at `/signup/complete`.
-- `/signup/complete` ([app/signup/complete/page.tsx](app/signup/complete/page.tsx)) is a tiny server component that calls `clerkClient().users.updateUserMetadata` to set `publicMetadata.role = 'vendor'`, then `redirect('/dashboard')`. This is the **only** server-side metadata write in the app.
-- `/login` ([app/login/[[...sign-in]]/page.tsx](app/login/%5B%5B...sign-in%5D%5D/page.tsx)) hosts Clerk's `<SignIn />`. After sign-in, Clerk redirects to `/dashboard`; middleware routes by role.
-
-### Header
-
-[components/Header.tsx](components/Header.tsx) reads `useUser().publicMetadata.role` on the client. Signed-out users see **Register Hotel** (→ `/signup`) + **Hotel Login** (→ `/login`). Signed-in users see a portal link picked by role, plus **Sign Out**.
-
-### Data flow
-
-- [lib/data.ts](lib/data.ts) — types (`Hotel`, `Room`, `Concern`, `AppStore`), `SEED_HOTELS`, `SEED_CONCERNS`, and the storage keys (`STORE_KEY = 'krp_v7_store'`, `LS_SYNC_KEY`). Hotel records include `approved: boolean`; only approved hotels appear on the public board. Room rates are stored as `double`, `cnb` (Child No Bed), `extraBed`. There are no `single` or `triple` fields.
-- [lib/storage.ts](lib/storage.ts) — wraps localStorage. `loadStore()` returns `AppStore { hotels, concerns, version }` and **merges new seed hotels** into existing data on every load (so adding to the seed doesn't wipe vendor edits). `saveStore` bumps `LS_SYNC_KEY` to trigger the cross-tab `storage` event.
-- All pages listen for `window.addEventListener('storage', …)` and reload when `LS_SYNC_KEY` changes — vendor edits go live on the public board and across other tabs instantly.
-- **No rating system anywhere.** No `HotelRating` type, no review moderation. The only "stars" surface is the hotel's intrinsic category (e.g. `5 Star Deluxe`) rendered as a text badge.
+- Schema lives in [supabase/schema.sql](supabase/schema.sql). Run it once in Supabase Dashboard → SQL Editor.
+- Three tables: `hotels`, `rooms`, `concerns`.
+- **Row Level Security**: public can `SELECT` only approved hotels and their rooms. All writes (and reads of unapproved data) go through Next.js API routes that use the **service-role key** server-side, after Clerk auth checks.
+- Real-time: `hotels` and `rooms` are added to the `supabase_realtime` publication so client subscriptions fire on every insert/update/delete.
 
 ### Vendor ↔ hotel mapping
 
-A vendor user is linked to a specific hotel record by `publicMetadata.hotelId` on the Clerk user (string key matching a `SEED_HOTELS` entry, case-insensitive). [VendorPortal.tsx](app/vendor/VendorPortal.tsx) reads `user.publicMetadata.hotelId` and edits that hotel. If `hotelId` is unset or unknown, the portal shows a friendly "Hotel not linked" notice instead of crashing — admin must set the mapping in Clerk Dashboard.
+Hotel id is derived from the Clerk user id: **`vendor_<lowercased-userId>`**. No admin metadata step. Each vendor owns exactly one hotel; the row id equals their derived hotel id. API routes enforce this — `/api/hotels/me/*` always operates on the caller's derived hotel id.
+
+### API routes (`/app/api/...`)
+
+| Route | Method | Auth | Purpose |
+|---|---|---|---|
+| `/api/hotels` | GET | public | Approved hotels + rooms for the public board |
+| `/api/hotels/me` | GET, POST | vendor | Fetch / upsert vendor's own hotel (used by onboarding + Profile tab) |
+| `/api/hotels/me/rooms` | POST | vendor | Add a room |
+| `/api/hotels/me/rooms/[roomId]` | PUT, DELETE | vendor | Update / delete a room |
+| `/api/admin/hotels` | GET | admin | All hotels (incl. pending) |
+| `/api/admin/hotels/[id]` | PATCH, DELETE | admin | Approve/suspend, delete |
+| `/api/concerns` | GET, POST | admin / customer | List (filtered by role) / raise |
+| `/api/concerns/[id]` | PATCH | admin | Update status, send response |
+
+### Client data layer
+
+- [lib/supabase.ts](lib/supabase.ts) — `browserSupabase()` (anon key, for real-time subscriptions) and `serverSupabase()` (service role; **never import server-side from client code**).
+- [lib/data.ts](lib/data.ts) — types, constants, snake_case ↔ camelCase mappers (`rowToHotel`, `rowToRoom`, `rowToConcern`), and pure formatters (`fmtINR`, `fmtDate`, `timeAgo`, `bestStatus`, etc.). No business logic, no I/O.
+
+Pages **never** call Supabase directly for writes — they always go through `/api/*`. They DO call `browserSupabase()` to subscribe to `postgres_changes` channels for real-time refresh.
+
+### Onboarding flow
+
+[app/vendor/OnboardingFlow.tsx](app/vendor/OnboardingFlow.tsx) is a 9-step typeform-style wizard that runs when a vendor has no hotel record yet. On submit it POSTs to `/api/hotels/me`, which creates the hotel row with `approved=false`. Admin must approve before the listing appears on the public board.
 
 ### Design system
 
-Visual reference is the **Via Kashmir "Alpine Editorial" theme** (HTML at `/Users/aribanigar/Downloads/via-kashmir-theme-factory.html`, not in this repo). Rules:
+Visual reference: Via Kashmir "Alpine Editorial" theme (HTML at `/Users/aribanigar/Downloads/via-kashmir-theme-factory.html`, not in this repo).
 
-- Fonts: **Manrope** (display) + **Inter** (body), loaded via Google Fonts `@import` in [app/globals.css](app/globals.css), not `next/font`.
-- Icons: **Flaticon UIcons** via CDN (`fi fi-rr-*` regular, `fi fi-rs-*` solid). No emojis. `lucide-react` is in `package.json` but prefer Flaticon classes for new code.
-- Color tokens are CSS variables (`--vk-primary`, surface hierarchy, etc.) defined in `globals.css` and mirrored in [tailwind.config.ts](tailwind.config.ts).
-- Component primitives are CSS classes, not React components: `.btn-primary` (gradient CTA), `.btn-secondary`, `.btn-tertiary` (saffron — urgency only), `.btn-danger`, `.btn-ghost`, `.card-elevated`, `.input-field`, `.badge-*`, `.glass-nav`.
+- **Manrope** display, **Inter** body — loaded via Google Fonts `@import` in [app/globals.css](app/globals.css), not `next/font`.
+- **Flaticon UIcons** via CDN (`fi fi-rr-*` regular, `fi fi-rs-*` solid). No emojis.
+- Color tokens are CSS variables in `globals.css`, mirrored in [tailwind.config.ts](tailwind.config.ts).
+- Class-based primitives: `.btn-primary` (gradient CTA), `.btn-secondary`, `.btn-tertiary`, `.btn-danger`, `.btn-ghost`, `.card-elevated`, `.input-field`, `.badge-*`.
 - **No 1px sectioning borders** — separate regions with surface-color shifts.
-- Responsive layout is driven by classes in `globals.css` (`.app-shell`, `.hero-section`, `.stat-grid`, `.form-grid`, `.filter-row`, `.hotel-grid`, `.table-scroll`, `.dash-header`, `.login-shell`) with breakpoints at 900/600/380px. Inline `style={}` props can **not** be overridden by media queries — for responsive behaviour, route through a class.
+- Responsive via classes (`.app-shell`, `.hero-section`, `.stat-grid`, `.form-grid`, `.filter-row`, `.hotel-grid`, `.table-scroll`) with breakpoints at 900/600/380px.
+- Brand mark: `public/logo.svg` (rendered by `<ViaKashmirLogo />`). Favicon: `app/icon.svg`.
+
+### Env vars
+
+Set in `.env.local` and Vercel Project Settings:
+
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+CLERK_SECRET_KEY
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/signup
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/dashboard
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/signup/complete
+
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+```
+
+Live Clerk keys (`pk_live_*`) require DNS records for the Clerk subdomains under your production domain — otherwise sign-in cookies cannot be set and users loop back to `/login`. See Clerk Dashboard → Domains.
+
+### Deployment
+
+GitHub repo: `https://github.com/viakashmir/b2bviakashmir`. Vercel project: `b2bviakashmir-tq4j` under the `viakashmir` account, Hobby plan. Custom domain: `b2b.viakashmiritinerary.in`.
+
+Commits must be authored as `viakashmir <243838831+viakashmir@users.noreply.github.com>` or Vercel blocks the build ("commit author did not have contributing access").
 
 ### Path alias
 
 `@/*` maps to the repo root (see [tsconfig.json](tsconfig.json)).
-
-### Deployment
-
-- Target repo: `https://github.com/viakashmir/b2bviakashmir` deployed via Vercel under the `viakashmir` account, Hobby plan.
-- Hobby blocks external collaborators, so commits **must** be authored as `viakashmir <243838831+viakashmir@users.noreply.github.com>`. Set `GIT_AUTHOR_NAME` / `GIT_AUTHOR_EMAIL` or amend before pushing, otherwise Vercel blocks the build with "commit author did not have contributing access".
-- Custom domain `b2b.viakashmiritinerary.in` is attached to the `b2bviakashmir-tq4j` Vercel project.
-
-### Env vars
-
-In `.env.local` and Vercel project Settings → Environment Variables (see `.env.local.example`):
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`
-- `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login`
-- `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/signup`
-- `NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/dashboard`
-- `NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/signup/complete`
-
-### Production Clerk DNS
-
-Live Clerk keys (`pk_live_*`) require DNS records (CNAMEs) for the Clerk subdomains under `b2b.viakashmiritinerary.in` — without them, sign-in cookies cannot be set and users loop back to `/login`. Find the exact records in Clerk Dashboard → Domains. Until DNS verifies, swap in dev keys (`pk_test_*`) to unblock local + preview testing.
