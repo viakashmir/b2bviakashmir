@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@clerk/nextjs'
 import {
   Trash2, Save, Plus, Eye, Clock, BedDouble, TrendingUp,
-  Coins, Building2, Contact, CheckCircle2, X as XIcon,
+  Coins, Building2, Contact, CheckCircle2, X as XIcon, Calendar,
 } from 'lucide-react'
+import BrandedDatePicker from '@/components/BrandedDatePicker'
 import Toast, { ToastMessage } from '@/components/Toast'
 import OnboardingFlow from './OnboardingFlow'
 import {
@@ -101,9 +102,12 @@ export default function VendorPortal() {
       body: JSON.stringify({
         name: profileDraft.name, stars: profileDraft.stars,
         location: profileDraft.location, locationLabel: profileDraft.locationLabel,
+        propertyType: profileDraft.propertyType,
         address: profileDraft.address, phone: profileDraft.phone, email: profileDraft.email,
         website: profileDraft.website, description: profileDraft.description,
         amenities: profileDraft.amenities,
+        tariffStart: profileDraft.tariffStart || null,
+        tariffEnd:   profileDraft.tariffEnd   || null,
       }),
     })
     if (!res.ok) { addToast(await res.text(), 'error'); return }
@@ -233,6 +237,28 @@ export default function VendorPortal() {
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 <BedDouble size={12} strokeWidth={2.2} /> {hotel.rooms.length} room type{hotel.rooms.length === 1 ? '' : 's'} · {totalInv} rooms total
               </span>
+              {hotel.tariffStart && hotel.tariffEnd ? (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  background: 'rgba(255,220,196,0.18)', color: '#ffdcc4',
+                  padding: '2px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
+                }}>
+                  <Calendar size={11} strokeWidth={2.4} />
+                  Tariff {hotel.tariffStart.slice(5)} → {hotel.tariffEnd.slice(5)}
+                </span>
+              ) : (
+                <button
+                  onClick={() => { setTab('profile'); setTimeout(() => document.getElementById('tariff-block')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80) }}
+                  style={{
+                    background: 'rgba(255,220,196,0.18)', color: '#ffdcc4', border: 'none', cursor: 'pointer',
+                    padding: '2px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
+                    fontFamily: 'Inter, sans-serif', display: 'inline-flex', alignItems: 'center', gap: 4,
+                  }}
+                >
+                  <Calendar size={11} strokeWidth={2.4} />
+                  Set tariff period →
+                </button>
+              )}
             </p>
           </div>
 
@@ -512,6 +538,33 @@ export default function VendorPortal() {
                   )}
                 </div>
               ))}
+            </div>
+
+            {/* Tariff window */}
+            <div id="tariff-block" style={{ scrollMarginTop: 80, marginTop: 28, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(255,220,196,0.32), rgba(184,240,197,0.28))', border: '1px solid rgba(240,159,94,0.25)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <Calendar size={14} strokeWidth={2.5} color="#6f3800" />
+                <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6f3800', fontFamily: 'Inter, sans-serif' }}>Tariff valid period</label>
+              </div>
+              <p style={{ fontSize: 12.5, color: '#414942', margin: '0 0 14px', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>
+                The window these rates apply for. Shown on the public card as <strong>Tariff Mar 26 → Jun 26</strong>. Update each season.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <BrandedDatePicker
+                  label="Valid from"
+                  value={profileDraft.tariffStart || ''}
+                  max={profileDraft.tariffEnd || undefined}
+                  onChange={v => setProfileDraft({ ...profileDraft, tariffStart: v })}
+                  placeholder="Pick start date"
+                />
+                <BrandedDatePicker
+                  label="Valid till"
+                  value={profileDraft.tariffEnd || ''}
+                  min={profileDraft.tariffStart || undefined}
+                  onChange={v => setProfileDraft({ ...profileDraft, tariffEnd: v })}
+                  placeholder="Pick end date"
+                />
+              </div>
             </div>
 
             <div style={{ marginTop: 28 }}>
