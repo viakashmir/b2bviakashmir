@@ -487,7 +487,7 @@ export default function VendorPortal() {
                   <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>{f.label}</label>
                   {f.multi ? (
                     <textarea
-                      value={(hotel as Record<string, unknown>)[f.key] as string || ''}
+                      value={((hotel as unknown) as Record<string, unknown>)[f.key] as string || ''}
                       onChange={e => updateProfile({ [f.key]: e.target.value } as Partial<Hotel>)}
                       className="input-field"
                       rows={3}
@@ -496,7 +496,7 @@ export default function VendorPortal() {
                   ) : (
                     <input
                       type="text"
-                      value={(hotel as Record<string, unknown>)[f.key] as string || ''}
+                      value={((hotel as unknown) as Record<string, unknown>)[f.key] as string || ''}
                       onChange={e => updateProfile({ [f.key]: e.target.value } as Partial<Hotel>)}
                       className="input-field"
                       style={{ padding: '11px 14px', fontSize: 13 }}
