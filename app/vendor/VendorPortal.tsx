@@ -4,8 +4,14 @@ import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@clerk/nextjs'
 import Header from '@/components/Header'
 import Toast, { ToastMessage } from '@/components/Toast'
+import OnboardingFlow from './OnboardingFlow'
 import { Hotel, Room, MealPlan, RoomCategory, MEAL_LABELS, ROOM_CATEGORIES, STAR_LABELS, AMENITIES_LIST } from '@/lib/data'
 import { loadHotels, saveHotels, fmtDate, timeAgo, fmtINR, availableInventory, totalInventory, LS_SYNC_KEY } from '@/lib/storage'
+
+/** Hotel id is derived from the Clerk user id — no admin action needed. */
+function deriveHotelId(userId: string): string {
+  return `vendor_${userId.toLowerCase()}`
+}
 
 export default function VendorPortal() {
   const { user, isLoaded } = useUser()
@@ -14,8 +20,8 @@ export default function VendorPortal() {
   const [toasts, setToasts] = useState<ToastMessage[]>([])
   const [savedRows, setSavedRows] = useState<Set<number>>(new Set())
   const [mounted, setMounted] = useState(false)
-  const [missing, setMissing] = useState<string | null>(null)
   const [tab, setTab] = useState<'rooms' | 'profile'>('rooms')
+  const [onboardingTick, setOnboardingTick] = useState(0)
 
   const [newRoom, setNewRoom] = useState({
     type: '', category: 'Deluxe' as RoomCategory, meal: 'CP' as MealPlan,
@@ -27,33 +33,22 @@ export default function VendorPortal() {
 
   useEffect(() => {
     if (!isLoaded || !user) return
-    const hotelId = (user.publicMetadata?.hotelId as string | undefined)?.toLowerCase()
+    const hotelId = deriveHotelId(user.id)
     const h = loadHotels()
     setHotels(h)
     setMounted(true)
-
-    if (!hotelId) {
-      setMissing('No hotel is linked to your account. Ask an admin to set publicMetadata.hotelId in Clerk.')
-      return
-    }
-    const current = h[hotelId]
-    if (!current) {
-      setMissing(`Linked hotel "${hotelId}" was not found in the rate portal.`)
-      return
-    }
-    setHotel(current)
+    setHotel(h[hotelId] ?? null)
 
     const onStorage = (e: StorageEvent) => {
       if (e.key === LS_SYNC_KEY) {
         const updated = loadHotels()
         setHotels(updated)
-        const u = updated[hotelId]
-        if (u) setHotel(u)
+        setHotel(updated[hotelId] ?? null)
       }
     }
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
-  }, [isLoaded, user])
+  }, [isLoaded, user, onboardingTick])
 
   const addToast = useCallback((message: string, type: ToastMessage['type'] = 'info') => {
     setToasts(prev => [...prev, { id: Date.now().toString() + Math.random(), message, type }])
@@ -148,30 +143,29 @@ export default function VendorPortal() {
 
   const statusClass = (s: string) => s === 'Available' ? 'avail' : s === 'Limited' ? 'limited' : 'sold'
 
-  if (missing) {
+  if (!mounted || !isLoaded || !user) {
     return (
-      <>
-        <Header />
-        <main className="login-shell">
-          <div className="card-elevated" style={{ padding: 40, maxWidth: 520, textAlign: 'center' }}>
-            <i className="fi fi-rr-exclamation" style={{ fontSize: 36, color: '#ba1a1a', display: 'block', marginBottom: 16 }} />
-            <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', margin: '0 0 12px' }}>
-              Hotel not linked
-            </h2>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#414942', lineHeight: 1.6, margin: 0 }}>
-              {missing}
-            </p>
-          </div>
-        </main>
-      </>
+      <div style={{ minHeight: '100vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading…</div>
+      </div>
     )
   }
 
-  if (!mounted || !hotel) {
+  // First-time vendor — no hotel record yet → run the onboarding flow.
+  if (!hotel) {
+    const hotelId = deriveHotelId(user.id)
+    const defaultName = user.firstName || user.username || ''
+    const defaultEmail = user.primaryEmailAddress?.emailAddress || ''
     return (
-      <div style={{ minHeight: '100vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading hotel…</div>
-      </div>
+      <>
+        <Header />
+        <OnboardingFlow
+          hotelId={hotelId}
+          defaultName={defaultName}
+          defaultEmail={defaultEmail}
+          onComplete={() => setOnboardingTick(t => t + 1)}
+        />
+      </>
     )
   }
 
