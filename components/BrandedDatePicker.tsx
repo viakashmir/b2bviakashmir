@@ -35,10 +35,23 @@ function fmtFullLabel(s: string): string {
 
 export default function BrandedDatePicker({ value, onChange, min, max, placeholder = 'Select a date', label }: Props) {
   const [open, setOpen] = useState(false)
+  const [openUp, setOpenUp] = useState(false)
   const initial = parseYmd(value) || parseYmd(min || '') || new Date()
   const [viewYear,  setViewYear]  = useState(initial.getFullYear())
   const [viewMonth, setViewMonth] = useState(initial.getMonth()) // 0..11
   const rootRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  // Decide whether to open upward or downward based on available viewport space
+  useEffect(() => {
+    if (!open) return
+    const el = triggerRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const POPOVER_HEIGHT = 420 // generous estimate; safer than under-estimating
+    const spaceBelow = window.innerHeight - rect.bottom
+    setOpenUp(spaceBelow < POPOVER_HEIGHT && rect.top > POPOVER_HEIGHT)
+  }, [open])
 
   // Keep the calendar view aligned with the picked value when opening
   useEffect(() => {
@@ -98,6 +111,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
       )}
       {/* Trigger */}
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(o => !o)}
         style={{
@@ -137,8 +151,11 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
           role="dialog"
           aria-label="Pick a date"
           style={{
-            position: 'absolute', zIndex: 100,
-            top: 'calc(100% + 8px)', left: 0,
+            position: 'absolute', zIndex: 350,
+            ...(openUp
+              ? { bottom: 'calc(100% + 8px)' }
+              : { top: 'calc(100% + 8px)' }),
+            left: 0,
             width: 320, maxWidth: '92vw',
             background: '#ffffff',
             borderRadius: 16,

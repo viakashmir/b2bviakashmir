@@ -65,7 +65,6 @@ const ALL_STEPS = [
   { key: 'location'     },
   { key: 'propertyType', srinagarOnly: true },
   { key: 'stars'        },
-  { key: 'address'      },
   { key: 'contact'      },
   { key: 'rates'        }, // tariff window + at least 1 room with at least 1 meal-plan rate
   { key: 'review'       },
@@ -103,6 +102,18 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
     }
   }, [data.location, data.propertyType])
 
+  // Auto-seed the first room when entering the rates step so vendors see the
+  // form immediately instead of an empty state.
+  useEffect(() => {
+    if (step.key !== 'rates') return
+    if (data.rooms.length > 0) return
+    setData(d => ({
+      ...d,
+      rooms: [blankRoom((d.propertyType || 'hotel') as PropertyType)],
+    }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step.key])
+
   useEffect(() => {
     const valid = new Set(amenitiesFor(data.propertyType === 'houseboat' ? 'houseboat' : 'hotel'))
     setData(d => ({ ...d, amenities: d.amenities.filter(a => valid.has(a)) }))
@@ -120,7 +131,6 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
       case 'location':     return !data.location ? 'Pick a location.' : null
       case 'propertyType': return !data.propertyType ? 'Pick whether this is a hotel or a houseboat.' : null
       case 'stars':        return !data.stars ? 'Select your star category.' : null
-      case 'address':      return data.address.trim().length < 6 ? 'Please enter a full address.' : null
       case 'contact':      {
         const digits = data.phone.replace(/\D/g, '')
         return digits.length < 10 || digits.length > 15 ? 'Phone must be 10–15 digits.' : null
@@ -344,18 +354,6 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
             </Prompt>
           )}
 
-          {step.key === 'address' && (
-            <Prompt title="What's the full address?" subtitle="Street, area, PIN code — what a driver would need.">
-              <Textarea
-                refEl={inputRef as React.MutableRefObject<HTMLTextAreaElement>}
-                value={data.address}
-                onChange={v => update('address', v)}
-                placeholder="e.g. Residency Road, Srinagar 190001"
-                rows={3}
-              />
-            </Prompt>
-          )}
-
           {step.key === 'contact' && (
             <Prompt title="How can agents reach you?" subtitle="Phone goes onto the public card. Email + website appear on Enquire.">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -436,21 +434,6 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
 
               {/* Room cards */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                {data.rooms.length === 0 && (
-                  <div style={{
-                    background: 'rgba(255,255,255,0.7)',
-                    border: '2px dashed rgba(0,54,26,0.22)',
-                    borderRadius: 16, padding: '24px 22px',
-                    fontFamily: 'Inter, sans-serif', color: '#414942', fontSize: 13.5,
-                    textAlign: 'center', lineHeight: 1.55,
-                  }}>
-                    <strong style={{ color: '#00361a' }}>Tap below to add your first room.</strong>
-                    <div style={{ marginTop: 4, color: '#717971', fontSize: 12.5 }}>
-                      Without at least one room with a price, agents won&apos;t see anything.
-                    </div>
-                  </div>
-                )}
-
                 {data.rooms.map((r, idx) => (
                   <RoomDraftCard
                     key={idx}
@@ -499,7 +482,6 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                   <ReviewRow label="Type"     value={data.propertyType === 'houseboat' ? 'Houseboat' : 'Hotel'} />
                   <ReviewRow label="Location" value={data.location ? LOCATION_LABELS[data.location as Location] : ''} />
                   <ReviewRow label="Star"     value={data.stars ? STAR_LABELS[data.stars] : ''} />
-                  <ReviewRow label="Address"  value={data.address} />
                   <ReviewRow label="Phone"    value={data.phone} />
                   <ReviewRow label="Email"    value={data.email} />
                   {data.website && <ReviewRow label="Website" value={data.website} />}
@@ -829,6 +811,11 @@ function RoomDraftCard({
   onRemove: () => void
 }) {
   const cats = categoriesFor(propertyType)
+  const [showMore, setShowMore] = useState(false)
+  // Count of filled meal-plan rates — small progress chip in the header
+  const rateCount = (['ep','cp','map','ap'] as const).reduce(
+    (n, k) => n + ((room as Record<string, string | unknown>)[k] ? 1 : 0), 0,
+  )
   return (
     <div style={{
       background: '#ffffff',
@@ -854,7 +841,16 @@ function RoomDraftCard({
             fontSize: 12, fontWeight: 900, boxShadow: '0 4px 10px rgba(0,54,26,0.2)',
           }}>{index + 1}</span>
           <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 800, color: '#00361a', letterSpacing: '-0.01em' }}>
-            Room Type {index + 1}
+            {room.type.trim() || `Room Type ${index + 1}`}
+          </span>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '3px 9px', borderRadius: 9999,
+            background: rateCount > 0 ? 'rgba(0,54,26,0.10)' : 'rgba(240,159,94,0.16)',
+            color: rateCount > 0 ? '#00361a' : '#6f3800',
+            fontSize: 10, fontWeight: 800, letterSpacing: '0.04em',
+          }}>
+            {rateCount > 0 ? `${rateCount}/4 rates` : 'Add a rate'}
           </span>
         </div>
         <button
@@ -915,34 +911,51 @@ function RoomDraftCard({
           ))}
         </div>
 
-        {/* Extras */}
-        <SectionLabel>Extras &amp; surcharges</SectionLabel>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.6fr', gap: 14, marginBottom: 22 }}>
-          <Field label="Extra Bed (₹)">
-            <Stepper value={room.extraBed} onChange={v => onChange({ extraBed: v })} step={100} max={20000} />
-          </Field>
-          <Field label="Child WOB (₹)">
-            <Stepper value={room.childWob} onChange={v => onChange({ childWob: v })} step={100} max={20000} />
-          </Field>
-          <Field label="GST treatment">
-            <select value={room.gst} onChange={e => onChange({ gst: e.target.value as GstStatus })} style={tfInput}>
-              {GST_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
-            </select>
-          </Field>
-        </div>
+        {/* Progressive disclosure: extras + display defaults */}
+        <button
+          type="button"
+          onClick={() => setShowMore(s => !s)}
+          style={{
+            width: '100%', padding: '10px 14px', borderRadius: 10,
+            border: '1px dashed rgba(0,54,26,0.18)', background: 'transparent',
+            color: '#00361a', fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 700,
+            cursor: 'pointer',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          }}
+        >
+          {showMore ? '− Hide' : '+ Add'} extra bed, child rate, GST &amp; meal-plan defaults <span style={{ opacity: 0.55, fontWeight: 600 }}>(optional)</span>
+        </button>
 
-        {/* Defaults */}
-        <SectionLabel>Display defaults</SectionLabel>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 14 }}>
-          <Field label="Headline meal plan" hint="Shown as the big rate on the public card">
-            <select value={room.meal} onChange={e => onChange({ meal: e.target.value as MealPlan })} style={tfInput}>
-              {MEAL_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
-            </select>
-          </Field>
-          <Field label="Notes (optional)">
-            <input value={room.notes} onChange={e => onChange({ notes: e.target.value })} placeholder="e.g. Max 3 Pax · Net B2B" style={tfInput} />
-          </Field>
-        </div>
+        {showMore && (
+          <div style={{ marginTop: 22 }}>
+            <SectionLabel>Extras &amp; surcharges</SectionLabel>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.6fr', gap: 14, marginBottom: 22 }}>
+              <Field label="Extra Bed (₹)">
+                <Stepper value={room.extraBed} onChange={v => onChange({ extraBed: v })} step={100} max={20000} />
+              </Field>
+              <Field label="Child WOB (₹)">
+                <Stepper value={room.childWob} onChange={v => onChange({ childWob: v })} step={100} max={20000} />
+              </Field>
+              <Field label="GST treatment">
+                <select value={room.gst} onChange={e => onChange({ gst: e.target.value as GstStatus })} style={tfInput}>
+                  {GST_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+                </select>
+              </Field>
+            </div>
+
+            <SectionLabel>Display defaults</SectionLabel>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 14 }}>
+              <Field label="Headline meal plan" hint="Shown as the big rate on the public card">
+                <select value={room.meal} onChange={e => onChange({ meal: e.target.value as MealPlan })} style={tfInput}>
+                  {MEAL_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+                </select>
+              </Field>
+              <Field label="Notes (optional)">
+                <input value={room.notes} onChange={e => onChange({ notes: e.target.value })} placeholder="e.g. Max 3 Pax · Net B2B" style={tfInput} />
+              </Field>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
