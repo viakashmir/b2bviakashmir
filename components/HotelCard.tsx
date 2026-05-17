@@ -123,30 +123,30 @@ export default function HotelCard({ hotel, index }: Props) {
           </div>
         </div>
 
-        {/* Rate table — column headers */}
+        {/* Tariff window + updated strip */}
         <div style={{
-          display: 'grid', gridTemplateColumns: '1.6fr 1fr 0.85fr 0.95fr 0.7fr',
-          padding: '8px 16px 6px', background: '#f3f4f5',
-        }}>
-          {['Room / Meal', 'Double', 'CNB', 'Extra Bed', 'Room Avail.'].map((h, i) => (
-            <div key={i} style={{ fontFamily: 'Inter, sans-serif', fontSize: 8.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', textAlign: i > 0 ? 'right' : 'left' }}>
-              {h}
-            </div>
-          ))}
-        </div>
-
-        {/* Updated timestamp strip */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 6, padding: '5px 16px',
-          background: '#f3f4f5',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          gap: 8, padding: '8px 16px', background: '#f3f4f5',
           fontSize: 10, color: '#717971', fontFamily: 'Inter, sans-serif',
         }}>
-          <span className="pulse-dot" style={{ width: 5, height: 5, borderRadius: '50%', background: '#13677b', display: 'inline-block', flexShrink: 0 }} />
-          <Clock size={10} strokeWidth={2} />
-          Updated <strong style={{ color: '#414942', fontWeight: 700, marginLeft: 2 }}>{fmtDate(hotel.updatedAt)}</strong>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span className="pulse-dot" style={{ width: 5, height: 5, borderRadius: '50%', background: '#13677b', display: 'inline-block', flexShrink: 0 }} />
+            <Clock size={10} strokeWidth={2} />
+            Updated <strong style={{ color: '#414942', fontWeight: 700, marginLeft: 2 }}>{fmtDate(hotel.updatedAt)}</strong>
+          </div>
+          {hotel.tariffStart && hotel.tariffEnd && (
+            <span style={{
+              fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase',
+              color: '#6f3800',
+              background: 'rgba(255,220,196,0.55)',
+              padding: '3px 9px', borderRadius: 9999,
+            }}>
+              Tariff {shortRange(hotel.tariffStart, hotel.tariffEnd)}
+            </span>
+          )}
         </div>
 
-        {/* Rate rows — show ALL rooms */}
+        {/* Rate rows — show ALL rooms with each meal plan's rate */}
         <div style={{ flex: 1 }}>
           {hotel.rooms.length === 0 ? (
             <div style={{ padding: '20px', textAlign: 'center', fontSize: 12, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
@@ -158,35 +158,68 @@ export default function HotelCard({ hotel, index }: Props) {
               : (r.status === 'Limited' || r.inventory <= 3)
                 ? 'avail-amber'
                 : 'avail-green'
+            // pick the headline rate by the room's declared meal plan
+            const headline =
+              r.meal === 'EP'  ? r.ep :
+              r.meal === 'MAP' ? r.map :
+              r.meal === 'AP'  ? r.ap :
+              r.cp || r.double
+            const offered = [
+              { code: 'EP',  val: r.ep },
+              { code: 'CP',  val: r.cp || (r.meal === 'CP' ? r.double : 0) },
+              { code: 'MAP', val: r.map },
+              { code: 'AP',  val: r.ap },
+            ].filter(p => p.val > 0)
             return (
               <div key={r.id} style={{
-                display: 'grid', gridTemplateColumns: '1.6fr 1fr 0.85fr 0.95fr 0.7fr',
-                alignItems: 'center', padding: '10px 16px',
+                padding: '12px 16px',
                 background: ri % 2 === 1 ? '#f8f9fa' : '#ffffff',
                 borderBottom: ri < hotel.rooms.length - 1 ? '1px solid #edeeef' : 'none',
               }}>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 700, color: '#191c1d', lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.type}</div>
-                  <div style={{ fontSize: 9.5, color: '#13677b', marginTop: 2, fontFamily: 'Inter, sans-serif', fontWeight: 600, letterSpacing: '0.02em' }}>
-                    {r.category} · <span style={{ color: '#717971' }}>{r.meal}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 700, color: '#191c1d', lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.type}</div>
+                    <div style={{ fontSize: 9.5, color: '#13677b', marginTop: 2, fontFamily: 'Inter, sans-serif', fontWeight: 600, letterSpacing: '0.02em' }}>
+                      {r.category}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, justifyContent: 'flex-end' }}>
+                      <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', color: '#13677b' }}>{r.meal}</span>
+                      <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 16, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>
+                        {fmtINR(headline)}
+                      </span>
+                    </div>
+                    <span className={lowStock} style={{ display: 'inline-block', minWidth: 30, padding: '3px 9px', borderRadius: 9999, fontSize: 10, fontWeight: 800, fontFamily: 'Inter, sans-serif', marginTop: 4 }}>
+                      {r.inventory} {r.inventory === 1 ? 'room' : 'rooms'}
+                    </span>
                   </div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>
-                    {fmtINR(r.double)}
+
+                {/* All offered meal-plan rates as small chips */}
+                {offered.length > 1 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 8 }}>
+                    {offered.map(p => (
+                      <span key={p.code} style={{
+                        fontSize: 9.5, fontWeight: 700, fontFamily: 'Inter, sans-serif',
+                        padding: '3px 8px', borderRadius: 9999,
+                        background: p.code === r.meal ? 'rgba(0,54,26,0.08)' : '#f3f4f5',
+                        color: p.code === r.meal ? '#00361a' : '#414942',
+                        border: p.code === r.meal ? '1px solid rgba(0,54,26,0.15)' : '1px solid transparent',
+                      }}>
+                        <strong>{p.code}</strong> {fmtINR(p.val)}
+                      </span>
+                    ))}
                   </div>
-                </div>
-                <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: '#414942', fontFamily: 'Inter, sans-serif' }}>
-                  {r.cnb ? fmtINR(r.cnb) : '—'}
-                </div>
-                <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: '#414942', fontFamily: 'Inter, sans-serif' }}>
-                  {r.extraBed ? fmtINR(r.extraBed) : '—'}
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span className={lowStock} style={{ display: 'inline-block', minWidth: 30, padding: '4px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 800, fontFamily: 'Inter, sans-serif' }}>
-                    {r.inventory}
-                  </span>
-                </div>
+                )}
+
+                {/* Extras */}
+                {(r.extraBed || r.childWob) && (
+                  <div style={{ display: 'flex', gap: 10, marginTop: 6, fontSize: 9.5, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+                    {r.extraBed > 0 && <span>Extra Bed <strong style={{ color: '#414942' }}>{fmtINR(r.extraBed)}</strong></span>}
+                    {r.childWob > 0 && <span>Child WOB <strong style={{ color: '#414942' }}>{fmtINR(r.childWob)}</strong></span>}
+                  </div>
+                )}
               </div>
             )
           })}
@@ -269,31 +302,50 @@ export default function HotelCard({ hotel, index }: Props) {
               {/* Contact rows — every icon is an inline SVG (lucide), so ad blockers can't hide them */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {[
-                  { Icon: Phone,    label: 'Phone',         value: hotel.phone || '—' },
-                  { Icon: Mail,     label: 'Email',         value: hotel.email || '—' },
-                  { Icon: MapPin,   label: 'Address',       value: hotel.address || hotel.locationLabel },
-                  { Icon: Globe,    label: 'Website',       value: hotel.website || '—' },
+                  { Icon: Phone,    label: 'Phone',         value: hotel.phone || '—', href: hotel.phone ? `tel:${hotel.phone.replace(/\s+/g, '')}` : undefined },
+                  { Icon: Mail,     label: 'Email',         value: hotel.email || '—', href: hotel.email ? `mailto:${hotel.email}` : undefined },
+                  { Icon: MapPin,   label: 'Address',       value: hotel.address || hotel.locationLabel, href: mapsUrl(hotel.name, hotel.address, hotel.locationLabel), action: 'Open in Maps' },
+                  { Icon: Globe,    label: 'Website',       value: hotel.website || '—', href: hotel.website ? (hotel.website.startsWith('http') ? hotel.website : `https://${hotel.website}`) : undefined },
                   { Icon: Clock,    label: 'Rates Updated', value: fmtDate(hotel.updatedAt) },
                   { Icon: BedDouble, label: 'Available Now', value: `${availInv} rooms · ${availTypes + limitTypes}/${hotel.rooms.length} types open` },
-                ].map(({ Icon, label, value }, i, arr) => (
-                  <div key={label} style={{
+                ].map(({ Icon, label, value, href, action }, i, arr) => {
+                  const inner = (
+                    <>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: 9999, background: '#f3f4f5',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#00361a',
+                      }}>
+                        <Icon size={17} strokeWidth={2} />
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {label}
+                          {href && action && (
+                            <span style={{
+                              fontSize: 8.5, fontWeight: 800, letterSpacing: '0.08em',
+                              color: '#13677b', background: 'rgba(19,103,123,0.10)',
+                              padding: '2px 7px', borderRadius: 9999,
+                            }}>{action}</span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: href ? '#00361a' : '#191c1d', marginTop: 3, fontFamily: 'Inter, sans-serif', overflowWrap: 'anywhere', textDecoration: href ? 'underline' : 'none', textDecorationColor: 'rgba(0,54,26,0.25)', textUnderlineOffset: 3 }}>{value}</div>
+                      </div>
+                    </>
+                  )
+                  const rowStyle: React.CSSProperties = {
                     display: 'grid', gridTemplateColumns: '44px 1fr',
                     alignItems: 'center', gap: 14,
                     padding: '11px 0',
                     borderBottom: i < arr.length - 1 ? '1px solid #edeeef' : 'none',
-                  }}>
-                    <div style={{
-                      width: 40, height: 40, borderRadius: 9999, background: '#f3f4f5',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#00361a',
-                    }}>
-                      <Icon size={17} strokeWidth={2} />
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', fontFamily: 'Inter, sans-serif' }}>{label}</div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: '#191c1d', marginTop: 3, fontFamily: 'Inter, sans-serif', overflowWrap: 'anywhere' }}>{value}</div>
-                    </div>
-                  </div>
-                ))}
+                  }
+                  return href ? (
+                    <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer" style={{ ...rowStyle, textDecoration: 'none', color: 'inherit' }}>
+                      {inner}
+                    </a>
+                  ) : (
+                    <div key={label} style={rowStyle}>{inner}</div>
+                  )
+                })}
               </div>
 
               {hotel.amenities?.length > 0 && (
@@ -339,4 +391,21 @@ export default function HotelCard({ hotel, index }: Props) {
       )}
     </>
   )
+}
+
+/** Build a Google Maps search URL from the hotel name + address. */
+function mapsUrl(name: string, address: string, locationLabel: string): string {
+  const q = [name, address, locationLabel].filter(Boolean).join(' ').trim()
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
+}
+
+/** Format YYYY-MM-DD → 'Mar 26' style; range → 'Mar 26 → Jun 26'. */
+function shortRange(start: string, end: string): string {
+  const fmt = (s: string) => {
+    const d = new Date(s)
+    if (Number.isNaN(d.getTime())) return s
+    const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]
+    return `${m} ${String(d.getFullYear()).slice(2)}`
+  }
+  return `${fmt(start)} → ${fmt(end)}`
 }

@@ -37,15 +37,19 @@ export async function GET(req: Request) {
   const start = ymd(year, month, 1)
   const end   = ymd(year, month, daysInMonth(year, month))
 
-  const [{ data: rooms, error: rErr }, { data: blocks, error: bErr }] = await Promise.all([
+  const [{ data: rooms, error: rErr }, { data: blocks, error: bErr }, { data: hotelRow }] = await Promise.all([
     sb.from('rooms').select('*').eq('hotel_id', hotelId),
     sb.from('inventory_blocks').select('*')
       .eq('hotel_id', hotelId)
       .lte('start_date', end)
       .gte('end_date',   start),
+    sb.from('hotels').select('tariff_start, tariff_end').eq('id', hotelId).maybeSingle(),
   ])
   if (rErr) return NextResponse.json({ error: rErr.message }, { status: 500 })
   if (bErr) return NextResponse.json({ error: bErr.message }, { status: 500 })
+
+  const tariffStart: string | null = hotelRow?.tariff_start ?? null
+  const tariffEnd:   string | null = hotelRow?.tariff_end   ?? null
 
   // Map each room → its array of per-day blocked counts for the month
   type Row = { id: string; hotel_id: string; room_id: string | null; start_date: string; end_date: string; count: number; block_type: string; reason: string; source: string; ota_name: string | null }
@@ -56,6 +60,7 @@ export async function GET(req: Request) {
     date: string
     day: number
     status: 'available' | 'partial' | 'full' | 'past'
+    inTariff: boolean
     totalRooms: number
     totalBlocked: number
     totalAvailable: number
@@ -89,8 +94,11 @@ export async function GET(req: Request) {
       totalAvailable < totalRooms ? 'partial' :
       'available'
 
+    const inTariff = !!(tariffStart && tariffEnd && date >= tariffStart && date <= tariffEnd)
+
     days.push({
       date, day: d, status,
+      inTariff,
       totalRooms, totalBlocked, totalAvailable,
       rooms: perRoom,
       blocks: activeBlocks.map(b => ({
@@ -102,6 +110,7 @@ export async function GET(req: Request) {
 
   return NextResponse.json({
     year, month,
+    tariffStart, tariffEnd,
     rooms: (rooms ?? []).map(r => ({ id: r.id, type: r.type, category: r.category, inventory: r.inventory })),
     days,
   })

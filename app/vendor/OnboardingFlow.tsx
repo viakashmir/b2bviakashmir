@@ -124,7 +124,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
         return digits.length < 10 || digits.length > 15 ? 'Phone must be 10–15 digits.' : null
       }
       case 'totalRooms':   return !data.totalRooms || parseInt(data.totalRooms) <= 0 ? 'Total rooms must be a positive number.' : null
-      case 'description':  return data.description.trim().length < 20 ? 'Tell guests a bit more — at least a sentence (20+ chars).' : null
+      case 'description':  return data.description.trim().length < 20 ? 'Tell agents a bit more — at least a sentence (20+ chars).' : null
       case 'tariff':       return !data.tariffStart || !data.tariffEnd
                             ? 'Pick a tariff validity range.'
                             : (data.tariffEnd < data.tariffStart ? 'End date must be on or after start date.' : null)
@@ -271,7 +271,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
 
           {/* === STEPS === */}
           {step.key === 'name' && (
-            <Prompt title="What's your property called?" subtitle="The name agents and guests will see on the rates board.">
+            <Prompt title="What's your property called?" subtitle="The name travel agents will see on the rates board.">
               <TextField
                 refEl={inputRef as React.MutableRefObject<HTMLInputElement>}
                 value={data.name}
@@ -452,27 +452,12 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
 
           {step.key === 'tariff' && (
             <Prompt title="Tariff valid from – to?" subtitle="The window these prices apply for. Most properties publish for a season (e.g. Mar–Jun, Oct–Mar). You can update later.">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <LabeledField label="Valid from">
-                  <input
-                    type="date"
-                    value={data.tariffStart}
-                    onChange={e => update('tariffStart', e.target.value)}
-                    style={tfInput}
-                  />
-                </LabeledField>
-                <LabeledField label="Valid till">
-                  <input
-                    type="date"
-                    value={data.tariffEnd}
-                    onChange={e => update('tariffEnd', e.target.value)}
-                    style={tfInput}
-                  />
-                </LabeledField>
-              </div>
-              <div style={{ marginTop: 14, fontSize: 12, color: '#717971', fontFamily: 'Inter, sans-serif' }}>
-                Example: <strong>15 Mar 2026 → 30 Jun 2026</strong> for the spring/summer season.
-              </div>
+              <TariffWindow
+                start={data.tariffStart}
+                end={data.tariffEnd}
+                onStart={v => update('tariffStart', v)}
+                onEnd={v => update('tariffEnd', v)}
+              />
             </Prompt>
           )}
 
@@ -876,22 +861,29 @@ function RoomDraftCard({
   return (
     <div style={{
       background: '#ffffff',
-      border: '1px solid rgba(0,54,26,0.10)',
-      borderRadius: 16,
-      padding: 20,
-      boxShadow: '0 4px 24px rgba(0,54,26,0.05)',
+      border: '1px solid rgba(0,54,26,0.08)',
+      borderRadius: 20,
+      padding: 0,
+      boxShadow: '0 8px 32px rgba(0,54,26,0.06)',
       fontFamily: 'Inter, sans-serif',
+      overflow: 'hidden',
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      {/* Header strip */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '14px 22px',
+        background: 'linear-gradient(135deg, rgba(0,54,26,0.05), rgba(184,240,197,0.18))',
+        borderBottom: '1px solid rgba(0,54,26,0.06)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{
-            width: 22, height: 22, borderRadius: 9999,
+            width: 28, height: 28, borderRadius: 9999,
             background: 'linear-gradient(135deg, #00361a, #1a4d2e)',
             color: '#ffffff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 11, fontWeight: 900,
+            fontSize: 12, fontWeight: 900, boxShadow: '0 4px 10px rgba(0,54,26,0.2)',
           }}>{index + 1}</span>
-          <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#1a4d2e' }}>
-            Room type
+          <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 800, color: '#00361a', letterSpacing: '-0.01em' }}>
+            Room Type {index + 1}
           </span>
         </div>
         <button
@@ -899,80 +891,314 @@ function RoomDraftCard({
           onClick={onRemove}
           aria-label="Remove room"
           style={{
-            width: 30, height: 30, borderRadius: 9999, border: 'none',
-            background: 'rgba(186,26,26,0.08)', color: '#ba1a1a',
-            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            padding: '7px 12px', borderRadius: 9999, border: 'none',
+            background: 'transparent', color: '#717971',
+            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
+            fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700,
+            transition: 'all 0.18s',
           }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(186,26,26,0.08)'; (e.currentTarget as HTMLElement).style.color = '#ba1a1a' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#717971' }}
         >
-          <Trash2 size={13} strokeWidth={2.3} />
+          <Trash2 size={12} strokeWidth={2.3} /> Remove
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
-        <div>
-          <label style={tfLabel}>Room name</label>
-          <input value={room.type} onChange={e => onChange({ type: e.target.value })} placeholder="e.g. Deluxe Double" style={tfInput} />
+      <div style={{ padding: 24 }}>
+        {/* Basics */}
+        <SectionLabel>Basics</SectionLabel>
+        <div style={{ display: 'grid', gridTemplateColumns: '2.2fr 1fr 1fr', gap: 14, marginBottom: 22 }}>
+          <Field label="Room name">
+            <input value={room.type} onChange={e => onChange({ type: e.target.value })} placeholder="e.g. Deluxe Double" style={tfInput} />
+          </Field>
+          <Field label="Category">
+            <select value={room.category} onChange={e => onChange({ category: e.target.value as RoomCategory })} style={tfInput}>
+              {cats.map(c => <option key={c}>{c}</option>)}
+            </select>
+          </Field>
+          <Field label="Inventory">
+            <Stepper value={room.inventory} onChange={v => onChange({ inventory: v })} min={0} max={500} />
+          </Field>
         </div>
-        <div>
-          <label style={tfLabel}>Category</label>
-          <select value={room.category} onChange={e => onChange({ category: e.target.value as RoomCategory })} style={tfInput}>
-            {cats.map(c => <option key={c}>{c}</option>)}
-          </select>
-        </div>
-        <div>
-          <label style={tfLabel}>Inventory</label>
-          <input type="number" inputMode="numeric" min={0} value={room.inventory} onChange={e => onChange({ inventory: e.target.value.replace(/\D/g, '') })} placeholder="10" style={tfInput} />
-        </div>
-      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 12 }}>
-        {([
-          ['EP — Room Only',    'ep'  as const],
-          ['CP — Breakfast',    'cp'  as const],
-          ['MAP — B + D',       'map' as const],
-          ['AP — All Meals',    'ap'  as const],
-        ]).map(([label, key]) => (
-          <div key={key}>
-            <label style={tfLabel}>{label} (₹)</label>
-            <input
-              type="number" inputMode="numeric" min={0}
-              value={(room as Record<string, string | unknown>)[key as string] as string}
-              onChange={e => onChange({ [key]: e.target.value.replace(/\D/g, '') } as Partial<RoomDraft>)}
-              placeholder="0"
-              style={tfInput}
+        {/* Rates */}
+        <SectionLabel>Meal-plan rates (₹ per night)</SectionLabel>
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14,
+          marginBottom: 22,
+        }}>
+          {([
+            { key: 'ep'  as const, code: 'EP',  text: 'Room Only',         tip: 'No meals included' },
+            { key: 'cp'  as const, code: 'CP',  text: 'Breakfast',         tip: 'Breakfast only' },
+            { key: 'map' as const, code: 'MAP', text: 'Breakfast + Dinner', tip: 'Two meals' },
+            { key: 'ap'  as const, code: 'AP',  text: 'All meals',         tip: 'Breakfast, lunch & dinner' },
+          ]).map(plan => (
+            <RatePill
+              key={plan.key}
+              code={plan.code}
+              label={plan.text}
+              hint={plan.tip}
+              value={(room as Record<string, string | unknown>)[plan.key as string] as string}
+              onChange={v => onChange({ [plan.key]: v } as Partial<RoomDraft>)}
             />
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.4fr', gap: 10, marginBottom: 12 }}>
-        <div>
-          <label style={tfLabel}>Extra Bed (₹)</label>
-          <input type="number" inputMode="numeric" min={0} value={room.extraBed} onChange={e => onChange({ extraBed: e.target.value.replace(/\D/g, '') })} placeholder="0" style={tfInput} />
+        {/* Extras */}
+        <SectionLabel>Extras &amp; surcharges</SectionLabel>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.6fr', gap: 14, marginBottom: 22 }}>
+          <Field label="Extra Bed (₹)">
+            <Stepper value={room.extraBed} onChange={v => onChange({ extraBed: v })} step={100} max={20000} />
+          </Field>
+          <Field label="Child WOB (₹)">
+            <Stepper value={room.childWob} onChange={v => onChange({ childWob: v })} step={100} max={20000} />
+          </Field>
+          <Field label="GST treatment">
+            <select value={room.gst} onChange={e => onChange({ gst: e.target.value as GstStatus })} style={tfInput}>
+              {GST_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+            </select>
+          </Field>
         </div>
-        <div>
-          <label style={tfLabel}>Child WOB (₹)</label>
-          <input type="number" inputMode="numeric" min={0} value={room.childWob} onChange={e => onChange({ childWob: e.target.value.replace(/\D/g, '') })} placeholder="0" style={tfInput} />
-        </div>
-        <div>
-          <label style={tfLabel}>GST</label>
-          <select value={room.gst} onChange={e => onChange({ gst: e.target.value as GstStatus })} style={tfInput}>
-            {GST_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
-          </select>
+
+        {/* Defaults */}
+        <SectionLabel>Display defaults</SectionLabel>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 14 }}>
+          <Field label="Headline meal plan" hint="Shown as the big rate on the public card">
+            <select value={room.meal} onChange={e => onChange({ meal: e.target.value as MealPlan })} style={tfInput}>
+              {MEAL_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+            </select>
+          </Field>
+          <Field label="Notes (optional)">
+            <input value={room.notes} onChange={e => onChange({ notes: e.target.value })} placeholder="e.g. Max 3 Pax · Net B2B" style={tfInput} />
+          </Field>
         </div>
       </div>
+    </div>
+  )
+}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 10 }}>
-        <div>
-          <label style={tfLabel}>Default meal plan</label>
-          <select value={room.meal} onChange={e => onChange({ meal: e.target.value as MealPlan })} style={tfInput}>
-            {MEAL_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
-          </select>
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{
+      fontSize: 10, fontWeight: 800, letterSpacing: '0.16em',
+      textTransform: 'uppercase', color: '#1a4d2e',
+      marginBottom: 12,
+      display: 'flex', alignItems: 'center', gap: 8,
+    }}>
+      <span style={{ width: 4, height: 4, borderRadius: 9999, background: '#1a4d2e' }} />
+      {children}
+    </div>
+  )
+}
+
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label style={{
+        display: 'block',
+        fontSize: 11, fontWeight: 700, color: '#414942',
+        marginBottom: 7, fontFamily: 'Inter, sans-serif',
+      }}>{label}</label>
+      {children}
+      {hint && <div style={{ marginTop: 5, fontSize: 10.5, color: '#9aa19f' }}>{hint}</div>}
+    </div>
+  )
+}
+
+/** Rate-plan pill with code badge + amount stepper inside. */
+function RatePill({ code, label, hint, value, onChange }: {
+  code: string; label: string; hint: string
+  value: string; onChange: (v: string) => void
+}) {
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '52px 1fr',
+      gap: 12,
+      padding: 12,
+      borderRadius: 14,
+      border: '1px solid rgba(0,54,26,0.08)',
+      background: '#fbfdfc',
+      alignItems: 'center',
+    }}>
+      <div style={{
+        width: 52, height: 52, borderRadius: 12,
+        background: 'linear-gradient(135deg, #00361a, #1a4d2e)',
+        color: '#ffdcc4',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        fontFamily: 'Manrope, sans-serif',
+      }}>
+        <div style={{ fontSize: 14, fontWeight: 900, lineHeight: 1 }}>{code}</div>
+        <div style={{ fontSize: 7.5, fontWeight: 700, marginTop: 3, opacity: 0.85, letterSpacing: '0.06em' }}>RATE</div>
+      </div>
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 5 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#191c1d' }}>{label}</span>
+          <span style={{ fontSize: 10, color: '#9aa19f' }}>{hint}</span>
         </div>
-        <div>
-          <label style={tfLabel}>Notes (optional)</label>
-          <input value={room.notes} onChange={e => onChange({ notes: e.target.value })} placeholder="e.g. Max 3 Pax · Net B2B" style={tfInput} />
-        </div>
+        <Stepper value={value} onChange={onChange} step={100} max={500000} prefix="₹" />
+      </div>
+    </div>
+  )
+}
+
+/** Numeric stepper with –/+ buttons (replaces browser default spinners). */
+function Stepper({ value, onChange, min = 0, max = 999999, step = 1, prefix }: {
+  value: string; onChange: (v: string) => void
+  min?: number; max?: number; step?: number; prefix?: string
+}) {
+  const n = parseInt(value || '0') || 0
+  const setN = (v: number) => onChange(String(Math.max(min, Math.min(max, v))))
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'stretch',
+      borderRadius: 10, overflow: 'hidden',
+      border: '1px solid rgba(0,54,26,0.14)',
+      background: '#ffffff',
+    }}>
+      <button
+        type="button"
+        onClick={() => setN(n - step)}
+        aria-label="decrease"
+        style={stepperBtn}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f5' }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#ffffff' }}
+      >−</button>
+      <div style={{ flex: 1, position: 'relative' }}>
+        {prefix && (
+          <span style={{
+            position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+            color: '#9aa19f', fontWeight: 600, fontFamily: 'Inter, sans-serif', fontSize: 13,
+            pointerEvents: 'none',
+          }}>{prefix}</span>
+        )}
+        <input
+          type="text"
+          inputMode="numeric"
+          value={value}
+          onChange={e => onChange(e.target.value.replace(/\D/g, ''))}
+          placeholder="0"
+          style={{
+            width: '100%', border: 'none', outline: 'none', background: 'transparent',
+            padding: prefix ? '11px 12px 11px 22px' : '11px 12px',
+            fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 700, color: '#191c1d',
+            textAlign: 'center',
+          }}
+        />
+      </div>
+      <button
+        type="button"
+        onClick={() => setN(n + step)}
+        aria-label="increase"
+        style={stepperBtn}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f5' }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#ffffff' }}
+      >+</button>
+    </div>
+  )
+}
+
+const stepperBtn: React.CSSProperties = {
+  width: 36, border: 'none', background: '#ffffff', cursor: 'pointer',
+  fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 18,
+  color: '#00361a',
+  transition: 'background 0.15s',
+  borderLeft: '1px solid rgba(0,54,26,0.08)',
+  borderRight: '1px solid rgba(0,54,26,0.08)',
+}
+
+/** Tariff date range with min=today, branded native date inputs, and a day-count badge. */
+function TariffWindow({ start, end, onStart, onEnd }: {
+  start: string; end: string
+  onStart: (v: string) => void
+  onEnd: (v: string) => void
+}) {
+  const today = new Date().toISOString().slice(0, 10)
+  // duration calc
+  let nights = 0
+  if (start && end && end >= start) {
+    const s = new Date(start), e = new Date(end)
+    nights = Math.round((e.getTime() - s.getTime()) / 86400000) + 1
+  }
+  const months = nights >= 30 ? Math.round((nights / 30) * 10) / 10 : 0
+
+  return (
+    <div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <BrandedDateField label="Valid from" value={start} min={today} max={end || undefined} onChange={onStart} />
+        <BrandedDateField label="Valid till" value={end} min={start || today} onChange={onEnd} />
+      </div>
+      <div style={{
+        marginTop: 18,
+        padding: '14px 18px',
+        borderRadius: 12,
+        background: nights > 0
+          ? 'linear-gradient(135deg, rgba(184,240,197,0.35), rgba(255,220,196,0.35))'
+          : 'rgba(0,54,26,0.04)',
+        border: '1px solid rgba(0,54,26,0.08)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+        fontFamily: 'Inter, sans-serif',
+      }}>
+        <span style={{ fontSize: 13, color: '#414942', fontWeight: 600 }}>
+          {nights > 0
+            ? <>
+                Validity: <strong style={{ color: '#00361a' }}>{nights} {nights === 1 ? 'day' : 'days'}</strong>
+                {months > 0 && <span style={{ color: '#717971', fontWeight: 500 }}> · approx. {months} month{months !== 1 ? 's' : ''}</span>}
+              </>
+            : <span style={{ color: '#717971' }}>Pick a start and end date to see the validity window.</span>}
+        </span>
+        {nights > 0 && <ArrowRight size={14} strokeWidth={2.5} color="#1a4d2e" />}
+      </div>
+      <div style={{ marginTop: 12, fontSize: 12, color: '#717971', fontFamily: 'Inter, sans-serif' }}>
+        Example: <strong>15 Mar 2026 → 30 Jun 2026</strong> for the spring/summer season.
+      </div>
+    </div>
+  )
+}
+
+function BrandedDateField({ label, value, min, max, onChange }: {
+  label: string; value: string
+  min?: string; max?: string
+  onChange: (v: string) => void
+}) {
+  return (
+    <div>
+      <label style={{
+        display: 'block',
+        fontSize: 11, fontWeight: 700, color: '#414942',
+        marginBottom: 7, fontFamily: 'Inter, sans-serif',
+      }}>{label}</label>
+      <div style={{
+        position: 'relative',
+        borderRadius: 12,
+        border: '1px solid rgba(0,54,26,0.14)',
+        background: '#ffffff',
+        transition: 'border-color 0.18s, box-shadow 0.18s',
+      }}>
+        <input
+          type="date"
+          value={value}
+          min={min}
+          max={max}
+          onChange={e => onChange(e.target.value)}
+          style={{
+            width: '100%',
+            border: 'none', outline: 'none', background: 'transparent',
+            padding: '12px 14px',
+            fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 700,
+            color: '#00361a',
+          }}
+          onFocus={e => {
+            const wrap = e.currentTarget.parentElement as HTMLElement
+            wrap.style.borderColor = '#00361a'
+            wrap.style.boxShadow = '0 0 0 4px rgba(0,54,26,0.08)'
+          }}
+          onBlur={e => {
+            const wrap = e.currentTarget.parentElement as HTMLElement
+            wrap.style.borderColor = 'rgba(0,54,26,0.14)'
+            wrap.style.boxShadow = 'none'
+          }}
+        />
       </div>
     </div>
   )

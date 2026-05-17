@@ -284,6 +284,54 @@ export default function VendorPortal() {
           )}
         </div>
 
+        {/* Add Room Type — big standout CTA */}
+        <button
+          onClick={() => { setTab('rooms'); setShowForm(true); setTimeout(() => document.getElementById('add-room-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80) }}
+          style={{
+            width: '100%',
+            padding: '18px 22px',
+            borderRadius: 16, border: 'none',
+            background: 'linear-gradient(135deg, rgba(255,220,196,0.45), rgba(184,240,197,0.45))',
+            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14,
+            fontFamily: 'Inter, sans-serif',
+            marginBottom: 24,
+            transition: 'transform 0.18s, box-shadow 0.18s',
+            boxShadow: '0 4px 20px rgba(240,159,94,0.18)',
+          } as React.CSSProperties}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 28px rgba(240,159,94,0.28)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(240,159,94,0.18)' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left' }}>
+            <div style={{
+              width: 44, height: 44, borderRadius: 12,
+              background: 'linear-gradient(135deg, #00361a, #1a4d2e)',
+              color: '#ffdcc4',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+              boxShadow: '0 6px 14px rgba(0,54,26,0.22)',
+            }}>
+              <Plus size={22} strokeWidth={2.6} />
+            </div>
+            <div>
+              <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 16, fontWeight: 800, color: '#00361a', letterSpacing: '-0.01em' }}>
+                Add another room category
+              </div>
+              <div style={{ fontSize: 12, color: '#414942', marginTop: 3, fontWeight: 500 }}>
+                Deluxe, Suite, Family… add EP/CP/MAP/AP rates with one form. Goes live the moment you save.
+              </div>
+            </div>
+          </div>
+          <div style={{
+            padding: '8px 14px', borderRadius: 9999,
+            background: '#ffffff', color: '#00361a',
+            fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 12,
+            display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0,
+          }}>
+            Add now →
+          </div>
+        </button>
+
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, borderBottom: '1px solid #edeeef' }}>
           {([
@@ -372,7 +420,7 @@ export default function VendorPortal() {
             </div>
 
             {showForm && (
-              <div style={{ marginBottom: 32 }}>
+              <div id="add-room-form" style={{ marginBottom: 32, scrollMarginTop: 80 }}>
                 <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 20, fontWeight: 700, color: '#00361a', marginBottom: 12 }}>Add New Room Type</div>
                 <div className="card-elevated" style={{ padding: 24 }}>
                   <div className="form-grid">

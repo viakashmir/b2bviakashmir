@@ -208,7 +208,7 @@ export default function CustomerPortal() {
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
                 <label className="t-overline" style={{ display: 'block', marginBottom: 8 }}>Description</label>
-                <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={5} placeholder="What happened? Dates, guest names, what the portal showed vs. reality." className="input-field" style={{ padding: '12px 14px', fontSize: 13, resize: 'vertical' }} />
+                <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={5} placeholder="What happened? Dates, traveller names, what the portal showed vs. reality." className="input-field" style={{ padding: '12px 14px', fontSize: 13, resize: 'vertical' }} />
               </div>
             </div>
 

@@ -10,6 +10,7 @@ import { browserSupabase } from '@/lib/supabase'
 
 type Day = {
   date: string; day: number; status: 'available' | 'partial' | 'full' | 'past'
+  inTariff?: boolean
   totalRooms: number; totalBlocked: number; totalAvailable: number
   rooms: Array<{ id: string; type: string; total: number; blocked: number; available: number }>
   blocks: Array<{ id: string; type: string; reason: string; count: number; roomId: string | null; otaName: string | null }>
@@ -17,6 +18,8 @@ type Day = {
 type CalendarData = {
   year: number
   month: number
+  tariffStart?: string | null
+  tariffEnd?: string | null
   rooms: Array<{ id: string; type: string; category: string; inventory: number }>
   days: Day[]
 }
@@ -27,6 +30,11 @@ const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'Ju
 function todayStr() {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+function fmtDateLabel(iso: string): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return iso
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 function statusBg(s: Day['status']) {
   switch (s) {
@@ -232,6 +240,31 @@ export default function InventoryCalendar() {
           ))}
         </div>
 
+        {/* Tariff strip */}
+        {data.tariffStart && data.tariffEnd && (
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 12, flexWrap: 'wrap', marginBottom: 12,
+            padding: '12px 18px', borderRadius: 14,
+            background: 'linear-gradient(135deg, rgba(255,220,196,0.4), rgba(184,240,197,0.4))',
+            border: '1px solid rgba(240,159,94,0.35)',
+            fontFamily: 'Inter, sans-serif',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 10, height: 10, borderRadius: 9999, background: '#f09f5e', boxShadow: '0 0 0 4px rgba(240,159,94,0.18)' }} />
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6f3800' }}>Current tariff window</div>
+                <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 800, color: '#00361a', marginTop: 2 }}>
+                  {fmtDateLabel(data.tariffStart)} → {fmtDateLabel(data.tariffEnd)}
+                </div>
+              </div>
+            </div>
+            <div style={{ fontSize: 12, color: '#414942', fontWeight: 600 }}>
+              Highlighted days show when your published prices apply.
+            </div>
+          </div>
+        )}
+
         {/* Month nav */}
         <div className="card-elevated" style={{ padding: 18, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>
@@ -270,8 +303,15 @@ export default function InventoryCalendar() {
                   key={d.date}
                   onClick={() => setSelected(isSelected ? null : d)}
                   style={{
-                    background: s.bg,
-                    border: isSelected ? '2px solid #00361a' : isToday ? '2px solid #13677b' : '1px solid transparent',
+                    position: 'relative',
+                    background: d.inTariff && d.status === 'available'
+                      ? 'linear-gradient(135deg, rgba(255,220,196,0.55), rgba(184,240,197,0.45))'
+                      : s.bg,
+                    border:
+                      isSelected ? '2px solid #00361a'
+                      : isToday ? '2px solid #13677b'
+                      : d.inTariff ? '2px solid #ffb780'
+                      : '1px solid transparent',
                     borderRadius: 10, padding: '8px 6px',
                     minHeight: 64, cursor: 'pointer',
                     display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4,
@@ -282,11 +322,17 @@ export default function InventoryCalendar() {
                   onMouseEnter={e => { if (d.status !== 'past') (e.currentTarget as HTMLElement).style.transform = 'scale(1.04)' }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)' }}
                 >
-                  <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
-                  }}>
+                  {d.inTariff && (
+                    <span title="In tariff window" style={{
+                      position: 'absolute', top: 4, right: 4,
+                      width: 8, height: 8, borderRadius: 9999,
+                      background: '#f09f5e',
+                      boxShadow: '0 0 0 3px rgba(240,159,94,0.18)',
+                    }} />
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
                     <span style={{ fontWeight: 800, fontSize: 13, color: '#191c1d' }}>{d.day}</span>
-                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: s.dot }} />
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: s.dot, marginLeft: 'auto' }} />
                   </div>
                   <div style={{ fontSize: 10, fontWeight: 700, color: '#414942' }}>
                     {d.totalAvailable}/{d.totalRooms}
@@ -315,6 +361,12 @@ export default function InventoryCalendar() {
                 {label}
               </span>
             ))}
+            {data.tariffStart && data.tariffEnd && (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ width: 12, height: 12, borderRadius: 4, background: 'linear-gradient(135deg, rgba(255,220,196,0.55), rgba(184,240,197,0.45))', border: '2px solid #ffb780' }} />
+                Tariff window
+              </span>
+            )}
           </div>
         </div>
 
@@ -418,14 +470,81 @@ export default function InventoryCalendar() {
               </button>
             </div>
 
+            {/* Quick presets */}
+            <div style={{ marginBottom: 14 }}>
+              <div className="t-overline" style={{ marginBottom: 8 }}>Quick presets</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {([
+                  { label: 'Today',           days: 1 },
+                  { label: 'Next 3 days',     days: 3 },
+                  { label: 'This weekend',    days: 0, weekend: true },
+                  { label: 'Next 7 days',     days: 7 },
+                  { label: 'Next 14 days',    days: 14 },
+                  { label: 'Next 30 days',    days: 30 },
+                ]).map(p => (
+                  <button
+                    key={p.label}
+                    type="button"
+                    onClick={() => {
+                      const today = new Date()
+                      const start = new Date(today)
+                      const end = new Date(today)
+                      if (p.weekend) {
+                        // Friday → Sunday
+                        const day = today.getDay() // 0 Sun..6 Sat
+                        const toFriday = (5 - day + 7) % 7 || 0
+                        start.setDate(today.getDate() + toFriday)
+                        end.setDate(start.getDate() + 2)
+                      } else {
+                        end.setDate(today.getDate() + p.days - 1)
+                      }
+                      setForm(f => ({ ...f, startDate: toInputDate(start), endDate: toInputDate(end) }))
+                    }}
+                    style={{
+                      padding: '7px 13px', borderRadius: 9999,
+                      border: '1px solid rgba(0,54,26,0.12)', background: '#ffffff',
+                      color: '#1a4d2e', cursor: 'pointer',
+                      fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 700,
+                      transition: 'all 0.18s',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f5'; (e.currentTarget as HTMLElement).style.borderColor = '#00361a' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#ffffff'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,54,26,0.12)' }}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Live duration badge */}
+            {form.startDate && form.endDate && form.endDate >= form.startDate && (() => {
+              const s = new Date(form.startDate), e = new Date(form.endDate)
+              const nights = Math.round((e.getTime() - s.getTime()) / 86400000) + 1
+              return (
+                <div style={{
+                  marginBottom: 12, padding: '10px 14px', borderRadius: 10,
+                  background: 'linear-gradient(135deg, rgba(184,240,197,0.35), rgba(255,220,196,0.3))',
+                  fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, color: '#00361a',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                  <span>
+                    Blocking <strong>{form.count} × {nights}</strong> = {form.count * nights} room-nights
+                  </span>
+                  <span style={{ fontSize: 11, color: '#414942', fontWeight: 600 }}>
+                    {fmtDateLabel(form.startDate)} → {fmtDateLabel(form.endDate)}
+                  </span>
+                </div>
+              )
+            })()}
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div>
                 <label className="t-overline" style={{ display: 'block', marginBottom: 6 }}>Start date</label>
-                <input type="date" value={form.startDate} onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} className="input-field" style={{ padding: '10px 12px', fontSize: 13 }} />
+                <input type="date" min={todayStr()} value={form.startDate} onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} className="input-field" style={{ padding: '10px 12px', fontSize: 13 }} />
               </div>
               <div>
                 <label className="t-overline" style={{ display: 'block', marginBottom: 6 }}>End date</label>
-                <input type="date" value={form.endDate} onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} className="input-field" style={{ padding: '10px 12px', fontSize: 13 }} />
+                <input type="date" min={form.startDate || todayStr()} value={form.endDate} onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} className="input-field" style={{ padding: '10px 12px', fontSize: 13 }} />
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
                 <label className="t-overline" style={{ display: 'block', marginBottom: 6 }}>Room type (optional — leave blank for all)</label>
