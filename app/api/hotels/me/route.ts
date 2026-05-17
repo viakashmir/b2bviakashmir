@@ -41,6 +41,12 @@ export async function POST(req: Request) {
   const { data: existing } = await sb.from('hotels').select('approved, created_at').eq('id', hotelId).maybeSingle()
 
   const propertyType = body.propertyType === 'houseboat' ? 'houseboat' : 'hotel'
+  // Strip non-digits from phone for storage consistency, preserve leading +
+  const rawPhone = String(body.phone ?? '').trim()
+  const phone = rawPhone.startsWith('+')
+    ? '+' + rawPhone.slice(1).replace(/\D/g, '')
+    : rawPhone.replace(/\D/g, '')
+
   const row = {
     id: hotelId,
     name: String(body.name ?? '').trim(),
@@ -49,16 +55,60 @@ export async function POST(req: Request) {
     location_label: String(body.locationLabel ?? '').trim(),
     property_type: propertyType,
     address: String(body.address ?? '').trim(),
-    phone: String(body.phone ?? '').trim(),
+    phone,
     email: String(body.email ?? '').trim(),
     website: String(body.website ?? '').trim(),
     description: String(body.description ?? '').trim(),
     amenities: Array.isArray(body.amenities) ? body.amenities : [],
+    tariff_start: body.tariffStart || null,
+    tariff_end:   body.tariffEnd   || null,
     // Vendor cannot self-approve. Preserve existing approval status; new rows default to false.
     approved: existing?.approved ?? false,
   }
 
   const { error } = await sb.from('hotels').upsert(row, { onConflict: 'id' })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Optional: bulk-create rooms passed in onboarding
+  if (Array.isArray(body.rooms) && body.rooms.length > 0) {
+    type RoomInput = {
+      type?: string; category?: string; meal?: string
+      ep?: number | string; cp?: number | string; map?: number | string; ap?: number | string
+      childWob?: number | string; extraBed?: number | string
+      gst?: string; notes?: string
+      inventory?: number | string; status?: string
+    }
+    const num = (v: unknown) => Math.max(0, parseInt(String(v ?? '0')) || 0)
+    const roomRows = (body.rooms as RoomInput[])
+      .filter(r => (r.type || '').toString().trim().length > 0)
+      .map(r => {
+        const cp = num(r.cp)
+        return {
+          id: 'r_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36),
+          hotel_id: hotelId,
+          type: String(r.type).trim(),
+          category: String(r.category ?? 'Standard'),
+          meal: String(r.meal ?? 'CP'),
+          ep:       num(r.ep),
+          cp,
+          map_rate: num(r.map),
+          ap:       num(r.ap),
+          child_wob: num(r.childWob),
+          extra_bed: num(r.extraBed),
+          // Headline 'double' kept for backwards-compat with existing public board
+          double: cp || num(r.ep) || num(r.map) || num(r.ap),
+          cnb: num(r.childWob), // legacy mirror
+          gst: String(r.gst ?? 'as_applicable'),
+          notes: String(r.notes ?? '').trim(),
+          inventory: num(r.inventory),
+          status: String(r.status ?? 'Available'),
+        }
+      })
+    if (roomRows.length > 0) {
+      const { error: roomErr } = await sb.from('rooms').insert(roomRows)
+      if (roomErr) return NextResponse.json({ error: roomErr.message }, { status: 500 })
+    }
+  }
+
   return NextResponse.json({ ok: true, id: hotelId })
 }

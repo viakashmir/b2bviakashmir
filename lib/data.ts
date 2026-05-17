@@ -12,18 +12,36 @@ export type ConcernCategory =
   | 'Rate Discrepancy' | 'Room Quality' | 'Service Issue'
   | 'Availability Error' | 'Billing Problem' | 'Other'
 
+export type GstStatus = 'included' | 'extra' | 'as_applicable' | 'non_commissionable'
+
 export interface Room {
   id: string
   hotelId: string
   type: string
   category: RoomCategory
+  /** Default headline meal plan (used for the big rate on the public card). */
   meal: MealPlan
-  double: number
-  cnb: number
+  /** Per-meal-plan rates. 0 = not offered. */
+  ep: number
+  cp: number
+  map: number
+  ap: number
+  /** Child Without Bed surcharge — ₹ per child per night. */
+  childWob: number
+  /** Extra Bed surcharge — ₹ per bed per night. */
   extraBed: number
+  /** GST treatment. */
+  gst: GstStatus
+  /** Free-text notes (e.g. "Max 3 Pax", "Net B2B"). */
+  notes: string
   inventory: number
   status: RoomStatus
   updatedAt: number
+
+  /** Legacy field — kept so old data still renders. cp will mirror this if zero. */
+  double: number
+  /** Legacy alias for childWob — kept on the type for back-compat reads. */
+  cnb: number
 }
 
 export interface Hotel {
@@ -40,9 +58,19 @@ export interface Hotel {
   description: string
   amenities: string[]
   approved: boolean
+  /** ISO date 'YYYY-MM-DD' or '' — tariff validity window. */
+  tariffStart: string
+  tariffEnd: string
   createdAt: number
   updatedAt: number
   rooms: Room[]
+}
+
+export const GST_LABELS: Record<GstStatus, string> = {
+  included: 'GST Included',
+  extra: 'GST Extra',
+  as_applicable: 'GST As Applicable',
+  non_commissionable: 'Net Non-Commissionable',
 }
 
 export interface Concern {
@@ -150,11 +178,14 @@ type HotelRow = {
   property_type: string | null
   address: string; phone: string; email: string; website: string; description: string
   amenities: string[]; approved: boolean; created_at: string; updated_at: string
+  tariff_start: string | null; tariff_end: string | null
 }
 type RoomRow = {
   id: string; hotel_id: string; type: string; category: string; meal: string
-  double: number; cnb: number; extra_bed: number; inventory: number
-  status: string; updated_at: string
+  double: number; cnb: number; extra_bed: number
+  ep: number | null; cp: number | null; map_rate: number | null; ap: number | null
+  child_wob: number | null; gst: string | null; notes: string | null
+  inventory: number; status: string; updated_at: string
 }
 type ConcernRow = {
   id: string; hotel_id: string; hotel_name: string; agent_name: string
@@ -171,6 +202,8 @@ export function rowToHotel(row: HotelRow, rooms: RoomRow[] = []): Hotel {
     address: row.address, phone: row.phone, email: row.email,
     website: row.website, description: row.description, amenities: row.amenities,
     approved: row.approved,
+    tariffStart: row.tariff_start ?? '',
+    tariffEnd:   row.tariff_end   ?? '',
     createdAt: new Date(row.created_at).getTime(),
     updatedAt: new Date(row.updated_at).getTime(),
     rooms: rooms.filter(r => r.hotel_id === row.id).map(rowToRoom),
@@ -178,12 +211,23 @@ export function rowToHotel(row: HotelRow, rooms: RoomRow[] = []): Hotel {
 }
 
 export function rowToRoom(row: RoomRow): Room {
+  const cp = row.cp ?? 0
+  const fallback = row.double ?? 0
   return {
     id: row.id, hotelId: row.hotel_id, type: row.type,
     category: row.category as RoomCategory, meal: row.meal as MealPlan,
-    double: row.double, cnb: row.cnb, extraBed: row.extra_bed,
+    ep:       row.ep       ?? 0,
+    cp:       cp || fallback, // fall back to legacy double when cp not set
+    map:      row.map_rate ?? 0,
+    ap:       row.ap       ?? 0,
+    childWob: row.child_wob ?? row.cnb ?? 0,
+    extraBed: row.extra_bed,
+    gst:      (row.gst as GstStatus | null) ?? 'as_applicable',
+    notes:    row.notes ?? '',
     inventory: row.inventory, status: row.status as RoomStatus,
     updatedAt: new Date(row.updated_at).getTime(),
+    double: cp || fallback,
+    cnb: row.child_wob ?? row.cnb ?? 0,
   }
 }
 

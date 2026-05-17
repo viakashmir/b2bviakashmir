@@ -2,14 +2,33 @@
 
 import { useState, useEffect, useRef } from 'react'
 import {
-  Location, PropertyType, StarCategory,
+  Location, PropertyType, StarCategory, MealPlan, RoomCategory, GstStatus,
   LOCATIONS, LOCATION_LABELS, STAR_LABELS,
-  amenitiesFor,
+  amenitiesFor, categoriesFor,
 } from '@/lib/data'
 import {
   ArrowRight, ArrowLeft, Check, Building2, Sailboat, MapPin,
-  Sparkles, Mountain, Wifi, ChevronDown,
+  Sparkles, Mountain, Wifi, Plus, Trash2,
 } from 'lucide-react'
+
+type RoomDraft = {
+  type: string
+  category: RoomCategory
+  meal: MealPlan
+  ep: string; cp: string; map: string; ap: string
+  childWob: string; extraBed: string
+  inventory: string
+  gst: GstStatus
+  notes: string
+}
+function blankRoom(forPropertyType: PropertyType): RoomDraft {
+  return {
+    type: '', category: forPropertyType === 'houseboat' ? 'Houseboat Deluxe' : 'Deluxe',
+    meal: 'CP', ep: '', cp: '', map: '', ap: '',
+    childWob: '', extraBed: '', inventory: '',
+    gst: 'as_applicable', notes: '',
+  }
+}
 
 interface Props {
   defaultName: string
@@ -29,19 +48,25 @@ type FormData = {
   totalRooms: string
   description: string
   amenities: string[]
+  tariffStart: string
+  tariffEnd: string
+  rooms: RoomDraft[]
 }
 
+// Steps include both pre-existing info and the new pricing capture.
 const ALL_STEPS = [
-  { key: 'name',         num:  1 },
-  { key: 'location',     num:  2 },
-  { key: 'propertyType', num:  3, srinagarOnly: true },
-  { key: 'stars',        num:  4 },
-  { key: 'address',      num:  5 },
-  { key: 'contact',      num:  6 },
-  { key: 'rooms',        num:  7 },
-  { key: 'description',  num:  8 },
-  { key: 'amenities',    num:  9 },
-  { key: 'review',       num: 10 },
+  { key: 'name'         },
+  { key: 'location'     },
+  { key: 'propertyType', srinagarOnly: true },
+  { key: 'stars'        },
+  { key: 'address'      },
+  { key: 'contact'      },
+  { key: 'totalRooms'   },
+  { key: 'description'  },
+  { key: 'amenities'    },
+  { key: 'tariff'       }, // NEW — Tariff valid from–to
+  { key: 'roomRates'    }, // NEW — Add 1-3 room types with full pricing (skippable)
+  { key: 'review'       },
 ] as const
 
 export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
@@ -50,6 +75,8 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
     name: '', location: '', propertyType: '', address: '', stars: 0,
     phone: '', email: defaultEmail || '', website: '', totalRooms: '',
     description: '', amenities: [],
+    tariffStart: '', tariffEnd: '',
+    rooms: [],
   })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -92,9 +119,24 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
       case 'propertyType': return !data.propertyType ? 'Pick whether this is a hotel or a houseboat.' : null
       case 'stars':        return !data.stars ? 'Select your star category.' : null
       case 'address':      return data.address.trim().length < 6 ? 'Please enter a full address.' : null
-      case 'contact':      return !/^[+\d][\d\s\-()]{6,}$/.test(data.phone) ? 'Enter a valid phone number.' : null
-      case 'rooms':        return !data.totalRooms || parseInt(data.totalRooms) <= 0 ? 'Total rooms must be a positive number.' : null
+      case 'contact':      {
+        const digits = data.phone.replace(/\D/g, '')
+        return digits.length < 10 || digits.length > 15 ? 'Phone must be 10–15 digits.' : null
+      }
+      case 'totalRooms':   return !data.totalRooms || parseInt(data.totalRooms) <= 0 ? 'Total rooms must be a positive number.' : null
       case 'description':  return data.description.trim().length < 20 ? 'Tell guests a bit more — at least a sentence (20+ chars).' : null
+      case 'tariff':       return !data.tariffStart || !data.tariffEnd
+                            ? 'Pick a tariff validity range.'
+                            : (data.tariffEnd < data.tariffStart ? 'End date must be on or after start date.' : null)
+      case 'roomRates':    {
+        // Skippable — if no rooms, allow continuing. Each row that has a name needs a positive rate.
+        for (const r of data.rooms) {
+          if (!r.type.trim()) continue
+          const hasAnyRate = [r.ep, r.cp, r.map, r.ap].some(x => parseInt(x) > 0)
+          if (!hasAnyRate) return `Room "${r.type}" needs at least one meal-plan rate (EP/CP/MAP/AP).`
+        }
+        return null
+      }
       default: return null
     }
   }
@@ -112,6 +154,21 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
     setSubmitting(true); setError('')
     try {
       const propertyType = data.propertyType || 'hotel'
+      // Phone normalised to digits-only (preserving leading + if user typed one)
+      const phoneDigits = data.phone.startsWith('+')
+        ? '+' + data.phone.slice(1).replace(/\D/g, '')
+        : data.phone.replace(/\D/g, '')
+
+      const roomsPayload = data.rooms
+        .filter(r => r.type.trim())
+        .map(r => ({
+          type: r.type.trim(), category: r.category, meal: r.meal,
+          ep: r.ep, cp: r.cp, map: r.map, ap: r.ap,
+          childWob: r.childWob, extraBed: r.extraBed,
+          gst: r.gst, notes: r.notes.trim(),
+          inventory: r.inventory, status: 'Available',
+        }))
+
       const res = await fetch('/api/hotels/me', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -122,11 +179,14 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           locationLabel: LOCATION_LABELS[data.location as Location],
           propertyType,
           address: data.address.trim(),
-          phone: data.phone.trim(),
+          phone: phoneDigits,
           email: data.email.trim(),
           website: data.website.trim(),
           description: data.description.trim(),
           amenities: data.amenities,
+          tariffStart: data.tariffStart || null,
+          tariffEnd:   data.tariffEnd   || null,
+          rooms: roomsPayload,
         }),
       })
       if (!res.ok) throw new Error(await res.text())
@@ -298,15 +358,22 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           )}
 
           {step.key === 'contact' && (
-            <Prompt title="How can agents reach you?" subtitle="Phone goes onto the public card. Email + website are shown on Enquire.">
+            <Prompt title="How can agents reach you?" subtitle="Phone goes onto the public card. Email + website appear on Enquire.">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <LabeledField label="Phone">
+                <LabeledField label="Phone — digits only">
                   <TextField
                     refEl={inputRef as React.MutableRefObject<HTMLInputElement>}
                     type="tel"
+                    inputMode="numeric"
                     value={data.phone}
-                    onChange={v => update('phone', v)}
-                    placeholder="+91 194 245 6789"
+                    onChange={v => {
+                      // Allow leading + and digits only
+                      const cleaned = v.startsWith('+')
+                        ? '+' + v.slice(1).replace(/\D/g, '')
+                        : v.replace(/\D/g, '')
+                      update('phone', cleaned)
+                    }}
+                    placeholder="9194245678901"
                   />
                 </LabeledField>
                 <LabeledField label="Email">
@@ -329,8 +396,8 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
             </Prompt>
           )}
 
-          {step.key === 'rooms' && (
-            <Prompt title="How many rooms in total?" subtitle="A round number is fine — you'll add room types and rates next.">
+          {step.key === 'totalRooms' && (
+            <Prompt title="How many rooms in total?" subtitle="Round figure is fine — you'll add specific room types and rates next.">
               <BigNumberInput
                 refEl={inputRef as React.MutableRefObject<HTMLInputElement>}
                 value={data.totalRooms}
@@ -383,10 +450,94 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
             </Prompt>
           )}
 
+          {step.key === 'tariff' && (
+            <Prompt title="Tariff valid from – to?" subtitle="The window these prices apply for. Most properties publish for a season (e.g. Mar–Jun, Oct–Mar). You can update later.">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <LabeledField label="Valid from">
+                  <input
+                    type="date"
+                    value={data.tariffStart}
+                    onChange={e => update('tariffStart', e.target.value)}
+                    style={tfInput}
+                  />
+                </LabeledField>
+                <LabeledField label="Valid till">
+                  <input
+                    type="date"
+                    value={data.tariffEnd}
+                    onChange={e => update('tariffEnd', e.target.value)}
+                    style={tfInput}
+                  />
+                </LabeledField>
+              </div>
+              <div style={{ marginTop: 14, fontSize: 12, color: '#717971', fontFamily: 'Inter, sans-serif' }}>
+                Example: <strong>15 Mar 2026 → 30 Jun 2026</strong> for the spring/summer season.
+              </div>
+            </Prompt>
+          )}
+
+          {step.key === 'roomRates' && (
+            <Prompt
+              title="Add 1–3 room types with rates"
+              subtitle="Quick setup — you can edit or add more from the dashboard anytime. Skip this step if you'd rather do it later."
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {data.rooms.length === 0 && (
+                  <div style={{
+                    background: 'rgba(255,255,255,0.55)',
+                    border: '2px dashed rgba(0,54,26,0.18)',
+                    borderRadius: 14, padding: '20px 22px',
+                    fontFamily: 'Inter, sans-serif', color: '#414942', fontSize: 13,
+                    textAlign: 'center',
+                  }}>
+                    No room types added yet — click <strong>Add Room Type</strong> below, or just hit <strong>OK</strong> to skip.
+                  </div>
+                )}
+
+                {data.rooms.map((r, idx) => (
+                  <RoomDraftCard
+                    key={idx}
+                    index={idx}
+                    room={r}
+                    propertyType={(data.propertyType || 'hotel') as PropertyType}
+                    onChange={(patch) => {
+                      setData(d => {
+                        const next = [...d.rooms]
+                        next[idx] = { ...next[idx], ...patch }
+                        return { ...d, rooms: next }
+                      })
+                    }}
+                    onRemove={() => setData(d => ({ ...d, rooms: d.rooms.filter((_, i) => i !== idx) }))}
+                  />
+                ))}
+
+                {data.rooms.length < 3 && (
+                  <button
+                    type="button"
+                    onClick={() => setData(d => ({ ...d, rooms: [...d.rooms, blankRoom((d.propertyType || 'hotel') as PropertyType)] }))}
+                    style={{
+                      padding: '14px 18px', borderRadius: 14, border: '2px dashed rgba(0,54,26,0.25)',
+                      background: 'transparent', color: '#00361a',
+                      fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      transition: 'all 0.18s',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,54,26,0.05)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                  >
+                    <Plus size={15} strokeWidth={2.5} />
+                    {data.rooms.length === 0 ? 'Add Room Type' : 'Add Another Room Type'}
+                    {data.rooms.length > 0 && <span style={{ opacity: 0.55, fontSize: 12 }}>({data.rooms.length}/3)</span>}
+                  </button>
+                )}
+              </div>
+            </Prompt>
+          )}
+
           {step.key === 'review' && (
             <Prompt title="Ready to publish your listing?" subtitle="Looks right? Hit Publish — your listing goes live after admin approval.">
               <div style={{ background: '#ffffff', borderRadius: 18, padding: 24, boxShadow: '0 12px 40px rgba(0,54,26,0.08)' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px 18px', fontFamily: 'Inter, sans-serif', fontSize: 14 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '8px 18px', fontFamily: 'Inter, sans-serif', fontSize: 14 }}>
                   <ReviewRow label="Name"     value={data.name} />
                   <ReviewRow label="Type"     value={data.propertyType === 'houseboat' ? 'Houseboat' : 'Hotel'} />
                   <ReviewRow label="Location" value={data.location ? LOCATION_LABELS[data.location as Location] : ''} />
@@ -395,9 +546,30 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                   <ReviewRow label="Phone"    value={data.phone} />
                   <ReviewRow label="Email"    value={data.email} />
                   {data.website && <ReviewRow label="Website" value={data.website} />}
-                  <ReviewRow label="Rooms"    value={data.totalRooms} />
+                  <ReviewRow label="Total rooms" value={data.totalRooms} />
+                  <ReviewRow label="Tariff period" value={data.tariffStart && data.tariffEnd ? `${data.tariffStart} → ${data.tariffEnd}` : '—'} />
+                  <ReviewRow label="Room types"   value={data.rooms.length ? `${data.rooms.length} added` : '—'} />
                   <ReviewRow label="Amenities" value={data.amenities.length ? data.amenities.join(', ') : '—'} />
                 </div>
+                {data.rooms.length > 0 && (
+                  <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #edeeef' }}>
+                    <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', marginBottom: 8 }}>
+                      Rates summary
+                    </div>
+                    {data.rooms.map((r, i) => (
+                      <div key={i} style={{ fontSize: 13, color: '#414942', lineHeight: 1.5 }}>
+                        <strong style={{ color: '#191c1d' }}>{r.type}</strong> · {r.category} · {r.inventory || 0} rooms
+                        {' · '}
+                        {[
+                          r.ep && `EP ₹${r.ep}`,
+                          r.cp && `CP ₹${r.cp}`,
+                          r.map && `MAP ₹${r.map}`,
+                          r.ap && `AP ₹${r.ap}`,
+                        ].filter(Boolean).join(' · ')}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <p style={{ marginTop: 14, fontSize: 12.5, color: '#717971', fontFamily: 'Inter, sans-serif', textAlign: 'center' }}>
                 You can change anything from your dashboard after publishing.
@@ -499,15 +671,18 @@ function Prompt({ title, subtitle, children }: { title: string; subtitle?: strin
   )
 }
 
-function TextField({ refEl, type = 'text', value, onChange, onSubmit, placeholder }: {
+function TextField({ refEl, type = 'text', inputMode, value, onChange, onSubmit, placeholder }: {
   refEl?: React.MutableRefObject<HTMLInputElement>
-  type?: string; value: string; onChange: (v: string) => void
+  type?: string
+  inputMode?: 'text' | 'email' | 'tel' | 'url' | 'numeric' | 'decimal' | 'search'
+  value: string; onChange: (v: string) => void
   onSubmit?: () => void; placeholder?: string
 }) {
   return (
     <input
       ref={refEl}
       type={type}
+      inputMode={inputMode}
       value={value}
       onChange={e => onChange(e.target.value)}
       onKeyDown={e => { if (e.key === 'Enter' && onSubmit) { e.preventDefault(); onSubmit() } }}
@@ -663,4 +838,148 @@ const kbd: React.CSSProperties = {
   border: '1px solid rgba(0,54,26,0.15)',
   borderRadius: 6, fontSize: 11, fontWeight: 700, fontFamily: 'Inter, sans-serif',
   color: '#414942',
+}
+
+const tfInput: React.CSSProperties = {
+  width: '100%',
+  background: '#ffffff',
+  border: '1px solid rgba(0,54,26,0.14)',
+  borderRadius: 10,
+  fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 600,
+  color: '#191c1d', padding: '11px 14px', outline: 'none',
+}
+
+const GST_OPTIONS: { key: GstStatus; label: string }[] = [
+  { key: 'as_applicable',     label: 'GST As Applicable' },
+  { key: 'included',          label: 'GST Included' },
+  { key: 'extra',             label: 'GST Extra' },
+  { key: 'non_commissionable',label: 'Net Non-Commissionable' },
+]
+
+const MEAL_OPTIONS: { key: MealPlan; label: string }[] = [
+  { key: 'EP',  label: 'EP — Room Only' },
+  { key: 'CP',  label: 'CP — Breakfast' },
+  { key: 'MAP', label: 'MAP — Breakfast & Dinner' },
+  { key: 'AP',  label: 'AP — All Meals' },
+]
+
+function RoomDraftCard({
+  index, room, propertyType, onChange, onRemove,
+}: {
+  index: number
+  room: RoomDraft
+  propertyType: PropertyType
+  onChange: (patch: Partial<RoomDraft>) => void
+  onRemove: () => void
+}) {
+  const cats = categoriesFor(propertyType)
+  return (
+    <div style={{
+      background: '#ffffff',
+      border: '1px solid rgba(0,54,26,0.10)',
+      borderRadius: 16,
+      padding: 20,
+      boxShadow: '0 4px 24px rgba(0,54,26,0.05)',
+      fontFamily: 'Inter, sans-serif',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{
+            width: 22, height: 22, borderRadius: 9999,
+            background: 'linear-gradient(135deg, #00361a, #1a4d2e)',
+            color: '#ffffff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 11, fontWeight: 900,
+          }}>{index + 1}</span>
+          <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#1a4d2e' }}>
+            Room type
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label="Remove room"
+          style={{
+            width: 30, height: 30, borderRadius: 9999, border: 'none',
+            background: 'rgba(186,26,26,0.08)', color: '#ba1a1a',
+            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <Trash2 size={13} strokeWidth={2.3} />
+        </button>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
+        <div>
+          <label style={tfLabel}>Room name</label>
+          <input value={room.type} onChange={e => onChange({ type: e.target.value })} placeholder="e.g. Deluxe Double" style={tfInput} />
+        </div>
+        <div>
+          <label style={tfLabel}>Category</label>
+          <select value={room.category} onChange={e => onChange({ category: e.target.value as RoomCategory })} style={tfInput}>
+            {cats.map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={tfLabel}>Inventory</label>
+          <input type="number" inputMode="numeric" min={0} value={room.inventory} onChange={e => onChange({ inventory: e.target.value.replace(/\D/g, '') })} placeholder="10" style={tfInput} />
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 12 }}>
+        {([
+          ['EP — Room Only',    'ep'  as const],
+          ['CP — Breakfast',    'cp'  as const],
+          ['MAP — B + D',       'map' as const],
+          ['AP — All Meals',    'ap'  as const],
+        ]).map(([label, key]) => (
+          <div key={key}>
+            <label style={tfLabel}>{label} (₹)</label>
+            <input
+              type="number" inputMode="numeric" min={0}
+              value={(room as Record<string, string | unknown>)[key as string] as string}
+              onChange={e => onChange({ [key]: e.target.value.replace(/\D/g, '') } as Partial<RoomDraft>)}
+              placeholder="0"
+              style={tfInput}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.4fr', gap: 10, marginBottom: 12 }}>
+        <div>
+          <label style={tfLabel}>Extra Bed (₹)</label>
+          <input type="number" inputMode="numeric" min={0} value={room.extraBed} onChange={e => onChange({ extraBed: e.target.value.replace(/\D/g, '') })} placeholder="0" style={tfInput} />
+        </div>
+        <div>
+          <label style={tfLabel}>Child WOB (₹)</label>
+          <input type="number" inputMode="numeric" min={0} value={room.childWob} onChange={e => onChange({ childWob: e.target.value.replace(/\D/g, '') })} placeholder="0" style={tfInput} />
+        </div>
+        <div>
+          <label style={tfLabel}>GST</label>
+          <select value={room.gst} onChange={e => onChange({ gst: e.target.value as GstStatus })} style={tfInput}>
+            {GST_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+          </select>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 10 }}>
+        <div>
+          <label style={tfLabel}>Default meal plan</label>
+          <select value={room.meal} onChange={e => onChange({ meal: e.target.value as MealPlan })} style={tfInput}>
+            {MEAL_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={tfLabel}>Notes (optional)</label>
+          <input value={room.notes} onChange={e => onChange({ notes: e.target.value })} placeholder="e.g. Max 3 Pax · Net B2B" style={tfInput} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const tfLabel: React.CSSProperties = {
+  display: 'block',
+  fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
+  color: '#717971', marginBottom: 5, fontFamily: 'Inter, sans-serif',
 }
