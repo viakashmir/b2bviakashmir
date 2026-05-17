@@ -27,10 +27,10 @@ type CalendarData = {
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-function todayStr() {
-  const d = new Date()
+function toInputDate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
+function todayStr() { return toInputDate(new Date()) }
 function fmtDateLabel(iso: string): string {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return iso
