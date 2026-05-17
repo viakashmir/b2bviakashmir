@@ -12,6 +12,6 @@ export async function GET() {
     sb.from('rooms').select('*'),
   ])
   if (hErr || rErr) return NextResponse.json({ error: hErr?.message || rErr?.message }, { status: 500 })
-  const mapped = (hotels ?? []).map(h => rowToHotel(h, rooms ?? []))
+  const mapped = (hotels ?? []).map((h: any) => rowToHotel(h, rooms ?? []))
   return NextResponse.json({ hotels: mapped })
 }

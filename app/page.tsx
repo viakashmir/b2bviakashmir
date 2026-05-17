@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Header from '@/components/Header'
 import HotelCard from '@/components/HotelCard'
 import KashmirLive from '@/components/KashmirLive'
-import { Hotel, LOCATIONS, Location, PropertyType } from '@/lib/data'
+import { Hotel, LOCATIONS, Location, PropertyType, rowToHotel } from '@/lib/data'
 import { browserSupabase } from '@/lib/supabase'
 
 type PropFilter = 'all' | PropertyType
@@ -17,33 +17,37 @@ export default function PublicPage() {
   const [mounted, setMounted] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const refresh = async () => {
+  // Public page reads Supabase directly via anon key + RLS (which already
+  // allows SELECT on approved hotels and their rooms). No API hop — this
+  // makes real-time subscriptions and refresh-after-change instant.
+  const refresh = useCallback(async () => {
+    let sb: ReturnType<typeof browserSupabase> | null = null
+    try { sb = browserSupabase() } catch (e) { setError((e as Error).message); return }
     try {
-      const res = await fetch('/api/hotels', { cache: 'no-store' })
-      if (!res.ok) throw new Error(await res.text())
-      const json = await res.json()
-      setHotels(json.hotels ?? [])
+      const [{ data: hRows, error: hErr }, { data: rRows, error: rErr }] = await Promise.all([
+        sb.from('hotels').select('*').eq('approved', true).order('created_at', { ascending: false }),
+        sb.from('rooms').select('*'),
+      ])
+      if (hErr) throw hErr
+      if (rErr) throw rErr
+      setHotels((hRows ?? []).map((h: any) => rowToHotel(h, rRows ?? [])))
       setError(null)
     } catch (e) {
       setError((e as Error).message)
     }
-  }
+  }, [])
 
   useEffect(() => {
     setMounted(true)
     refresh()
-
-    // Real-time: any change to hotels or rooms triggers a refetch
     let sb: ReturnType<typeof browserSupabase> | null = null
-    try { sb = browserSupabase() } catch { /* env vars missing in dev */ }
-    if (!sb) return
-
+    try { sb = browserSupabase() } catch { return }
     const channel = sb.channel('public-hotels')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'hotels' }, refresh)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms'  }, refresh)
       .subscribe()
     return () => { sb!.removeChannel(channel) }
-  }, [])
+  }, [refresh])
 
   const filtered = hotels.filter(h => {
     const locMatch = filter === 'all' || h.location === filter

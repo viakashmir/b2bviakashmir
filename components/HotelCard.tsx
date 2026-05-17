@@ -128,11 +128,12 @@ export default function HotelCard({ hotel, index }: Props) {
               No rates published yet
             </div>
           ) : hotel.rooms.map((r, ri) => {
-            const rmsPill = {
-              Available: { bg: 'rgba(19,103,123,0.10)', color: '#13677b' },
-              Limited:   { bg: 'rgba(74,36,0,0.08)',   color: '#6f3800' },
-              'Sold Out':{ bg: 'rgba(186,26,26,0.10)', color: '#93000a' },
-            }[r.status]
+            // Green when plenty, blinking yellow when low (≤3 OR status=Limited), red when sold out.
+            const lowStock = r.status === 'Sold Out' || r.inventory === 0
+              ? 'avail-red'
+              : (r.status === 'Limited' || r.inventory <= 3)
+                ? 'avail-amber'
+                : 'avail-green'
             return (
               <div key={r.id} style={{
                 display: 'grid', gridTemplateColumns: '1.6fr 1fr 0.85fr 0.95fr 0.55fr',
@@ -158,7 +159,7 @@ export default function HotelCard({ hotel, index }: Props) {
                   {r.extraBed ? fmtINR(r.extraBed) : '—'}
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <span style={{ display: 'inline-block', minWidth: 28, padding: '3px 8px', borderRadius: 9999, fontSize: 11, fontWeight: 700, background: rmsPill.bg, color: rmsPill.color, fontFamily: 'Inter, sans-serif' }}>
+                  <span className={lowStock} style={{ display: 'inline-block', minWidth: 30, padding: '4px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 800, fontFamily: 'Inter, sans-serif' }}>
                     {r.inventory}
                   </span>
                 </div>

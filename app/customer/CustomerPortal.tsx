@@ -7,7 +7,7 @@ import HotelCard from '@/components/HotelCard'
 import Toast, { ToastMessage } from '@/components/Toast'
 import {
   Concern, ConcernCategory, ConcernStatus, CONCERN_CATEGORIES, Hotel,
-  timeAgo,
+  rowToHotel, timeAgo,
 } from '@/lib/data'
 import { browserSupabase } from '@/lib/supabase'
 
@@ -39,11 +39,17 @@ export default function CustomerPortal() {
 
   const refresh = useCallback(async () => {
     try {
-      const [hRes, cRes] = await Promise.all([
-        fetch('/api/hotels', { cache: 'no-store' }),
-        fetch('/api/concerns', { cache: 'no-store' }),
-      ])
-      if (hRes.ok) { const j = await hRes.json(); setHotels(j.hotels ?? []) }
+      // Hotels: read direct from Supabase via anon key (RLS allows approved=true)
+      let sb: ReturnType<typeof browserSupabase> | null = null
+      try { sb = browserSupabase() } catch {}
+      if (sb) {
+        const [{ data: hRows }, { data: rRows }] = await Promise.all([
+          sb.from('hotels').select('*').eq('approved', true).order('created_at', { ascending: false }),
+          sb.from('rooms').select('*'),
+        ])
+        setHotels((hRows ?? []).map((h: any) => rowToHotel(h, rRows ?? [])))
+      }
+      const cRes = await fetch('/api/concerns', { cache: 'no-store' })
       if (cRes.ok) { const j = await cRes.json(); setMyConcerns(j.concerns ?? []) }
     } finally { setLoading(false) }
   }, [])

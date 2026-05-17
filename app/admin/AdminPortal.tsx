@@ -28,13 +28,17 @@ export default function AdminPortal() {
   const [replyId, setReplyId] = useState<string | null>(null)
   const [replyText, setReplyText] = useState('')
 
+  const [authError, setAuthError] = useState<string | null>(null)
+
   const refresh = useCallback(async () => {
     try {
       const [hRes, cRes] = await Promise.all([
         fetch('/api/admin/hotels', { cache: 'no-store' }),
         fetch('/api/concerns', { cache: 'no-store' }),
       ])
-      if (hRes.ok) { const j = await hRes.json(); setHotels(j.hotels ?? []) }
+      if (hRes.status === 401 || hRes.status === 403) {
+        setAuthError('Your Clerk user is missing publicMetadata.role = "admin". Open Clerk Dashboard → Users → your user → Metadata → Public, set the role, and reload.')
+      } else if (hRes.ok) { const j = await hRes.json(); setHotels(j.hotels ?? []); setAuthError(null) }
       if (cRes.ok) { const j = await cRes.json(); setConcerns(j.concerns ?? []) }
     } finally { setLoading(false) }
   }, [])
@@ -59,18 +63,24 @@ export default function AdminPortal() {
       method: 'PATCH', headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
     })
-    if (!res.ok) { addToast(await res.text(), 'error'); return }
+    if (res.status === 401 || res.status === 403) {
+      addToast('Admin role missing on your Clerk user. See banner above.', 'error'); return
+    }
+    if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Update failed', 'error'); return }
     addToast(success, 'success'); refresh()
   }
 
   const approveHotel = (id: string) => patchHotel(id, { approved: true }, 'Hotel approved · Now live')
   const suspendHotel = (id: string) => patchHotel(id, { approved: false }, 'Hotel suspended')
 
-  const deleteHotel = async (id: string) => {
-    if (!confirm('Permanently delete this hotel?')) return
+  const deleteHotel = async (id: string, name: string) => {
+    if (!confirm(`Permanently delete "${name}"? This will also remove all its rooms and rates.`)) return
     const res = await fetch(`/api/admin/hotels/${id}`, { method: 'DELETE' })
-    if (!res.ok) { addToast(await res.text(), 'error'); return }
-    addToast('Hotel deleted', 'info'); refresh()
+    if (res.status === 401 || res.status === 403) {
+      addToast('Admin role missing on your Clerk user. See banner above.', 'error'); return
+    }
+    if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Delete failed', 'error'); return }
+    addToast(`"${name}" deleted`, 'success'); refresh()
   }
 
   const patchConcern = async (id: string, body: object, success: string) => {
@@ -123,7 +133,21 @@ export default function AdminPortal() {
               Approve hotels, moderate concerns, monitor the portal.
             </p>
           </div>
+          <div className="dash-actions">
+            <button onClick={refresh} className="btn-secondary" style={{ padding: '10px 18px', fontSize: 13 }}>
+              <i className="fi fi-rr-refresh" style={{ fontSize: 13 }} /> Refresh
+            </button>
+          </div>
         </div>
+
+        {authError && (
+          <div className="card-elevated" style={{ padding: 18, marginBottom: 20, borderLeft: '4px solid #ba1a1a', background: '#ffdad6' }}>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, color: '#93000a', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <i className="fi fi-rs-exclamation" style={{ fontSize: 14 }} /> Admin actions disabled
+            </div>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#191c1d', lineHeight: 1.5 }}>{authError}</div>
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid #edeeef', flexWrap: 'wrap' }}>
           {TABS.map(t => (
@@ -195,18 +219,45 @@ export default function AdminPortal() {
                     </td>
                     <td style={{ padding: '14px 16px', fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#717971', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{timeAgo(h.createdAt)}</td>
                     <td style={{ padding: '14px 16px', whiteSpace: 'nowrap', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
-                      <div style={{ display: 'flex', gap: 6 }}>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                         {h.approved ? (
-                          <button onClick={() => suspendHotel(h.id)} className="btn-secondary" style={{ padding: '7px 14px', fontSize: 11 }}>
-                            <i className="fi fi-rr-pause" style={{ fontSize: 11 }} /> Suspend
+                          <button
+                            onClick={() => suspendHotel(h.id)}
+                            style={{
+                              padding: '8px 14px', borderRadius: 9999, border: 'none',
+                              background: '#fef3c7', color: '#6f3800',
+                              fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 800,
+                              cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
+                              transition: 'all 0.18s',
+                            }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ffdcc4' }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fef3c7' }}
+                          >
+                            <i className="fi fi-rr-pause" style={{ fontSize: 12 }} /> Suspend
                           </button>
                         ) : (
-                          <button onClick={() => approveHotel(h.id)} className="btn-primary" style={{ padding: '7px 14px', fontSize: 11 }}>
-                            <i className="fi fi-rr-check" style={{ fontSize: 11 }} /> Approve
+                          <button
+                            onClick={() => approveHotel(h.id)}
+                            className="btn-primary"
+                            style={{ padding: '9px 16px', fontSize: 12, boxShadow: '0 4px 14px rgba(0,54,26,0.22)' }}
+                          >
+                            <i className="fi fi-rs-check-circle" style={{ fontSize: 13 }} /> Approve
                           </button>
                         )}
-                        <button onClick={() => deleteHotel(h.id)} style={{ width: 34, height: 34, borderRadius: 9999, border: 'none', background: '#ffdad6', color: '#93000a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Delete">
-                          <i className="fi fi-rr-trash" style={{ fontSize: 13 }} />
+                        <button
+                          onClick={() => deleteHotel(h.id, h.name)}
+                          style={{
+                            padding: '8px 14px', borderRadius: 9999, border: 'none',
+                            background: '#ba1a1a', color: '#ffffff',
+                            fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 800,
+                            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
+                            transition: 'all 0.18s', boxShadow: '0 4px 12px rgba(186,26,26,0.25)',
+                          }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#93000a' }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#ba1a1a' }}
+                          aria-label={`Delete ${h.name}`}
+                        >
+                          <i className="fi fi-rr-trash" style={{ fontSize: 12 }} /> Delete
                         </button>
                       </div>
                     </td>
