@@ -6,6 +6,7 @@ import {
   BedDouble, Lock,
 } from 'lucide-react'
 import Toast, { ToastMessage } from '@/components/Toast'
+import BrandedDatePicker from '@/components/BrandedDatePicker'
 import { browserSupabase } from '@/lib/supabase'
 
 type Day = {
@@ -538,14 +539,21 @@ export default function InventoryCalendar() {
             })()}
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div>
-                <label className="t-overline" style={{ display: 'block', marginBottom: 6 }}>Start date</label>
-                <input type="date" min={todayStr()} value={form.startDate} onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} className="input-field" style={{ padding: '10px 12px', fontSize: 13 }} />
-              </div>
-              <div>
-                <label className="t-overline" style={{ display: 'block', marginBottom: 6 }}>End date</label>
-                <input type="date" min={form.startDate || todayStr()} value={form.endDate} onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} className="input-field" style={{ padding: '10px 12px', fontSize: 13 }} />
-              </div>
+              <BrandedDatePicker
+                label="Start date"
+                value={form.startDate}
+                min={todayStr()}
+                max={form.endDate || undefined}
+                onChange={v => setForm(f => ({ ...f, startDate: v }))}
+                placeholder="Pick start date"
+              />
+              <BrandedDatePicker
+                label="End date"
+                value={form.endDate}
+                min={form.startDate || todayStr()}
+                onChange={v => setForm(f => ({ ...f, endDate: v }))}
+                placeholder="Pick end date"
+              />
               <div style={{ gridColumn: '1 / -1' }}>
                 <label className="t-overline" style={{ display: 'block', marginBottom: 6 }}>Room type (optional — leave blank for all)</label>
                 <select value={form.roomId} onChange={e => setForm(f => ({ ...f, roomId: e.target.value }))} className="input-field" style={{ padding: '10px 12px', fontSize: 13 }}>

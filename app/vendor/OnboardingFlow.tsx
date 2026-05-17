@@ -10,6 +10,7 @@ import {
   ArrowRight, ArrowLeft, Check, Building2, Sailboat, MapPin,
   Sparkles, Mountain, Wifi, Plus, Trash2,
 } from 'lucide-react'
+import BrandedDatePicker from '@/components/BrandedDatePicker'
 
 type RoomDraft = {
   type: string
@@ -1125,8 +1126,8 @@ function TariffWindow({ start, end, onStart, onEnd }: {
   return (
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-        <BrandedDateField label="Valid from" value={start} min={today} max={end || undefined} onChange={onStart} />
-        <BrandedDateField label="Valid till" value={end} min={start || today} onChange={onEnd} />
+        <BrandedDatePicker label="Valid from" value={start} min={today} max={end || undefined} onChange={onStart} placeholder="Pick start date" />
+        <BrandedDatePicker label="Valid till" value={end}   min={start || today}                 onChange={onEnd}   placeholder="Pick end date" />
       </div>
       <div style={{
         marginTop: 18,
