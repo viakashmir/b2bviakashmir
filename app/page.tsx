@@ -101,7 +101,7 @@ export default function PublicPage() {
           </h1>
           <p className="hero-subtitle">
             Hotels publish once. Agents book confidently.<br />
-            Live B2B rates across Srinagar, Houseboats, Gulmarg, Pahalgam, Sonamarg &amp; Gurez.
+            Live B2B rates across Srinagar, Gulmarg, Pahalgam, Sonamarg &amp; Gurez.
           </p>
 
           <div className="hero-meta-row" style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 28, flexWrap: 'wrap' }}>

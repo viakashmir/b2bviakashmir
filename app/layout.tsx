@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
+
+const GA_ID = 'G-VGLJEWW5WS'
 
 export const metadata: Metadata = {
   title: 'Via Kashmir — B2B Hotel Rate Portal',
@@ -37,6 +40,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       }}
     >
       <html lang="en">
+        <head>
+          {/* Google Analytics — gtag.js */}
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="ga-init" strategy="afterInteractive">{`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}');
+          `}</Script>
+        </head>
         <body>{children}</body>
       </html>
     </ClerkProvider>
