@@ -396,6 +396,14 @@ body {
   .hotel-card-footer button { width: 100%; }
 }
 
+/* Kashmir live strip stacks under 700px */
+@media (max-width: 700px) {
+  .kashmir-live { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 480px) {
+  .kashmir-live .weather-row { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; row-gap: 6px; }
+}
+
 /* Very small phones */
 @media (max-width: 380px) {
   .hero-title { font-size: 26px; }

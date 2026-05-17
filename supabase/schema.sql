@@ -10,6 +10,7 @@ create table if not exists public.hotels (
   stars           int  not null default 3 check (stars between 1 and 5),
   location        text not null,
   location_label  text not null,
+  property_type   text not null default 'hotel', -- 'hotel' | 'houseboat'
   address         text not null default '',
   phone           text not null default '',
   email           text not null default '',

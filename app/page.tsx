@@ -3,12 +3,16 @@
 import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import HotelCard from '@/components/HotelCard'
-import { Hotel, LOCATIONS, Location } from '@/lib/data'
+import KashmirLive from '@/components/KashmirLive'
+import { Hotel, LOCATIONS, Location, PropertyType } from '@/lib/data'
 import { browserSupabase } from '@/lib/supabase'
+
+type PropFilter = 'all' | PropertyType
 
 export default function PublicPage() {
   const [hotels, setHotels] = useState<Hotel[]>([])
   const [filter, setFilter] = useState<Location | 'all'>('all')
+  const [propFilter, setPropFilter] = useState<PropFilter>('all')
   const [search, setSearch] = useState('')
   const [mounted, setMounted] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -43,9 +47,12 @@ export default function PublicPage() {
 
   const filtered = hotels.filter(h => {
     const locMatch = filter === 'all' || h.location === filter
+    // Property-type filter only applies to Srinagar (other cities are hotels-only)
+    const propMatch =
+      filter !== 'srinagar' || propFilter === 'all' || h.propertyType === propFilter
     const s = search.toLowerCase().trim()
     const searchMatch = !s || h.name.toLowerCase().includes(s) || h.locationLabel.toLowerCase().includes(s)
-    return locMatch && searchMatch
+    return locMatch && propMatch && searchMatch
   })
 
   if (!mounted) {
@@ -102,6 +109,8 @@ export default function PublicPage() {
           </div>
         </section>
 
+        <KashmirLive />
+
         <div className="filter-row">
           <span className="t-overline" style={{ marginRight: 6 }}>
             <i className="fi fi-rr-filter" style={{ fontSize: 11, marginRight: 6, verticalAlign: 'middle' }} />
@@ -112,7 +121,7 @@ export default function PublicPage() {
             return (
               <button
                 key={loc.value}
-                onClick={() => setFilter(loc.value as Location | 'all')}
+                onClick={() => { setFilter(loc.value as Location | 'all'); if (loc.value !== 'srinagar') setPropFilter('all') }}
                 style={{
                   padding: '8px 16px', borderRadius: 9999, border: 'none',
                   background: active ? 'linear-gradient(135deg, #00361a, #1a4d2e)' : '#ffffff',
@@ -143,6 +152,40 @@ export default function PublicPage() {
             {filtered.length} of {hotels.length}
           </span>
         </div>
+
+        {/* Srinagar sub-filter: Hotels / Houseboats */}
+        {filter === 'srinagar' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: -12, marginBottom: 28, flexWrap: 'wrap' }}>
+            <span className="t-overline" style={{ marginRight: 6 }}>
+              <i className="fi fi-rr-filter" style={{ fontSize: 11, marginRight: 6, verticalAlign: 'middle' }} />
+              Property
+            </span>
+            {([
+              { key: 'all',       label: 'All',        icon: 'fi-rr-grid' },
+              { key: 'hotel',     label: 'Hotels',     icon: 'fi-rr-building' },
+              { key: 'houseboat', label: 'Houseboats', icon: 'fi-rr-sailboat' },
+            ] as { key: PropFilter; label: string; icon: string }[]).map(p => {
+              const active = propFilter === p.key
+              return (
+                <button
+                  key={p.key}
+                  onClick={() => setPropFilter(p.key)}
+                  style={{
+                    padding: '7px 14px', borderRadius: 9999, border: 'none',
+                    background: active ? 'linear-gradient(135deg, #13677b, #18697e)' : '#f3f4f5',
+                    color: active ? '#ffffff' : '#414942',
+                    fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 700,
+                    cursor: 'pointer', transition: 'all 0.18s',
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                  }}
+                >
+                  <i className={`fi ${p.icon}`} style={{ fontSize: 11 }} />
+                  {p.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {error && (
           <div className="card" style={{ padding: '20px 24px', marginBottom: 24, borderLeft: '4px solid #ba1a1a', fontFamily: 'Inter, sans-serif', color: '#93000a' }}>

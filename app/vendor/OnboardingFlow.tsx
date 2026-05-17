@@ -1,7 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Location, StarCategory, LOCATIONS, LOCATION_LABELS, AMENITIES_LIST, STAR_LABELS } from '@/lib/data'
+import {
+  Location, PropertyType, StarCategory,
+  LOCATIONS, LOCATION_LABELS, STAR_LABELS,
+  amenitiesFor,
+} from '@/lib/data'
 
 interface Props {
   defaultName: string
@@ -12,6 +16,7 @@ interface Props {
 type FormData = {
   name: string
   location: Location | ''
+  propertyType: PropertyType | ''
   address: string
   stars: StarCategory | 0
   phone: string
@@ -22,32 +27,50 @@ type FormData = {
   amenities: string[]
 }
 
-const STEPS = [
-  { key: 'name',        label: 'Hotel Name' },
-  { key: 'location',    label: 'Location' },
-  { key: 'stars',       label: 'Star Category' },
-  { key: 'address',     label: 'Address' },
-  { key: 'contact',     label: 'Contact' },
-  { key: 'rooms',       label: 'Rooms' },
-  { key: 'description', label: 'About' },
-  { key: 'amenities',   label: 'Amenities' },
-  { key: 'review',      label: 'Review' },
+// Step list — 'propertyType' is shown only when location === 'srinagar'
+const ALL_STEPS = [
+  { key: 'name',         label: 'Name' },
+  { key: 'location',     label: 'Location' },
+  { key: 'propertyType', label: 'Property Type', srinagarOnly: true },
+  { key: 'stars',        label: 'Star Category' },
+  { key: 'address',      label: 'Address' },
+  { key: 'contact',      label: 'Contact' },
+  { key: 'rooms',        label: 'Rooms' },
+  { key: 'description',  label: 'About' },
+  { key: 'amenities',    label: 'Amenities' },
+  { key: 'review',       label: 'Review' },
 ] as const
-type StepKey = (typeof STEPS)[number]['key']
+type StepKey = (typeof ALL_STEPS)[number]['key']
 
 export default function OnboardingFlow({ defaultName, defaultEmail, onComplete }: Props) {
   const [stepIdx, setStepIdx] = useState(0)
   const [data, setData] = useState<FormData>({
-    name: '', location: '', address: '', stars: 0,
+    name: '', location: '', propertyType: '', address: '', stars: 0,
     phone: '', email: defaultEmail || '', website: '', totalRooms: '',
     description: '', amenities: [],
   })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
-  const step = STEPS[stepIdx]
-  const isLast = stepIdx === STEPS.length - 1
+
+  // Property-type step is conditional — only meaningful for Srinagar.
+  const STEPS = ALL_STEPS.filter(s => !('srinagarOnly' in s && s.srinagarOnly) || data.location === 'srinagar')
+  const step = STEPS[Math.min(stepIdx, STEPS.length - 1)]
+  const isLast = stepIdx >= STEPS.length - 1
   const progress = ((stepIdx + 1) / STEPS.length) * 100
+
+  // For non-Srinagar locations, hotels are the only property type — set it implicitly.
+  useEffect(() => {
+    if (data.location && data.location !== 'srinagar' && data.propertyType !== 'hotel') {
+      setData(d => ({ ...d, propertyType: 'hotel' }))
+    }
+  }, [data.location, data.propertyType])
+
+  // Reset amenity selection when switching property type — different lists.
+  useEffect(() => {
+    const valid = new Set(amenitiesFor(data.propertyType === 'houseboat' ? 'houseboat' : 'hotel'))
+    setData(d => ({ ...d, amenities: d.amenities.filter(a => valid.has(a)) }))
+  }, [data.propertyType])
 
   useEffect(() => {
     // Autofocus first input on step change
@@ -63,13 +86,14 @@ export default function OnboardingFlow({ defaultName, defaultEmail, onComplete }
 
   const validateStep = (): string | null => {
     switch (step.key) {
-      case 'name':        return data.name.trim().length < 3 ? 'Hotel name is required.' : null
-      case 'location':    return !data.location ? 'Pick a location.' : null
-      case 'stars':       return !data.stars ? 'Select your star category.' : null
-      case 'address':     return data.address.trim().length < 6 ? 'Please enter a full address.' : null
-      case 'contact':     return !/^[+\d][\d\s\-()]{6,}$/.test(data.phone) ? 'Enter a valid phone number.' : null
-      case 'rooms':       return !data.totalRooms || parseInt(data.totalRooms) <= 0 ? 'Total rooms must be a positive number.' : null
-      case 'description': return data.description.trim().length < 20 ? 'Please add at least a sentence (20+ chars).' : null
+      case 'name':         return data.name.trim().length < 3 ? 'Property name is required.' : null
+      case 'location':     return !data.location ? 'Pick a location.' : null
+      case 'propertyType': return !data.propertyType ? 'Pick whether this is a hotel or a houseboat.' : null
+      case 'stars':        return !data.stars ? 'Select your star category.' : null
+      case 'address':      return data.address.trim().length < 6 ? 'Please enter a full address.' : null
+      case 'contact':      return !/^[+\d][\d\s\-()]{6,}$/.test(data.phone) ? 'Enter a valid phone number.' : null
+      case 'rooms':        return !data.totalRooms || parseInt(data.totalRooms) <= 0 ? 'Total rooms must be a positive number.' : null
+      case 'description':  return data.description.trim().length < 20 ? 'Please add at least a sentence (20+ chars).' : null
       default: return null
     }
   }
@@ -86,6 +110,7 @@ export default function OnboardingFlow({ defaultName, defaultEmail, onComplete }
     setSubmitting(true)
     setError('')
     try {
+      const propertyType = data.propertyType || 'hotel'
       const res = await fetch('/api/hotels/me', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -94,6 +119,7 @@ export default function OnboardingFlow({ defaultName, defaultEmail, onComplete }
           stars: data.stars || 3,
           location: data.location,
           locationLabel: LOCATION_LABELS[data.location as Location],
+          propertyType,
           address: data.address.trim(),
           phone: data.phone.trim(),
           email: data.email.trim(),
@@ -135,12 +161,12 @@ export default function OnboardingFlow({ defaultName, defaultEmail, onComplete }
         <div className="card-elevated fade-up" key={step.key} style={{ padding: '40px 36px' }}>
           {/* Step body */}
           {step.key === 'name' && (
-            <StepShell title="What's your hotel called?" hint="The name guests will see on the rates board.">
+            <StepShell title="What's your property called?" hint="The name agents will see on the rates board.">
               <input
                 ref={inputRef as React.MutableRefObject<HTMLInputElement>}
                 type="text"
                 className="input-field"
-                placeholder="e.g. Grand Palace Hotel"
+                placeholder="e.g. Grand Palace Hotel · Dal View Houseboats"
                 value={data.name}
                 onChange={e => update('name', e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && next()}
@@ -171,6 +197,37 @@ export default function OnboardingFlow({ defaultName, defaultEmail, onComplete }
                     >
                       <i className="fi fi-rr-marker" style={{ fontSize: 14 }} />
                       {l.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </StepShell>
+          )}
+
+          {step.key === 'propertyType' && (
+            <StepShell title="Hotel or Houseboat?" hint="In Srinagar both are common — pick one.">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                {([
+                  { key: 'hotel',     label: 'Hotel',     icon: 'fi-rr-building',  blurb: 'Land-based property' },
+                  { key: 'houseboat', label: 'Houseboat', icon: 'fi-rr-sailboat',  blurb: 'On the Dal / Nigeen lake' },
+                ] as { key: PropertyType; label: string; icon: string; blurb: string }[]).map(p => {
+                  const active = data.propertyType === p.key
+                  return (
+                    <button
+                      key={p.key}
+                      type="button"
+                      onClick={() => { update('propertyType', p.key); setTimeout(next, 200) }}
+                      style={{
+                        padding: '20px 18px', borderRadius: 16, border: 'none',
+                        background: active ? 'linear-gradient(135deg, #00361a, #1a4d2e)' : '#f3f4f5',
+                        color: active ? '#ffffff' : '#191c1d',
+                        fontFamily: 'Inter, sans-serif', cursor: 'pointer',
+                        transition: 'all 0.18s', textAlign: 'left',
+                      }}
+                    >
+                      <i className={`fi ${p.icon}`} style={{ fontSize: 22, display: 'block', marginBottom: 8, color: active ? '#b8f0c5' : '#00361a' }} />
+                      <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 17, fontWeight: 800, letterSpacing: '-0.01em' }}>{p.label}</div>
+                      <div style={{ fontSize: 12, fontWeight: 500, marginTop: 4, opacity: active ? 0.85 : 0.65 }}>{p.blurb}</div>
                     </button>
                   )
                 })}
@@ -289,9 +346,9 @@ export default function OnboardingFlow({ defaultName, defaultEmail, onComplete }
           )}
 
           {step.key === 'amenities' && (
-            <StepShell title="Which amenities do you offer?" hint="Tap to toggle — these show in the Enquire details.">
+            <StepShell title="Which amenities do you offer?" hint={`Tap to toggle — ${data.propertyType === 'houseboat' ? 'houseboat-specific' : 'hotel'} amenities only.`}>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {AMENITIES_LIST.map(a => {
+                {amenitiesFor(data.propertyType === 'houseboat' ? 'houseboat' : 'hotel').map(a => {
                   const active = data.amenities.includes(a)
                   return (
                     <button
@@ -320,6 +377,7 @@ export default function OnboardingFlow({ defaultName, defaultEmail, onComplete }
             <StepShell title="Ready to publish?" hint="You can edit everything later from your dashboard. Your listing goes live after admin approval.">
               <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '10px 18px', fontFamily: 'Inter, sans-serif', fontSize: 14 }}>
                 <ReviewRow label="Name"        value={data.name} />
+                <ReviewRow label="Type"        value={data.propertyType === 'houseboat' ? 'Houseboat' : 'Hotel'} />
                 <ReviewRow label="Location"    value={data.location ? LOCATION_LABELS[data.location as Location] : ''} />
                 <ReviewRow label="Star"        value={data.stars ? STAR_LABELS[data.stars] : ''} />
                 <ReviewRow label="Address"     value={data.address} />

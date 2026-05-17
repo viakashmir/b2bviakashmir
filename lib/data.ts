@@ -1,10 +1,11 @@
 export type RoomStatus = 'Available' | 'Limited' | 'Sold Out'
 export type MealPlan = 'CP' | 'MAP' | 'AP' | 'EP'
 export type StarCategory = 1 | 2 | 3 | 4 | 5
-export type Location = 'houseboats' | 'srinagar' | 'gulmarg' | 'pahalgam' | 'sonamarg' | 'gurez'
+export type Location = 'srinagar' | 'gulmarg' | 'pahalgam' | 'sonamarg' | 'gurez'
+export type PropertyType = 'hotel' | 'houseboat'
 export type RoomCategory =
   | 'Standard' | 'Deluxe' | 'Super Deluxe' | 'Suite' | 'Executive Suite' | 'Presidential Suite'
-  | 'Houseboat Standard' | 'Houseboat Deluxe' | 'Houseboat Royal'
+  | 'Houseboat Standard' | 'Houseboat Deluxe' | 'Houseboat Super Deluxe' | 'Houseboat Royal'
   | 'Cottage' | 'Villa' | 'Camp / Tent'
 export type ConcernStatus = 'open' | 'in-progress' | 'resolved' | 'closed'
 export type ConcernCategory =
@@ -31,6 +32,7 @@ export interface Hotel {
   stars: StarCategory
   location: Location
   locationLabel: string
+  propertyType: PropertyType
   address: string
   phone: string
   email: string
@@ -63,9 +65,10 @@ export interface Concern {
 
 export type HotelsMap = Record<string, Hotel>
 
+// City filters on the public board and onboarding (no 'houseboats' here —
+// houseboats are a property type within Srinagar, not their own city).
 export const LOCATIONS: { value: Location | 'all'; label: string }[] = [
   { value: 'all', label: 'All Locations' },
-  { value: 'houseboats', label: 'Houseboats' },
   { value: 'srinagar', label: 'Srinagar' },
   { value: 'gulmarg', label: 'Gulmarg' },
   { value: 'pahalgam', label: 'Pahalgam' },
@@ -74,12 +77,20 @@ export const LOCATIONS: { value: Location | 'all'; label: string }[] = [
 ]
 
 export const LOCATION_LABELS: Record<Location, string> = {
-  houseboats: 'Houseboats, Dal Lake',
   srinagar: 'Srinagar',
   gulmarg: 'Gulmarg',
   pahalgam: 'Pahalgam',
   sonamarg: 'Sonamarg',
   gurez: 'Gurez',
+}
+
+// Coordinates for live weather strip (Open-Meteo).
+export const LOCATION_COORDS: Record<Location, { lat: number; lon: number }> = {
+  srinagar: { lat: 34.0837, lon: 74.7973 },
+  gulmarg:  { lat: 34.0500, lon: 74.3833 },
+  pahalgam: { lat: 34.0151, lon: 75.3260 },
+  sonamarg: { lat: 34.3000, lon: 75.2900 },
+  gurez:    { lat: 34.6500, lon: 74.8200 },
 }
 
 export const MEAL_LABELS: Record<MealPlan, string> = {
@@ -89,11 +100,22 @@ export const MEAL_LABELS: Record<MealPlan, string> = {
   EP: 'EP — No Meals',
 }
 
-export const ROOM_CATEGORIES: RoomCategory[] = [
+// Room categories shown to vendors in the dashboard depend on property type.
+export const HOTEL_ROOM_CATEGORIES: RoomCategory[] = [
   'Standard', 'Deluxe', 'Super Deluxe', 'Suite', 'Executive Suite',
-  'Presidential Suite', 'Houseboat Standard', 'Houseboat Deluxe',
-  'Houseboat Royal', 'Cottage', 'Villa', 'Camp / Tent',
+  'Presidential Suite', 'Cottage', 'Villa', 'Camp / Tent',
 ]
+export const HOUSEBOAT_ROOM_CATEGORIES: RoomCategory[] = [
+  'Houseboat Standard', 'Houseboat Deluxe', 'Houseboat Super Deluxe', 'Houseboat Royal',
+]
+export const ROOM_CATEGORIES: RoomCategory[] = [
+  ...HOTEL_ROOM_CATEGORIES,
+  ...HOUSEBOAT_ROOM_CATEGORIES,
+]
+
+export function categoriesFor(type: PropertyType): RoomCategory[] {
+  return type === 'houseboat' ? HOUSEBOAT_ROOM_CATEGORIES : HOTEL_ROOM_CATEGORIES
+}
 
 export const CONCERN_CATEGORIES: ConcernCategory[] = [
   'Rate Discrepancy', 'Room Quality', 'Service Issue',
@@ -104,19 +126,28 @@ export const STAR_LABELS: Record<number, string> = {
   1: '1 Star', 2: '2 Star', 3: '3 Star', 4: '4 Star', 5: '5 Star Deluxe',
 }
 
-export const AMENITIES_LIST = [
+// Amenity lists differ by property type.
+export const HOTEL_AMENITIES = [
   'Free WiFi', 'Parking', 'Room Service', 'Laundry', 'Airport Transfer',
-  'Shikara Ride', 'Breakfast Included', 'Hot Water', 'AC', 'Heating',
-  'Restaurant', 'Conference Room', 'Doctor on Call', '24h Reception',
+  'Breakfast Included', 'Hot Water', 'AC', 'Heating', 'Restaurant',
+  'Conference Room', 'Doctor on Call', '24h Reception',
 ]
+export const HOUSEBOAT_AMENITIES = [
+  'Free WiFi', 'Shikara Ride', 'Boat-boy Service', 'Cedar-wood Interiors',
+  'Lake View', 'Hot Water', 'Heating', 'Breakfast Included',
+  'Kashmiri Cuisine', 'Bonfire on Deck', 'Wazwan on Request', '24h Reception',
+]
+export const AMENITIES_LIST = HOTEL_AMENITIES // back-compat default
+export function amenitiesFor(type: PropertyType): string[] {
+  return type === 'houseboat' ? HOUSEBOAT_AMENITIES : HOTEL_AMENITIES
+}
 
 // =============================================================
 // Row ↔ Hotel/Room/Concern mappers (DB snake_case ↔ camelCase)
 // =============================================================
-import type { Hotel as HotelT, Room as RoomT, Concern as ConcernT } from './data'
-
 type HotelRow = {
   id: string; name: string; stars: number; location: string; location_label: string
+  property_type: string | null
   address: string; phone: string; email: string; website: string; description: string
   amenities: string[]; approved: boolean; created_at: string; updated_at: string
 }
@@ -132,10 +163,11 @@ type ConcernRow = {
   admin_response_at: string | null; created_at: string; updated_at: string
 }
 
-export function rowToHotel(row: HotelRow, rooms: RoomRow[] = []): HotelT {
+export function rowToHotel(row: HotelRow, rooms: RoomRow[] = []): Hotel {
   return {
     id: row.id, name: row.name, stars: row.stars as StarCategory,
     location: row.location as Location, locationLabel: row.location_label,
+    propertyType: (row.property_type as PropertyType | null) || 'hotel',
     address: row.address, phone: row.phone, email: row.email,
     website: row.website, description: row.description, amenities: row.amenities,
     approved: row.approved,
@@ -145,7 +177,7 @@ export function rowToHotel(row: HotelRow, rooms: RoomRow[] = []): HotelT {
   }
 }
 
-export function rowToRoom(row: RoomRow): RoomT {
+export function rowToRoom(row: RoomRow): Room {
   return {
     id: row.id, hotelId: row.hotel_id, type: row.type,
     category: row.category as RoomCategory, meal: row.meal as MealPlan,
@@ -155,7 +187,7 @@ export function rowToRoom(row: RoomRow): RoomT {
   }
 }
 
-export function rowToConcern(row: ConcernRow): ConcernT {
+export function rowToConcern(row: ConcernRow): Concern {
   return {
     id: row.id, hotelId: row.hotel_id, hotelName: row.hotel_name,
     agentName: row.agent_name, agentEmail: row.agent_email, agentCompany: row.agent_company,
@@ -170,7 +202,7 @@ export function rowToConcern(row: ConcernRow): ConcernT {
 }
 
 // =============================================================
-// Display helpers (formerly in lib/storage.ts)
+// Display helpers
 // =============================================================
 export function fmtDate(ts: number): string {
   if (!ts) return '—'

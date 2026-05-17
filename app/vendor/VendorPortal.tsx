@@ -7,7 +7,8 @@ import Toast, { ToastMessage } from '@/components/Toast'
 import OnboardingFlow from './OnboardingFlow'
 import {
   Hotel, Room, MealPlan, RoomCategory,
-  MEAL_LABELS, ROOM_CATEGORIES, STAR_LABELS, AMENITIES_LIST,
+  MEAL_LABELS, STAR_LABELS,
+  categoriesFor, amenitiesFor,
   fmtDate, timeAgo, fmtINR, availableInventory, totalInventory,
 } from '@/lib/data'
 import { browserSupabase } from '@/lib/supabase'
@@ -261,6 +262,7 @@ export default function VendorPortal() {
                     <RoomRow
                       key={room.id}
                       room={room}
+                      propertyType={hotel.propertyType}
                       saved={savedRows.has(room.id)}
                       onSave={patch => saveRow(room.id, patch)}
                       onDelete={() => deleteRoom(room.id, room.type)}
@@ -298,7 +300,7 @@ export default function VendorPortal() {
                     <div>
                       <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>Category</label>
                       <select value={newRoom.category} onChange={e => setNewRoom(p => ({ ...p, category: e.target.value as RoomCategory }))} className="input-field" style={{ padding: '11px 14px', fontSize: 13 }}>
-                        {ROOM_CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                        {categoriesFor(hotel.propertyType).map(c => <option key={c}>{c}</option>)}
                       </select>
                     </div>
                     <div>
@@ -369,7 +371,7 @@ export default function VendorPortal() {
             <div style={{ marginTop: 28 }}>
               <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 12, fontFamily: 'Inter, sans-serif' }}>Amenities</label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {AMENITIES_LIST.map(a => {
+                {amenitiesFor(hotel.propertyType).map(a => {
                   const active = profileDraft.amenities.includes(a)
                   return (
                     <button key={a} onClick={() => toggleAmenity(a)} style={{
@@ -400,8 +402,9 @@ export default function VendorPortal() {
   )
 }
 
-function RoomRow({ room, saved, onSave, onDelete, statusClass }: {
+function RoomRow({ room, propertyType, saved, onSave, onDelete, statusClass }: {
   room: Room
+  propertyType: Hotel['propertyType']
   saved: boolean
   onSave: (patch: Partial<Room>) => void
   onDelete: () => void
@@ -422,7 +425,7 @@ function RoomRow({ room, saved, onSave, onDelete, statusClass }: {
       </td>
       <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
         <select className="input-field" value={merged.category} onChange={e => change('category', e.target.value)} style={{ padding: '6px 10px', fontSize: 12, width: 'auto' }}>
-          {ROOM_CATEGORIES.map(c => <option key={c}>{c}</option>)}
+          {categoriesFor(propertyType).map(c => <option key={c}>{c}</option>)}
         </select>
       </td>
       <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>

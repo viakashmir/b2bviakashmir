@@ -40,12 +40,14 @@ export async function POST(req: Request) {
   const sb = serverSupabase()
   const { data: existing } = await sb.from('hotels').select('approved, created_at').eq('id', hotelId).maybeSingle()
 
+  const propertyType = body.propertyType === 'houseboat' ? 'houseboat' : 'hotel'
   const row = {
     id: hotelId,
     name: String(body.name ?? '').trim(),
     stars: Math.max(1, Math.min(5, parseInt(body.stars) || 3)),
     location: String(body.location ?? '').trim(),
     location_label: String(body.locationLabel ?? '').trim(),
+    property_type: propertyType,
     address: String(body.address ?? '').trim(),
     phone: String(body.phone ?? '').trim(),
     email: String(body.email ?? '').trim(),
