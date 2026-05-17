@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@clerk/nextjs'
 import {
   Trash2, Save, Plus, Eye, Clock, BedDouble, TrendingUp,
-  Coins, Building2, IdCard, CheckCircle2, X as XIcon,
+  Coins, Building2, Contact, CheckCircle2, X as XIcon,
 } from 'lucide-react'
 import Header from '@/components/Header'
 import Toast, { ToastMessage } from '@/components/Toast'
@@ -194,7 +194,7 @@ export default function VendorPortal() {
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, borderBottom: '1px solid #edeeef' }}>
           {([
             { key: 'rooms', label: 'Inventory & Rates', Icon: BedDouble },
-            { key: 'profile', label: 'Hotel Profile', Icon: IdCard },
+            { key: 'profile', label: 'Hotel Profile', Icon: Contact },
           ] as const).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
               padding: '12px 18px', border: 'none', background: 'transparent',
