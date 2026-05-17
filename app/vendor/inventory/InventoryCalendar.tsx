@@ -159,6 +159,38 @@ export default function InventoryCalendar() {
   const todayDay = data.days.find(d => d.date === todayStr())
   const availableToday = todayDay?.totalAvailable ?? totalRoomsToday
 
+  // No rooms yet → clear empty state pointing to where to add them
+  if (data.rooms.length === 0) {
+    return (
+      <>
+        <main>
+          <div className="dash-header">
+            <div>
+              <span className="badge badge-primary" style={{ marginBottom: 12 }}>
+                <Calendar size={11} strokeWidth={2.5} /> Inventory Calendar
+              </span>
+              <h1 className="dash-title">Inventory & Availability</h1>
+            </div>
+          </div>
+          <div className="card-elevated" style={{ padding: 48, textAlign: 'center', maxWidth: 560, margin: '0 auto' }}>
+            <BedDouble size={48} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 16px' }} />
+            <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', margin: '0 0 10px' }}>
+              No rooms in your listing yet
+            </h2>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#414942', lineHeight: 1.55, margin: '0 0 24px' }}>
+              Add at least one room type with rates from your dashboard, then come back here to block dates for OTA bookings, holds, or maintenance.
+            </p>
+            <a href="/vendor" style={{ textDecoration: 'none' }}>
+              <button className="btn-primary" style={{ padding: '12px 22px', fontSize: 13 }}>
+                <BedDouble size={13} strokeWidth={2.3} /> Add Room Types
+              </button>
+            </a>
+          </div>
+        </main>
+      </>
+    )
+  }
+
   return (
     <>
       <main>

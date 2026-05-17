@@ -192,6 +192,98 @@ export default function VendorPortal() {
           </div>
         </div>
 
+        {/* === MY LISTING — the data the vendor entered during onboarding === */}
+        <div className="card-elevated" style={{ overflow: 'hidden', marginBottom: 24 }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)',
+            padding: '20px 24px',
+            color: '#ffffff',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'absolute', right: 16, top: 16,
+              display: 'flex', gap: 8, alignItems: 'center',
+            }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                background: hotel.approved ? 'rgba(184,240,197,0.18)' : 'rgba(255,220,196,0.22)',
+                color: hotel.approved ? '#b8f0c5' : '#ffdcc4',
+                fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 800,
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                padding: '5px 12px', borderRadius: 9999,
+              }}>
+                {hotel.approved
+                  ? (<><CheckCircle2 size={11} strokeWidth={2.5} /> Live</>)
+                  : (<><Clock size={11} strokeWidth={2.5} /> Pending</>)}
+              </span>
+            </div>
+
+            <div className="t-overline" style={{ color: '#9dd3aa', marginBottom: 8 }}>
+              <Eye size={10} strokeWidth={2.5} style={{ verticalAlign: 'middle', marginRight: 6 }} />
+              Your Listing
+            </div>
+            <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', margin: '0 0 6px' }}>
+              {hotel.name}
+            </h2>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', margin: 0, fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <Building2 size={12} strokeWidth={2.2} /> {STAR_LABELS[hotel.stars]} · {hotel.propertyType === 'houseboat' ? 'Houseboat' : 'Hotel'}
+              </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <BedDouble size={12} strokeWidth={2.2} /> {hotel.rooms.length} room type{hotel.rooms.length === 1 ? '' : 's'} · {totalInv} rooms total
+              </span>
+            </p>
+          </div>
+
+          <div style={{ padding: '18px 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 18 }}>
+            {[
+              { label: 'Location', value: hotel.locationLabel },
+              { label: 'Address',  value: hotel.address || '—' },
+              { label: 'Phone',    value: hotel.phone },
+              { label: 'Email',    value: hotel.email },
+              ...(hotel.website ? [{ label: 'Website', value: hotel.website }] : []),
+            ].map(row => (
+              <div key={row.label}>
+                <div className="t-overline" style={{ marginBottom: 4 }}>{row.label}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#191c1d', fontFamily: 'Inter, sans-serif', wordBreak: 'break-word' }}>
+                  {row.value}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {hotel.description && (
+            <div style={{ padding: '0 24px 16px', fontSize: 13.5, color: '#414942', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>
+              {hotel.description}
+            </div>
+          )}
+
+          {hotel.amenities?.length > 0 && (
+            <div style={{ padding: '12px 24px 20px', borderTop: '1px solid #edeeef' }}>
+              <div className="t-overline" style={{ marginBottom: 10 }}>Amenities</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {hotel.amenities.map(a => (
+                  <span key={a} className="badge badge-neutral" style={{ fontSize: 10 }}>{a}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {hotel.rooms.length === 0 && (
+            <div style={{
+              padding: '14px 24px',
+              background: '#fff8ed',
+              borderTop: '1px solid #ffdcc4',
+              fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#6f3800',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <Clock size={14} strokeWidth={2.3} />
+              <strong>Next step:</strong> add room types &amp; rates below — your listing won&apos;t show on the public board without at least one room.
+            </div>
+          )}
+        </div>
+
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, borderBottom: '1px solid #edeeef' }}>
           {([
