@@ -137,12 +137,15 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
       case 'propertyType': return !data.propertyType ? 'Pick whether this is a hotel or a houseboat.' : null
       case 'stars':        return !data.stars ? 'Select your star category.' : null
       case 'contact':      {
+        // Phone stored without prefix — must be exactly 10 digits (India)
         const digits = data.phone.replace(/\D/g, '')
-        if (digits.length < 10 || digits.length > 15) return 'Phone must be 10–15 digits.'
+        if (digits.length !== 10) return 'Phone must be exactly 10 digits.'
+        if (!/^[6-9]/.test(digits))     return 'Please enter a valid Indian mobile number (starts with 6-9).'
         if (!data.whatsappSameAsPhone) return 'Tell us whether this number is also WhatsApp.'
         if (data.whatsappSameAsPhone === 'no') {
           const wa = data.whatsapp.replace(/\D/g, '')
-          if (wa.length < 10 || wa.length > 15) return 'WhatsApp number must be 10–15 digits.'
+          if (wa.length !== 10)         return 'WhatsApp number must be exactly 10 digits.'
+          if (!/^[6-9]/.test(wa))       return 'Please enter a valid Indian WhatsApp number (starts with 6-9).'
         }
         return null
       }
@@ -174,10 +177,9 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
     setSubmitting(true); setError('')
     try {
       const propertyType = data.propertyType || 'hotel'
-      // Phone normalised to digits-only (preserving leading + if user typed one)
-      const phoneDigits = data.phone.startsWith('+')
-        ? '+' + data.phone.slice(1).replace(/\D/g, '')
-        : data.phone.replace(/\D/g, '')
+      // Stored format: +91 prefix + the 10 digits the vendor typed
+      const phoneDigits = '+91' + data.phone.replace(/\D/g, '')
+      const whatsappDigits = data.whatsapp ? '+91' + data.whatsapp.replace(/\D/g, '') : ''
 
       const roomsPayload = data.rooms
         .filter(r => r.type.trim())
@@ -201,7 +203,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           address: data.address.trim(),
           phone: phoneDigits,
           whatsappSameAsPhone: data.whatsappSameAsPhone === 'yes',
-          whatsapp: data.whatsapp.trim(),
+          whatsapp: whatsappDigits,
           email: data.email.trim(),
           website: data.website.trim(),
           description: data.description.trim(),
@@ -370,20 +372,11 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           {step.key === 'contact' && (
             <Prompt title="How can agents reach you?" subtitle="Phone goes onto the public card. Email + website appear on Enquire.">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <LabeledField label="Phone — digits only">
-                  <TextField
-                    refEl={inputRef as React.MutableRefObject<HTMLInputElement>}
-                    type="tel"
-                    inputMode="numeric"
+                <LabeledField label="Phone — 10 digits, India">
+                  <PhoneInputIN
+                    inputRef={inputRef as React.MutableRefObject<HTMLInputElement>}
                     value={data.phone}
-                    onChange={v => {
-                      // Allow leading + and digits only
-                      const cleaned = v.startsWith('+')
-                        ? '+' + v.slice(1).replace(/\D/g, '')
-                        : v.replace(/\D/g, '')
-                      update('phone', cleaned)
-                    }}
-                    placeholder="9194245678901"
+                    onChange={v => update('phone', v)}
                   />
                 </LabeledField>
 
@@ -428,18 +421,10 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                 </div>
 
                 {data.whatsappSameAsPhone === 'no' && (
-                  <LabeledField label="WhatsApp number — digits only">
-                    <TextField
-                      type="tel"
-                      inputMode="numeric"
+                  <LabeledField label="WhatsApp number — 10 digits, India">
+                    <PhoneInputIN
                       value={data.whatsapp}
-                      onChange={v => {
-                        const cleaned = v.startsWith('+')
-                          ? '+' + v.slice(1).replace(/\D/g, '')
-                          : v.replace(/\D/g, '')
-                        update('whatsapp', cleaned)
-                      }}
-                      placeholder="9194245678901"
+                      onChange={v => update('whatsapp', v)}
                     />
                   </LabeledField>
                 )}
@@ -752,6 +737,59 @@ function TextField({ refEl, type = 'text', inputMode, value, onChange, onSubmit,
       onFocus={e => { (e.currentTarget as HTMLInputElement).style.borderBottomColor = '#00361a' }}
       onBlur={e => { (e.currentTarget as HTMLInputElement).style.borderBottomColor = 'rgba(0,54,26,0.18)' }}
     />
+  )
+}
+
+/**
+ * Phone input with a fixed "+91" prefix and a hard 10-digit limit.
+ * Value is stored WITHOUT the country code so validation logic only
+ * inspects the local 10 digits; the +91 is added at submit time.
+ */
+function PhoneInputIN({ inputRef, value, onChange }: {
+  inputRef?: React.MutableRefObject<HTMLInputElement>
+  value: string
+  onChange: (v: string) => void
+}) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'flex-end',
+      borderBottom: '2px solid rgba(0,54,26,0.18)',
+      transition: 'border-color 0.2s',
+    }}>
+      <span style={{
+        fontFamily: 'Manrope, sans-serif', fontSize: 26, fontWeight: 700,
+        color: '#717971', paddingBottom: 10, marginRight: 12,
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+      }}>
+        <span aria-hidden="true">🇮🇳</span> +91
+      </span>
+      <input
+        ref={inputRef}
+        type="tel"
+        inputMode="numeric"
+        maxLength={10}
+        value={value}
+        onChange={e => {
+          const digits = e.target.value.replace(/\D/g, '').slice(0, 10)
+          onChange(digits)
+        }}
+        placeholder="9876543210"
+        style={{
+          flex: 1, minWidth: 0,
+          background: 'transparent', border: 'none', outline: 'none',
+          fontFamily: 'Manrope, sans-serif', fontSize: 26, fontWeight: 600,
+          color: '#00361a', padding: '10px 0',
+          letterSpacing: '0.02em',
+        }}
+      />
+      <span style={{
+        fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700,
+        color: value.length === 10 ? '#1a5128' : '#9aa19f',
+        paddingBottom: 14, marginLeft: 8, whiteSpace: 'nowrap',
+      }}>
+        {value.length}/10
+      </span>
+    </div>
   )
 }
 

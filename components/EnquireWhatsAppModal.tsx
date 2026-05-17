@@ -69,7 +69,8 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
     setError('')
     if (name.trim().length < 2) { setError('Please enter your name.'); return }
     const digits = phone.replace(/\D/g, '')
-    if (digits.length < 10) { setError('Please enter a valid phone number (10+ digits).'); return }
+    if (digits.length !== 10)        { setError('Phone must be exactly 10 digits.'); return }
+    if (!/^[6-9]/.test(digits))      { setError('Please enter a valid Indian mobile number (starts with 6-9).'); return }
     setSubmitting(true)
     try {
       const res = await fetch('/api/enquiries', {
@@ -78,7 +79,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
         body: JSON.stringify({
           hotelId: hotel.id,
           travellerName: name.trim(),
-          travellerPhone: phone.trim(),
+          travellerPhone: '+91' + phone,
           checkIn: checkIn || null,
           checkOut: checkOut || null,
           rooms, adults, children,
@@ -236,20 +237,38 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
                 <FieldWrap label="Your full name">
                   <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Anaya Sharma" autoFocus style={fieldStyle} />
                 </FieldWrap>
-                <FieldWrap label="Your phone — for the hotel to reach you">
-                  <input
-                    value={phone}
-                    type="tel"
-                    inputMode="numeric"
-                    onChange={e => {
-                      const cleaned = e.target.value.startsWith('+')
-                        ? '+' + e.target.value.slice(1).replace(/\D/g, '')
-                        : e.target.value.replace(/\D/g, '')
-                      setPhone(cleaned)
-                    }}
-                    placeholder="+91 9876543210"
-                    style={fieldStyle}
-                  />
+                <FieldWrap label="Your phone — 10 digits, India">
+                  <div style={{
+                    display: 'flex', alignItems: 'center',
+                    borderRadius: 12, border: '1px solid rgba(0,54,26,0.14)',
+                    background: '#ffffff', padding: '4px 6px 4px 14px',
+                  }}>
+                    <span style={{
+                      fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 700,
+                      color: '#414942', marginRight: 10, whiteSpace: 'nowrap',
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                    }}>🇮🇳 +91</span>
+                    <input
+                      value={phone}
+                      type="tel"
+                      inputMode="numeric"
+                      maxLength={10}
+                      onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      placeholder="9876543210"
+                      style={{
+                        flex: 1, minWidth: 0,
+                        background: 'transparent', border: 'none', outline: 'none',
+                        fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 600,
+                        color: '#191c1d', padding: '8px 0',
+                        letterSpacing: '0.02em',
+                      }}
+                    />
+                    <span style={{
+                      fontFamily: 'Inter, sans-serif', fontSize: 10.5, fontWeight: 700,
+                      color: phone.length === 10 ? '#1a5128' : '#9aa19f',
+                      marginRight: 8, whiteSpace: 'nowrap',
+                    }}>{phone.length}/10</span>
+                  </div>
                 </FieldWrap>
               </div>
               <div style={{

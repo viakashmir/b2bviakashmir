@@ -32,8 +32,14 @@ export async function POST(req: Request) {
 
   if (!hotelId)        return NextResponse.json({ error: 'hotelId required' },        { status: 400 })
   if (!travellerName)  return NextResponse.json({ error: 'name required' },             { status: 400 })
-  if (travellerPhone.replace(/\D/g, '').length < 10) {
-    return NextResponse.json({ error: 'valid phone required' }, { status: 400 })
+  // Strip the country-code prefix (if any) to validate the local 10-digit number.
+  // We accept +91XXXXXXXXXX or 10 raw digits; anything else is rejected.
+  {
+    const digits = travellerPhone.replace(/\D/g, '')
+    const local = digits.length === 12 && digits.startsWith('91') ? digits.slice(2) : digits
+    if (local.length !== 10 || !/^[6-9]/.test(local)) {
+      return NextResponse.json({ error: 'Phone must be a valid 10-digit Indian mobile number.' }, { status: 400 })
+    }
   }
 
   const sb = serverSupabase()
