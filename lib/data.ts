@@ -16,9 +16,12 @@ export interface Room {
   type: string
   category: RoomCategory
   meal: MealPlan
-  single: number
+  /** Per-night base rate for double occupancy. */
   double: number
-  triple: number | null
+  /** Child No Bed surcharge (per child per night). */
+  cnb: number
+  /** Extra Bed surcharge (per bed per night). */
+  extraBed: number
   inventory: number
   status: RoomStatus
   updatedAt: number
@@ -68,8 +71,8 @@ export interface AppStore {
 
 export type HotelsMap = Record<string, Hotel>
 
-export const STORE_KEY = 'krp_v6_store'
-export const LS_SYNC_KEY = 'krp_v6_sync'
+export const STORE_KEY = 'krp_v7_store'
+export const LS_SYNC_KEY = 'krp_v7_sync'
 
 export const LOCATIONS: { value: Location | 'all'; label: string }[] = [
   { value: 'all', label: 'All Locations' },
@@ -130,9 +133,9 @@ export const SEED_HOTELS: HotelsMap = {
     amenities: ['Free WiFi', 'Parking', 'Room Service', 'Restaurant', '24h Reception', 'Airport Transfer'],
     approved: true, createdAt: NOW, updatedAt: NOW,
     rooms: [
-      { id: 'r1', type: 'Deluxe Room', category: 'Deluxe', meal: 'CP', single: 4500, double: 6500, triple: 8500, inventory: 12, status: 'Available', updatedAt: NOW },
-      { id: 'r2', type: 'Executive Suite', category: 'Executive Suite', meal: 'MAP', single: 8000, double: 11000, triple: null, inventory: 5, status: 'Available', updatedAt: NOW },
-      { id: 'r3', type: 'Presidential Suite', category: 'Presidential Suite', meal: 'AP', single: 14000, double: 18000, triple: null, inventory: 2, status: 'Limited', updatedAt: NOW },
+      { id: 'r1', type: 'Deluxe Room', category: 'Deluxe', meal: 'CP', double: 6500, cnb: 1200, extraBed: 1800, inventory: 12, status: 'Available', updatedAt: NOW },
+      { id: 'r2', type: 'Executive Suite', category: 'Executive Suite', meal: 'MAP', double: 11000, cnb: 1800, extraBed: 2400, inventory: 5, status: 'Available', updatedAt: NOW },
+      { id: 'r3', type: 'Presidential Suite', category: 'Presidential Suite', meal: 'AP', double: 18000, cnb: 2400, extraBed: 3200, inventory: 2, status: 'Limited', updatedAt: NOW },
     ],
   },
   dalview: {
@@ -144,9 +147,9 @@ export const SEED_HOTELS: HotelsMap = {
     amenities: ['Free WiFi', 'Shikara Ride', 'Breakfast Included', 'Room Service', 'Hot Water'],
     approved: true, createdAt: NOW, updatedAt: NOW,
     rooms: [
-      { id: 'r1', type: 'Standard Houseboat', category: 'Houseboat Standard', meal: 'CP', single: 3500, double: 5200, triple: 6800, inventory: 8, status: 'Available', updatedAt: NOW },
-      { id: 'r2', type: 'Deluxe Houseboat', category: 'Houseboat Deluxe', meal: 'MAP', single: 5800, double: 7800, triple: 9500, inventory: 4, status: 'Available', updatedAt: NOW },
-      { id: 'r3', type: 'Royal Houseboat', category: 'Houseboat Royal', meal: 'AP', single: 9500, double: 13500, triple: null, inventory: 1, status: 'Limited', updatedAt: NOW },
+      { id: 'r1', type: 'Standard Houseboat', category: 'Houseboat Standard', meal: 'CP', double: 5200, cnb: 1000, extraBed: 1500, inventory: 8, status: 'Available', updatedAt: NOW },
+      { id: 'r2', type: 'Deluxe Houseboat', category: 'Houseboat Deluxe', meal: 'MAP', double: 7800, cnb: 1400, extraBed: 1900, inventory: 4, status: 'Available', updatedAt: NOW },
+      { id: 'r3', type: 'Royal Houseboat', category: 'Houseboat Royal', meal: 'AP', double: 13500, cnb: 2000, extraBed: 2600, inventory: 1, status: 'Limited', updatedAt: NOW },
     ],
   },
   himalayancrest: {
@@ -158,9 +161,9 @@ export const SEED_HOTELS: HotelsMap = {
     amenities: ['Free WiFi', 'Parking', 'Restaurant', 'Room Service', 'Heating', 'Conference Room'],
     approved: true, createdAt: NOW, updatedAt: NOW,
     rooms: [
-      { id: 'r1', type: 'Mountain View Room', category: 'Deluxe', meal: 'MAP', single: 5500, double: 8200, triple: 10800, inventory: 10, status: 'Available', updatedAt: NOW },
-      { id: 'r2', type: 'Premium Chalet', category: 'Suite', meal: 'AP', single: 10500, double: 15000, triple: null, inventory: 3, status: 'Limited', updatedAt: NOW },
-      { id: 'r3', type: 'Alpine Suite', category: 'Executive Suite', meal: 'AP', single: 17000, double: 24000, triple: null, inventory: 0, status: 'Sold Out', updatedAt: NOW },
+      { id: 'r1', type: 'Mountain View Room', category: 'Deluxe', meal: 'MAP', double: 8200, cnb: 1500, extraBed: 2200, inventory: 10, status: 'Available', updatedAt: NOW },
+      { id: 'r2', type: 'Premium Chalet', category: 'Suite', meal: 'AP', double: 15000, cnb: 2200, extraBed: 2900, inventory: 3, status: 'Limited', updatedAt: NOW },
+      { id: 'r3', type: 'Alpine Suite', category: 'Executive Suite', meal: 'AP', double: 24000, cnb: 3000, extraBed: 3800, inventory: 0, status: 'Sold Out', updatedAt: NOW },
     ],
   },
   pinewood: {
@@ -172,9 +175,9 @@ export const SEED_HOTELS: HotelsMap = {
     amenities: ['Free WiFi', 'Parking', 'Hot Water', 'Laundry', 'Doctor on Call', '24h Reception'],
     approved: true, createdAt: NOW, updatedAt: NOW,
     rooms: [
-      { id: 'r1', type: 'Forest Room', category: 'Standard', meal: 'CP', single: 3200, double: 4800, triple: 6400, inventory: 15, status: 'Available', updatedAt: NOW },
-      { id: 'r2', type: 'Deluxe Forest Room', category: 'Deluxe', meal: 'MAP', single: 5000, double: 7200, triple: 9200, inventory: 6, status: 'Available', updatedAt: NOW },
-      { id: 'r3', type: 'Riverside Cottage', category: 'Cottage', meal: 'AP', single: 8500, double: 12000, triple: null, inventory: 0, status: 'Sold Out', updatedAt: NOW },
+      { id: 'r1', type: 'Forest Room', category: 'Standard', meal: 'CP', double: 4800, cnb: 900, extraBed: 1300, inventory: 15, status: 'Available', updatedAt: NOW },
+      { id: 'r2', type: 'Deluxe Forest Room', category: 'Deluxe', meal: 'MAP', double: 7200, cnb: 1300, extraBed: 1800, inventory: 6, status: 'Available', updatedAt: NOW },
+      { id: 'r3', type: 'Riverside Cottage', category: 'Cottage', meal: 'AP', double: 12000, cnb: 1800, extraBed: 2400, inventory: 0, status: 'Sold Out', updatedAt: NOW },
     ],
   },
   sonamargalpine: {
@@ -186,8 +189,8 @@ export const SEED_HOTELS: HotelsMap = {
     amenities: ['Free WiFi', 'Hot Water', 'Heating', 'Parking'],
     approved: true, createdAt: NOW, updatedAt: NOW,
     rooms: [
-      { id: 'r1', type: 'Standard Room', category: 'Standard', meal: 'CP', single: 2800, double: 4200, triple: 5400, inventory: 20, status: 'Available', updatedAt: NOW },
-      { id: 'r2', type: 'Deluxe Room', category: 'Deluxe', meal: 'MAP', single: 4000, double: 5800, triple: 7200, inventory: 8, status: 'Available', updatedAt: NOW },
+      { id: 'r1', type: 'Standard Room', category: 'Standard', meal: 'CP', double: 4200, cnb: 700, extraBed: 1100, inventory: 20, status: 'Available', updatedAt: NOW },
+      { id: 'r2', type: 'Deluxe Room', category: 'Deluxe', meal: 'MAP', double: 5800, cnb: 1000, extraBed: 1500, inventory: 8, status: 'Available', updatedAt: NOW },
     ],
   },
 }

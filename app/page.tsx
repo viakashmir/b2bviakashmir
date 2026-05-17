@@ -68,7 +68,9 @@ export default function PublicPage() {
             <span style={{ color: '#9dd3aa' }}>for Travel Agents</span>
           </h1>
           <p className="hero-subtitle">
-            Direct B2B net rates from hotels across Srinagar, Houseboats, Gulmarg, Pahalgam, Sonamarg and Gurez. Updated in real-time. No markup, no middleman.
+            Agents track inventory and rates live, no need to call hotels.
+            Hotels stop replying to every enquiry. Both sides save time and
+            focus on revenue growth.
           </p>
 
           <div className="hero-meta-row" style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 28, flexWrap: 'wrap' }}>

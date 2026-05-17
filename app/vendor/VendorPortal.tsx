@@ -19,7 +19,7 @@ export default function VendorPortal() {
 
   const [newRoom, setNewRoom] = useState({
     type: '', category: 'Deluxe' as RoomCategory, meal: 'CP' as MealPlan,
-    single: '', double: '', triple: '', inventory: '',
+    double: '', cnb: '', extraBed: '', inventory: '',
     status: 'Available' as Room['status'],
   })
   const [formError, setFormError] = useState('')
@@ -69,7 +69,7 @@ export default function VendorPortal() {
     if (!hotel) return
     const rooms = [...hotel.rooms]
     const room = { ...rooms[idx] }
-    if (['single', 'double', 'triple', 'inventory'].includes(field)) {
+    if (['double', 'cnb', 'extraBed', 'inventory'].includes(field)) {
       ;(room as Record<string, unknown>)[field] = parseInt(value) || 0
     } else {
       ;(room as Record<string, unknown>)[field] = value
@@ -112,9 +112,9 @@ export default function VendorPortal() {
       type: newRoom.type.trim(),
       category: newRoom.category,
       meal: newRoom.meal,
-      single: parseInt(newRoom.single) || 0,
       double: parseInt(newRoom.double) || 0,
-      triple: newRoom.triple ? parseInt(newRoom.triple) : null,
+      cnb: parseInt(newRoom.cnb) || 0,
+      extraBed: parseInt(newRoom.extraBed) || 0,
       inventory: parseInt(newRoom.inventory) || 0,
       status: newRoom.status,
       updatedAt: Date.now(),
@@ -122,7 +122,7 @@ export default function VendorPortal() {
     const updated = { ...hotel, rooms: [...hotel.rooms, room], updatedAt: Date.now() }
     setHotel(updated)
     persist(updated)
-    setNewRoom({ type: '', category: 'Deluxe', meal: 'CP', single: '', double: '', triple: '', inventory: '', status: 'Available' })
+    setNewRoom({ type: '', category: 'Deluxe', meal: 'CP', double: '', cnb: '', extraBed: '', inventory: '', status: 'Available' })
     setShowForm(false)
     addToast(`"${room.type}" added · Now live`, 'success')
   }
@@ -281,7 +281,7 @@ export default function VendorPortal() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
-                    {['Room', 'Category', 'Meal', 'Single ₹', 'Double ₹', 'Triple ₹', 'Avail.', 'Status', ''].map((h, i) => (
+                    {['Room', 'Category', 'Meal', 'Double ₹', 'CNB ₹', 'Extra Bed ₹', 'Avail.', 'Status', ''].map((h, i) => (
                       <th key={i} style={{
                         padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
                         textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)',
@@ -331,7 +331,7 @@ export default function VendorPortal() {
                           <option value="EP">EP</option>
                         </select>
                       </td>
-                      {(['single','double','triple'] as const).map(field => (
+                      {(['double','cnb','extraBed'] as const).map(field => (
                         <td key={field} style={{ padding: '14px 16px', textAlign: 'right', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                           <input
                             className="editable-cell"
@@ -378,15 +378,15 @@ export default function VendorPortal() {
                           <button
                             onClick={() => deleteRow(idx)}
                             style={{
-                              width: 32, height: 32, borderRadius: 9999, border: 'none',
-                              background: 'transparent', color: '#717971', cursor: 'pointer',
+                              width: 34, height: 34, borderRadius: 9999, border: 'none',
+                              background: '#ffdad6', color: '#93000a', cursor: 'pointer',
                               transition: 'all 0.18s', display: 'flex', alignItems: 'center', justifyContent: 'center',
                             }}
-                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ffdad6'; (e.currentTarget as HTMLElement).style.color = '#93000a' }}
-                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#717971' }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ba1a1a'; (e.currentTarget as HTMLElement).style.color = '#ffffff' }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#ffdad6'; (e.currentTarget as HTMLElement).style.color = '#93000a' }}
                             aria-label="Delete row"
                           >
-                            <i className="fi fi-rr-trash" style={{ fontSize: 13 }} />
+                            <i className="fi fi-rr-trash" style={{ fontSize: 14 }} />
                           </button>
                         </div>
                       </td>
@@ -403,9 +403,9 @@ export default function VendorPortal() {
                   <div className="form-grid">
                     {[
                       { label: 'Room Type *', field: 'type', type: 'text', placeholder: 'Deluxe Room' },
-                      { label: 'Single ₹', field: 'single', type: 'number', placeholder: '4500' },
                       { label: 'Double ₹ *', field: 'double', type: 'number', placeholder: '6500' },
-                      { label: 'Triple ₹', field: 'triple', type: 'number', placeholder: '8000' },
+                      { label: 'CNB ₹', field: 'cnb', type: 'number', placeholder: '1200' },
+                      { label: 'Extra Bed ₹', field: 'extraBed', type: 'number', placeholder: '1800' },
                       { label: 'Rooms', field: 'inventory', type: 'number', placeholder: '10' },
                     ].map(f => (
                       <div key={f.field}>
