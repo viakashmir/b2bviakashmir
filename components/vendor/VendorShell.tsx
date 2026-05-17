@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useUser, useAuth } from '@clerk/nextjs'
 import {
   LayoutDashboard, BedDouble, Calendar, MessageSquare, Building2,
-  Eye, LogOut, Bell, Search, Menu, X as XIcon, ChevronRight,
+  Eye, LogOut, Bell, Search, Menu, X as XIcon, ChevronRight, Hotel as HotelIcon,
 } from 'lucide-react'
 
 interface Props {
@@ -15,6 +15,7 @@ interface Props {
 
 const NAV: { href: string; label: string; Icon: typeof LayoutDashboard }[] = [
   { href: '/vendor',           label: 'Dashboard',          Icon: LayoutDashboard },
+  { href: '/vendor/listing',   label: 'My Listing',         Icon: HotelIcon },
   { href: '/vendor/inventory', label: 'Inventory Calendar', Icon: Calendar },
 ]
 
