@@ -88,7 +88,7 @@ export default function Header() {
                   }}
                 >
                   <i className="fi fi-rr-building" style={{ fontSize: 14 }} />
-                  <span className="nav-label">List Hotel</span>
+                  <span className="nav-label">Hotel Register</span>
                 </button>
               </Link>
               <Link href="/login" style={{ textDecoration: 'none' }}>
