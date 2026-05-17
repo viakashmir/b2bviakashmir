@@ -100,7 +100,7 @@ export default function CustomerPortal() {
         priority: form.priority,
         subject: form.subject.trim(),
         description: form.description.trim(),
-        company: form.company.trim() || '—',
+        company: form.company.trim() || '-',
       }),
     })
     if (!res.ok) { setFormError(await res.text()); return }
@@ -180,8 +180,8 @@ export default function CustomerPortal() {
               <div style={{ gridColumn: '1 / -1' }}>
                 <label className="t-overline" style={{ display: 'block', marginBottom: 8 }}>Hotel</label>
                 <select value={form.hotelId} onChange={e => setForm(p => ({ ...p, hotelId: e.target.value }))} className="input-field" style={{ padding: '12px 14px', fontSize: 13 }}>
-                  <option value="">— Select a hotel —</option>
-                  {hotels.map(h => <option key={h.id} value={h.id}>{h.name} — {h.locationLabel}</option>)}
+                  <option value="">- Select a hotel -</option>
+                  {hotels.map(h => <option key={h.id} value={h.id}>{h.name}, {h.locationLabel}</option>)}
                 </select>
               </div>
               <div>

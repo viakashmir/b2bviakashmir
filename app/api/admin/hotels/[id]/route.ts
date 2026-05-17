@@ -32,7 +32,7 @@ export async function PATCH(req: Request, ctx: { params: { id: string } }) {
   const { error } = await sb.from('hotels').update(update).eq('id', ctx.params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Email triggers — fire only when approved status actually flipped.
+  // Email triggers, fire only when approved status actually flipped.
   if (existing && typeof body.approved === 'boolean' && body.approved !== existing.approved && existing.email) {
     if (body.approved) {
       void emailHotelApproved({
@@ -51,7 +51,7 @@ export async function PATCH(req: Request, ctx: { params: { id: string } }) {
   return NextResponse.json({ ok: true })
 }
 
-/** DELETE /api/admin/hotels/[id] — also cascades to rooms via FK. */
+/** DELETE /api/admin/hotels/[id], also cascades to rooms via FK. */
 export async function DELETE(_req: Request, ctx: { params: { id: string } }) {
   const a = await assertAdmin(); if (!a.ok) return NextResponse.json({ error: 'forbidden' }, { status: a.code })
   const sb = serverSupabase()

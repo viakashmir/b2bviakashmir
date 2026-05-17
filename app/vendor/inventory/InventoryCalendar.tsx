@@ -134,7 +134,7 @@ export default function InventoryCalendar() {
     refresh()
   }
 
-  // Calendar grid layout — pad leading days from previous month
+  // Calendar grid layout, pad leading days from previous month
   const firstWeekday = new Date(year, month - 1, 1).getDay() // 0 Sun .. 6 Sat
   const pad = (firstWeekday + 6) % 7 // shift so Monday = 0
   const totalCells = pad + (data?.days.length ?? 0)
@@ -555,7 +555,7 @@ export default function InventoryCalendar() {
                 placeholder="Pick end date"
               />
               <div style={{ gridColumn: '1 / -1' }}>
-                <label className="t-overline" style={{ display: 'block', marginBottom: 6 }}>Room type (optional — leave blank for all)</label>
+                <label className="t-overline" style={{ display: 'block', marginBottom: 6 }}>Room type (optional, leave blank for all)</label>
                 <select value={form.roomId} onChange={e => setForm(f => ({ ...f, roomId: e.target.value }))} className="input-field" style={{ padding: '10px 12px', fontSize: 13 }}>
                   <option value="">All room types</option>
                   {data.rooms.map(r => <option key={r.id} value={r.id}>{r.type} ({r.inventory} rooms)</option>)}
@@ -577,7 +577,7 @@ export default function InventoryCalendar() {
                   <>
                     <label className="t-overline" style={{ display: 'block', marginBottom: 6 }}>OTA name</label>
                     <select value={form.otaName} onChange={e => setForm(f => ({ ...f, otaName: e.target.value }))} className="input-field" style={{ padding: '10px 12px', fontSize: 13 }}>
-                      <option value="">— Select OTA —</option>
+                      <option value="">- Select OTA -</option>
                       {['Booking.com', 'MakeMyTrip', 'Goibibo', 'Airbnb', 'Agoda', 'Expedia', 'EaseMyTrip', 'Yatra', 'Other'].map(o => <option key={o}>{o}</option>)}
                     </select>
                   </>

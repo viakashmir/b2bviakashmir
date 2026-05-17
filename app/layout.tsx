@@ -6,7 +6,7 @@ import './globals.css'
 const GA_ID = 'G-VGLJEWW5WS'
 
 export const metadata: Metadata = {
-  title: 'Via Kashmir — B2B Hotel Rate Portal',
+  title: 'Via Kashmir, B2B Hotel Rate Portal',
   description: 'Live B2B hotel rates from Via Kashmir for travel agents across Srinagar, Dal Lake, Gulmarg, Pahalgam, Sonamarg and Gurez.',
 }
 
@@ -41,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <html lang="en">
         <head>
-          {/* Google Analytics — gtag.js */}
+          {/* Google Analytics, gtag.js */}
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
             strategy="afterInteractive"

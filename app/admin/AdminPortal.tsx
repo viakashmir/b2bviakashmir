@@ -375,7 +375,7 @@ export default function AdminPortal() {
 }
 
 // =====================================================================
-// Detail panel — shown when an admin expands a hotel row. Renders the
+// Detail panel, shown when an admin expands a hotel row. Renders the
 // full submission so admin can decide approve/reject without leaving the
 // table.
 // =====================================================================
@@ -383,10 +383,10 @@ function HotelDetailPanel({ hotel }: { hotel: Hotel }) {
   return (
     <div style={{ padding: '20px 24px', borderTop: '1px solid #edeeef' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 18 }}>
-        <DetailRow Icon={Phone}   label="Phone"        value={hotel.phone || '—'} />
-        <DetailRow Icon={MessageCircle} label="WhatsApp" value={hotel.whatsapp || '—'} />
-        <DetailRow Icon={Mail}    label="Email"        value={hotel.email || '—'} />
-        <DetailRow Icon={MapPin}  label="Address"      value={hotel.address || '—'} />
+        <DetailRow Icon={Phone}   label="Phone"        value={hotel.phone || '-'} />
+        <DetailRow Icon={MessageCircle} label="WhatsApp" value={hotel.whatsapp || '-'} />
+        <DetailRow Icon={Mail}    label="Email"        value={hotel.email || '-'} />
+        <DetailRow Icon={MapPin}  label="Address"      value={hotel.address || '-'} />
         <DetailRow Icon={Building2} label="Type"       value={hotel.propertyType === 'houseboat' ? 'Houseboat' : 'Hotel'} />
         <DetailRow Icon={Clock}   label="Tariff window" value={hotel.tariffStart && hotel.tariffEnd ? `${hotel.tariffStart} → ${hotel.tariffEnd}` : 'Not set'} />
       </div>
@@ -414,7 +414,7 @@ function HotelDetailPanel({ hotel }: { hotel: Hotel }) {
         {hotel.rooms.length === 0 ? (
           <div style={{ padding: 14, borderRadius: 10, background: '#fff4f4', color: '#93000a', fontSize: 12.5, fontWeight: 600, border: '1px dashed #ba1a1a' }}>
             <AlertTriangle size={13} strokeWidth={2.4} style={{ verticalAlign: 'middle', marginRight: 6 }} />
-            No rooms submitted — nothing for agents to see. Consider rejecting until vendor adds rates.
+            No rooms submitted, nothing for agents to see. Consider rejecting until vendor adds rates.
           </div>
         ) : (
           <div style={{ overflowX: 'auto', borderRadius: 10, border: '1px solid #edeeef', background: '#ffffff' }}>
@@ -431,12 +431,12 @@ function HotelDetailPanel({ hotel }: { hotel: Hotel }) {
                   <tr key={r.id} style={{ borderTop: '1px solid #edeeef' }}>
                     <td style={{ padding: '10px 12px', fontWeight: 700, color: '#191c1d' }}>{r.type}</td>
                     <td style={{ padding: '10px 12px', color: '#414942' }}>{r.category}</td>
-                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.ep ? fmtINR(r.ep) : '—'}</td>
-                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.cp ? fmtINR(r.cp) : '—'}</td>
-                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.map ? fmtINR(r.map) : '—'}</td>
-                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.ap ? fmtINR(r.ap) : '—'}</td>
-                    <td style={{ padding: '10px 12px', color: '#414942' }}>{r.extraBed ? fmtINR(r.extraBed) : '—'}</td>
-                    <td style={{ padding: '10px 12px', color: '#414942' }}>{r.childWob ? fmtINR(r.childWob) : '—'}</td>
+                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.ep ? fmtINR(r.ep) : '-'}</td>
+                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.cp ? fmtINR(r.cp) : '-'}</td>
+                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.map ? fmtINR(r.map) : '-'}</td>
+                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.ap ? fmtINR(r.ap) : '-'}</td>
+                    <td style={{ padding: '10px 12px', color: '#414942' }}>{r.extraBed ? fmtINR(r.extraBed) : '-'}</td>
+                    <td style={{ padding: '10px 12px', color: '#414942' }}>{r.childWob ? fmtINR(r.childWob) : '-'}</td>
                     <td style={{ padding: '10px 12px', color: '#717971', fontSize: 11 }}>{GST_LABELS[r.gst] || r.gst}</td>
                     <td style={{ padding: '10px 12px', color: '#414942', fontWeight: 700 }}>{r.inventory}</td>
                     <td style={{ padding: '10px 12px' }}>
@@ -471,7 +471,7 @@ function DetailRow({ Icon, label, value }: { Icon: typeof Phone; label: string; 
 }
 
 // =====================================================================
-// Enquiries log — every WhatsApp enquiry that travellers submit.
+// Enquiries log, every WhatsApp enquiry that travellers submit.
 // =====================================================================
 function EnquiriesPanel({ enquiries }: { enquiries: Enquiry[] }) {
   if (enquiries.length === 0) {
@@ -515,7 +515,7 @@ function EnquiriesPanel({ enquiries }: { enquiries: Enquiry[] }) {
                 {e.rooms} rm · {e.adults}A{e.children > 0 ? ` + ${e.children}C` : ''}
               </td>
               <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#414942', maxWidth: 260 }}>
-                {e.notes || <span style={{ color: '#9aa19f' }}>—</span>}
+                {e.notes || <span style={{ color: '#9aa19f' }}>-</span>}
               </td>
               <td style={{ padding: '12px 16px' }}>
                 <a

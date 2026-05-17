@@ -26,9 +26,9 @@ export interface Room {
   cp: number
   map: number
   ap: number
-  /** Child Without Bed surcharge — ₹ per child per night. */
+  /** Child Without Bed surcharge, ₹ per child per night. */
   childWob: number
-  /** Extra Bed surcharge — ₹ per bed per night. */
+  /** Extra Bed surcharge, ₹ per bed per night. */
   extraBed: number
   /** GST treatment. */
   gst: GstStatus
@@ -38,9 +38,9 @@ export interface Room {
   status: RoomStatus
   updatedAt: number
 
-  /** Legacy field — kept so old data still renders. cp will mirror this if zero. */
+  /** Legacy field, kept so old data still renders. cp will mirror this if zero. */
   double: number
-  /** Legacy alias for childWob — kept on the type for back-compat reads. */
+  /** Legacy alias for childWob, kept on the type for back-compat reads. */
   cnb: number
 }
 
@@ -53,14 +53,14 @@ export interface Hotel {
   propertyType: PropertyType
   address: string
   phone: string
-  /** WhatsApp number — falls back to `phone` when the vendor uses one number for both. */
+  /** WhatsApp number, falls back to `phone` when the vendor uses one number for both. */
   whatsapp: string
   email: string
   website: string
   description: string
   amenities: string[]
   approved: boolean
-  /** ISO date 'YYYY-MM-DD' or '' — tariff validity window. */
+  /** ISO date 'YYYY-MM-DD' or '', tariff validity window. */
   tariffStart: string
   tariffEnd: string
   createdAt: number
@@ -112,7 +112,7 @@ export interface Enquiry {
 
 export type HotelsMap = Record<string, Hotel>
 
-// City filters on the public board and onboarding (no 'houseboats' here —
+// City filters on the public board and onboarding (no 'houseboats' here -
 // houseboats are a property type within Srinagar, not their own city).
 export const LOCATIONS: { value: Location | 'all'; label: string }[] = [
   { value: 'all', label: 'All Locations' },
@@ -141,10 +141,10 @@ export const LOCATION_COORDS: Record<Location, { lat: number; lon: number }> = {
 }
 
 export const MEAL_LABELS: Record<MealPlan, string> = {
-  CP: 'CP — Breakfast Only',
-  MAP: 'MAP — Breakfast & Dinner',
-  AP: 'AP — All Meals',
-  EP: 'EP — No Meals',
+  CP: 'CP, Breakfast Only',
+  MAP: 'MAP, Breakfast & Dinner',
+  AP: 'AP, All Meals',
+  EP: 'EP, No Meals',
 }
 
 // Room categories shown to vendors in the dashboard depend on property type.
@@ -291,7 +291,7 @@ export function rowToConcern(row: ConcernRow): Concern {
 // Display helpers
 // =============================================================
 export function fmtDate(ts: number): string {
-  if (!ts) return '—'
+  if (!ts) return '-'
   const d = new Date(ts)
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
   let h = d.getHours()
@@ -303,7 +303,7 @@ export function fmtDate(ts: number): string {
 }
 
 export function timeAgo(ts: number): string {
-  if (!ts) return '—'
+  if (!ts) return '-'
   const diff = Date.now() - ts
   const mins = Math.floor(diff / 60000)
   if (mins < 1) return 'Just now'
@@ -314,7 +314,7 @@ export function timeAgo(ts: number): string {
 }
 
 export function fmtINR(n: number | null | undefined): string {
-  if (!n) return '—'
+  if (!n) return '-'
   return '₹' + Number(n).toLocaleString('en-IN')
 }
 

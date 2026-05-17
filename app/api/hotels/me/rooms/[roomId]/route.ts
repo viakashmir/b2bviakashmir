@@ -14,7 +14,7 @@ const FIELD_MAP: Record<string, string> = {
   inventory: 'inventory', status: 'status',
 }
 
-/** PUT /api/hotels/me/rooms/[roomId] — update a room on vendor's own hotel. */
+/** PUT /api/hotels/me/rooms/[roomId], update a room on vendor's own hotel. */
 export async function PUT(req: Request, ctx: { params: { roomId: string } }) {
   const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 })
@@ -37,7 +37,7 @@ export async function PUT(req: Request, ctx: { params: { roomId: string } }) {
   return NextResponse.json({ ok: true })
 }
 
-/** DELETE /api/hotels/me/rooms/[roomId] — remove a room. */
+/** DELETE /api/hotels/me/rooms/[roomId], remove a room. */
 export async function DELETE(_req: Request, ctx: { params: { roomId: string } }) {
   const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 })

@@ -10,7 +10,7 @@ function vendorHotelId(userId: string) {
   return `vendor_${userId.toLowerCase()}`
 }
 
-/** GET /api/hotels/me — vendor's own hotel (may be unapproved). */
+/** GET /api/hotels/me, vendor's own hotel (may be unapproved). */
 export async function GET() {
   const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 })
@@ -28,7 +28,7 @@ export async function GET() {
   return NextResponse.json({ hotel: rowToHotel(hotel, rooms ?? []) })
 }
 
-/** POST /api/hotels/me — upsert vendor's hotel (used by onboarding + profile edits). */
+/** POST /api/hotels/me, upsert vendor's hotel (used by onboarding + profile edits). */
 export async function POST(req: Request) {
   const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 })
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
   const { error } = await sb.from('hotels').upsert(row, { onConflict: 'id' })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Fire the welcome email exactly once — on first submission.
+  // Fire the welcome email exactly once, on first submission.
   // (existing was null → this is a brand-new listing.)
   const isFirstSubmission = !existing
   if (isFirstSubmission) {

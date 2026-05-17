@@ -5,7 +5,7 @@ import { emailConcernResponded } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
-/** PATCH /api/concerns/[id] — admin updates status or sends response. */
+/** PATCH /api/concerns/[id], admin updates status or sends response. */
 export async function PATCH(req: Request, ctx: { params: { id: string } }) {
   const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 })

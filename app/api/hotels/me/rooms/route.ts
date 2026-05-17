@@ -8,7 +8,7 @@ function vendorHotelId(userId: string) {
   return `vendor_${userId.toLowerCase()}`
 }
 
-/** POST /api/hotels/me/rooms — add a room to vendor's own hotel. */
+/** POST /api/hotels/me/rooms, add a room to vendor's own hotel. */
 export async function POST(req: Request) {
   const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 })

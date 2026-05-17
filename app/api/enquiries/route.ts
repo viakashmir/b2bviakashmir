@@ -6,7 +6,7 @@ import { emailEnquirySent } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
-/** GET /api/enquiries — admin-only listing of every WhatsApp enquiry. */
+/** GET /api/enquiries, admin-only listing of every WhatsApp enquiry. */
 export async function GET() {
   const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 })
@@ -20,7 +20,7 @@ export async function GET() {
 }
 
 /**
- * POST /api/enquiries — public endpoint. A traveller on the public
+ * POST /api/enquiries, public endpoint. A traveller on the public
  * board submits trip details + name/phone; we log the row, fire
  * notification emails and return the wa.me deep-link the client opens.
  */
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
     paxLine,
   ]
   if (notes) lines.push('', `*Note:* ${notes}`)
-  lines.push('', `— ${travellerName}`, `Phone: ${travellerPhone}`, '', `(Sent via Via Kashmir B2B)`)
+  lines.push('', `- ${travellerName}`, `Phone: ${travellerPhone}`, '', `(Sent via Via Kashmir B2B)`)
   const text = lines.join('\n')
   const whatsappLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`
 

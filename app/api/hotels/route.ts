@@ -4,7 +4,7 @@ import { rowToHotel } from '@/lib/data'
 
 export const dynamic = 'force-dynamic'
 
-/** GET /api/hotels — public listing of approved hotels with rooms. */
+/** GET /api/hotels, public listing of approved hotels with rooms. */
 export async function GET() {
   const sb = serverSupabase()
   const [{ data: hotels, error: hErr }, { data: rooms, error: rErr }] = await Promise.all([

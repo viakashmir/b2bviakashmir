@@ -8,7 +8,7 @@ function vendorHotelId(userId: string) {
   return `vendor_${userId.toLowerCase()}`
 }
 
-/** DELETE /api/vendor/inventory/blocks/[id] — remove a block. */
+/** DELETE /api/vendor/inventory/blocks/[id], remove a block. */
 export async function DELETE(_req: Request, ctx: { params: { id: string } }) {
   const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 })

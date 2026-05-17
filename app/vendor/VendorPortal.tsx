@@ -199,7 +199,7 @@ export default function VendorPortal() {
           </div>
         </div>
 
-        {/* === MY LISTING — the data the vendor entered during onboarding === */}
+        {/* === MY LISTING, the data the vendor entered during onboarding === */}
         <div className="card-elevated" style={{ overflow: 'hidden', marginBottom: 24 }}>
           <div style={{
             background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)',
@@ -268,7 +268,7 @@ export default function VendorPortal() {
           <div style={{ padding: '18px 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 18 }}>
             {[
               { label: 'Location', value: hotel.locationLabel },
-              { label: 'Address',  value: hotel.address || '—' },
+              { label: 'Address',  value: hotel.address || '-' },
               { label: 'Phone',    value: hotel.phone },
               { label: 'Email',    value: hotel.email },
               ...(hotel.website ? [{ label: 'Website', value: hotel.website }] : []),
@@ -308,12 +308,12 @@ export default function VendorPortal() {
               display: 'flex', alignItems: 'center', gap: 8,
             }}>
               <Clock size={14} strokeWidth={2.3} />
-              <strong>Next step:</strong> add room types &amp; rates below — your listing won&apos;t show on the public board without at least one room.
+              <strong>Next step:</strong> add room types &amp; rates below, your listing won&apos;t show on the public board without at least one room.
             </div>
           )}
         </div>
 
-        {/* Add Room Type — big standout CTA */}
+        {/* Add Room Type, big standout CTA */}
         <button
           onClick={() => { setTab('rooms'); setShowForm(true); setTimeout(() => document.getElementById('add-room-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80) }}
           style={{
@@ -481,10 +481,10 @@ export default function VendorPortal() {
                     <div>
                       <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>Meal Plan</label>
                       <select value={newRoom.meal} onChange={e => setNewRoom(p => ({ ...p, meal: e.target.value as MealPlan }))} className="input-field" style={{ padding: '11px 14px', fontSize: 13 }}>
-                        <option value="CP">CP — Breakfast</option>
-                        <option value="MAP">MAP — B&amp;D</option>
-                        <option value="AP">AP — All Meals</option>
-                        <option value="EP">EP — No Meals</option>
+                        <option value="CP">CP, Breakfast</option>
+                        <option value="MAP">MAP, B&amp;D</option>
+                        <option value="AP">AP, All Meals</option>
+                        <option value="EP">EP, No Meals</option>
                       </select>
                     </div>
                   </div>

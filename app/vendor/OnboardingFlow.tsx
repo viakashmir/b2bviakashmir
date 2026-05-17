@@ -23,7 +23,7 @@ type RoomDraft = {
   notes: string
 }
 /**
- * Format a tariff window like "2 months · 14 days" or "45 days" — gives
+ * Format a tariff window like "2 months · 14 days" or "45 days", gives
  * the vendor a friendly sanity-check that their pricing window is what
  * they actually meant.
  */
@@ -67,7 +67,7 @@ type FormData = {
   address: string
   stars: StarCategory | 0
   phone: string
-  /** 'yes' | 'no' | '' — has the vendor told us whether their phone is also WhatsApp? */
+  /** 'yes' | 'no' | '', has the vendor told us whether their phone is also WhatsApp? */
   whatsappSameAsPhone: 'yes' | 'no' | ''
   /** Only relevant when whatsappSameAsPhone === 'no' */
   whatsapp: string
@@ -85,7 +85,7 @@ type FormData = {
 // been dropped. Description + amenities now live on the dashboard
 // Profile tab so vendors can fill them in their own time.
 //
-// The 'rates' step is the centerpiece — tariff window + 1-3 room types
+// The 'rates' step is the centerpiece, tariff window + 1-3 room types
 // with full meal-plan pricing on ONE screen.
 const ALL_STEPS = [
   { key: 'name'         },
@@ -160,7 +160,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
       case 'propertyType': return !data.propertyType ? 'Pick whether this is a hotel or a houseboat.' : null
       case 'stars':        return !data.stars ? 'Select your star category.' : null
       case 'contact':      {
-        // Phone stored without prefix — must be exactly 10 digits (India)
+        // Phone stored without prefix, must be exactly 10 digits (India)
         const digits = data.phone.replace(/\D/g, '')
         if (digits.length !== 10) return 'Phone must be exactly 10 digits.'
         if (!/^[6-9]/.test(digits))     return 'Please enter a valid Indian mobile number (starts with 6-9).'
@@ -176,7 +176,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
         if (!data.tariffStart || !data.tariffEnd) return 'Pick when your tariff is valid from – till.'
         if (data.tariffEnd < data.tariffStart)    return 'Tariff end date must be on or after the start date.'
         const filledRooms = data.rooms.filter(r => r.type.trim())
-        if (filledRooms.length === 0) return 'Add at least one room type with a price — this is what agents will see.'
+        if (filledRooms.length === 0) return 'Add at least one room type with a price, this is what agents will see.'
         for (const r of filledRooms) {
           const hasAnyRate = [r.ep, r.cp, r.map, r.ap].some(x => parseInt(x) > 0)
           if (!hasAnyRate) return `Room "${r.type}" needs at least one meal-plan rate (EP/CP/MAP/AP).`
@@ -252,7 +252,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
       fontFamily: 'Inter, sans-serif',
       zIndex: 200,
     }}>
-      {/* Progress bar — full width, top */}
+      {/* Progress bar, full width, top */}
       <div style={{ height: 4, background: 'rgba(0,54,26,0.08)', position: 'relative' }}>
         <div style={{
           height: '100%', width: `${progress}%`,
@@ -284,7 +284,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
         </div>
       </div>
 
-      {/* Centered content — scrolls when the step content (e.g. rates) is
+      {/* Centered content, scrolls when the step content (e.g. rates) is
           taller than the viewport. `safe center` keeps the top accessible
           when content overflows instead of clipping above the container. */}
       <div style={{
@@ -337,7 +337,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           )}
 
           {step.key === 'location' && (
-            <Prompt title="Where is your property?" subtitle="Pick the closest region — agents filter by this.">
+            <Prompt title="Where is your property?" subtitle="Pick the closest region, agents filter by this.">
               <ChoiceGrid
                 options={LOCATIONS.filter(l => l.value !== 'all').map(l => ({
                   key: l.value as string, label: l.label, Icon: MapPin,
@@ -349,7 +349,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           )}
 
           {step.key === 'propertyType' && (
-            <Prompt title="Hotel or Houseboat?" subtitle="Both are common in Srinagar — pick one.">
+            <Prompt title="Hotel or Houseboat?" subtitle="Both are common in Srinagar, pick one.">
               <ChoiceGrid
                 cols={2}
                 options={[
@@ -364,7 +364,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           )}
 
           {step.key === 'stars' && (
-            <Prompt title="What's your star category?" subtitle="Pick the closest match — you can update this later.">
+            <Prompt title="What's your star category?" subtitle="Pick the closest match, you can update this later.">
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
                 {[1, 2, 3, 4, 5].map(n => {
                   const active = data.stars === n
@@ -402,7 +402,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           {step.key === 'contact' && (
             <Prompt title="How can agents reach you?" subtitle="Phone goes onto the public card. Email + website appear on Enquire.">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <LabeledField label="Phone — 10 digits, India">
+                <LabeledField label="Phone, 10 digits, India">
                   <PhoneInputIN
                     inputRef={inputRef as React.MutableRefObject<HTMLInputElement>}
                     value={data.phone}
@@ -410,7 +410,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                   />
                 </LabeledField>
 
-                {/* WhatsApp conditional — required, drives the public "Enquire on WhatsApp" link */}
+                {/* WhatsApp conditional, required, drives the public "Enquire on WhatsApp" link */}
                 <div>
                   <label style={{
                     display: 'block',
@@ -443,7 +443,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                           }}
                         >
                           {active && <Check size={14} strokeWidth={3} />}
-                          {opt === 'yes' ? 'Yes — same number' : 'No — different number'}
+                          {opt === 'yes' ? 'Yes, same number' : 'No, different number'}
                         </button>
                       )
                     })}
@@ -451,7 +451,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                 </div>
 
                 {data.whatsappSameAsPhone === 'no' && (
-                  <LabeledField label="WhatsApp number — 10 digits, India">
+                  <LabeledField label="WhatsApp number, 10 digits, India">
                     <PhoneInputIN
                       value={data.whatsapp}
                       onChange={v => update('whatsapp', v)}
@@ -481,16 +481,16 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
 
           {step.key === 'rates' && (
             <Prompt
-              title="Your rates — the only thing agents actually search by"
+              title="Your rates, the only thing agents actually search by"
               subtitle="Every rate you add multiplies the number of agents who can quote you. Three minutes here usually pays for itself by tonight."
             >
-              {/* Gamified listing-power panel — grows as the vendor fills rates */}
+              {/* Gamified listing-power panel, grows as the vendor fills rates */}
               <ListingPowerPanel
                 tariffSet={!!(data.tariffStart && data.tariffEnd)}
                 rooms={data.rooms}
               />
 
-              {/* Tariff window — context for the rates */}
+              {/* Tariff window, context for the rates */}
               <div style={{
                 padding: 18, borderRadius: 14,
                 background: 'linear-gradient(135deg, rgba(255,220,196,0.30), rgba(184,240,197,0.26))',
@@ -503,7 +503,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                   display: 'flex', alignItems: 'center', gap: 6,
                 }}>
                   <Calendar size={11} strokeWidth={2.5} />
-                  These rates apply from — to
+                  These rates apply from, to
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   <BrandedDatePicker
@@ -523,7 +523,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                   />
                 </div>
 
-                {/* Duration chip — appears once both dates are picked */}
+                {/* Duration chip, appears once both dates are picked */}
                 {data.tariffStart && data.tariffEnd && data.tariffEnd >= data.tariffStart && (
                   <div style={{
                     marginTop: 14, padding: '8px 14px',
@@ -591,7 +591,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                   >
                     <Plus size={18} strokeWidth={2.8} />
                     {data.rooms.length === 0
-                      ? 'Add Your First Room — let agents quote you'
+                      ? 'Add Your First Room, let agents quote you'
                       : data.rooms.length === 1
                         ? 'Add a second category · double your reach'
                         : 'Add one more · max-out your visibility'}
@@ -613,7 +613,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                     textAlign: 'center', border: '1px solid rgba(0,54,26,0.10)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   }}>
-                    <Sparkles size={14} strokeWidth={2.5} /> Maxed out — you can add more room categories from your dashboard once you publish.
+                    <Sparkles size={14} strokeWidth={2.5} /> Maxed out, you can add more room categories from your dashboard once you publish.
                   </div>
                 )}
               </div>
@@ -621,7 +621,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           )}
 
           {step.key === 'review' && (
-            <Prompt title="Ready to publish your listing?" subtitle="Looks right? Hit Publish — your listing goes live after admin approval.">
+            <Prompt title="Ready to publish your listing?" subtitle="Looks right? Hit Publish, your listing goes live after admin approval.">
               <div style={{ background: '#ffffff', borderRadius: 18, padding: 24, boxShadow: '0 12px 40px rgba(0,54,26,0.08)' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '8px 18px', fontFamily: 'Inter, sans-serif', fontSize: 14 }}>
                   <ReviewRow label="Name"     value={data.name} />
@@ -631,8 +631,8 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                   <ReviewRow label="Phone"    value={data.phone} />
                   <ReviewRow label="Email"    value={data.email} />
                   {data.website && <ReviewRow label="Website" value={data.website} />}
-                  <ReviewRow label="Tariff period" value={data.tariffStart && data.tariffEnd ? `${data.tariffStart} → ${data.tariffEnd}` : '—'} />
-                  <ReviewRow label="Room types"   value={data.rooms.length ? `${data.rooms.length} added` : '—'} />
+                  <ReviewRow label="Tariff period" value={data.tariffStart && data.tariffEnd ? `${data.tariffStart} → ${data.tariffEnd}` : '-'} />
+                  <ReviewRow label="Room types"   value={data.rooms.length ? `${data.rooms.length} added` : '-'} />
                 </div>
                 {data.rooms.length > 0 && (
                   <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #edeeef' }}>
@@ -982,7 +982,7 @@ function ListingPowerPanel({ tariffSet, rooms }: { tariffSet: boolean; rooms: Ro
     { key: 'first',  label: 'First rate live', hit: hasAnyRate, reward: '+ You appear in agent search' },
     { key: 'plans',  label: 'All 4 meal plans on a room', hit: hasAllPlansOnAny, reward: '+ Agents quote you for every meal style' },
     { key: 'second', label: 'Second room category', hit: has2Rooms, reward: '+ 2× the quote requests on average' },
-    { key: 'third',  label: 'Third room category', hit: has3Rooms, reward: '+ Top-tier listing — featured chip' },
+    { key: 'third',  label: 'Third room category', hit: has3Rooms, reward: '+ Top-tier listing, featured chip' },
   ]
   const hits = milestones.filter(m => m.hit).length
   const pct = Math.round((hits / milestones.length) * 100)
@@ -990,10 +990,10 @@ function ListingPowerPanel({ tariffSet, rooms }: { tariffSet: boolean; rooms: Ro
   // Encouragement copy
   let mood = 'Let’s get your rates live'
   if (hits >= 5) mood = 'You’re a Via Kashmir Top Vendor 🏔'
-  else if (hits >= 4) mood = 'You’re unstoppable — one more to max out'
+  else if (hits >= 4) mood = 'You’re unstoppable, one more to max out'
   else if (hits >= 3) mood = 'Power vendor status unlocked'
   else if (hits >= 2) mood = 'You’re ahead of 70% of listings'
-  else if (hits === 1) mood = 'First milestone — keep going'
+  else if (hits === 1) mood = 'First milestone, keep going'
 
   return (
     <div style={{
@@ -1083,7 +1083,7 @@ function ReviewRow({ label, value }: { label: string; value: string }) {
       <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', paddingTop: 4 }}>
         {label}
       </div>
-      <div style={{ color: '#191c1d', fontWeight: 600, wordBreak: 'break-word' }}>{value || '—'}</div>
+      <div style={{ color: '#191c1d', fontWeight: 600, wordBreak: 'break-word' }}>{value || '-'}</div>
     </>
   )
 }
@@ -1112,10 +1112,10 @@ const GST_OPTIONS: { key: GstStatus; label: string }[] = [
 ]
 
 const MEAL_OPTIONS: { key: MealPlan; label: string }[] = [
-  { key: 'EP',  label: 'EP — Room Only' },
-  { key: 'CP',  label: 'CP — Breakfast' },
-  { key: 'MAP', label: 'MAP — Breakfast & Dinner' },
-  { key: 'AP',  label: 'AP — All Meals' },
+  { key: 'EP',  label: 'EP, Room Only' },
+  { key: 'CP',  label: 'CP, Breakfast' },
+  { key: 'MAP', label: 'MAP, Breakfast & Dinner' },
+  { key: 'AP',  label: 'AP, All Meals' },
 ]
 
 function RoomDraftCard({
@@ -1129,7 +1129,7 @@ function RoomDraftCard({
 }) {
   const cats = categoriesFor(propertyType)
   const [showMore, setShowMore] = useState(false)
-  // Count of filled meal-plan rates — small progress chip in the header
+  // Count of filled meal-plan rates, small progress chip in the header
   const rateCount = (['ep','cp','map','ap'] as const).reduce(
     (n, k) => n + ((room as Record<string, string | unknown>)[k] ? 1 : 0), 0,
   )
@@ -1228,7 +1228,7 @@ function RoomDraftCard({
           ))}
         </div>
 
-        {/* Promotional toggle — frames extras as upsells, not chores */}
+        {/* Promotional toggle, frames extras as upsells, not chores */}
         <button
           type="button"
           onClick={() => setShowMore(s => !s)}
@@ -1257,7 +1257,7 @@ function RoomDraftCard({
                 {showMore ? 'Hide bonus details' : 'Boost this room · add extras & GST'}
               </span>
               <span style={{ fontSize: 11, fontWeight: 600, color: '#414942', marginTop: 2 }}>
-                {showMore ? 'Collapse' : 'Extra bed, child rate, GST treatment & headline meal plan — takes 20 seconds.'}
+                {showMore ? 'Collapse' : 'Extra bed, child rate, GST treatment & headline meal plan, takes 20 seconds.'}
               </span>
             </span>
           </span>

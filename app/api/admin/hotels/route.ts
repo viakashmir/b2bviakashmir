@@ -13,7 +13,7 @@ async function assertAdmin() {
   return { ok: true as const, userId }
 }
 
-/** GET /api/admin/hotels — full list (approved + pending) for admin panel. */
+/** GET /api/admin/hotels, full list (approved + pending) for admin panel. */
 export async function GET() {
   const a = await assertAdmin()
   if (!a.ok) return NextResponse.json({ error: 'forbidden' }, { status: a.code })

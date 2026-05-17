@@ -18,7 +18,7 @@ const CITY_ORDER: Location[] = ['srinagar', 'gulmarg', 'pahalgam', 'sonamarg', '
 
 /** Map WMO weather code (open-meteo) → lucide icon + label */
 function wmoIcon(code: number | null) {
-  if (code == null) return { Icon: Cloud,           label: '—',         color: '#9dd3aa' }
+  if (code == null) return { Icon: Cloud,           label: '-',         color: '#9dd3aa' }
   if (code === 0)   return { Icon: Sun,             label: 'Clear',     color: '#ffdcc4' }
   if (code <= 3)    return { Icon: CloudSun,        label: 'Cloudy',    color: '#b8f0c5' }
   if (code <= 48)   return { Icon: CloudFog,        label: 'Foggy',     color: '#c1c9bf' }
@@ -35,14 +35,14 @@ export default function KashmirLive() {
     CITY_ORDER.map(k => ({ key: k, label: LOCATION_LABELS[k], temp: null, code: null }))
   )
 
-  // Clock — ticks every second
+  // Clock, ticks every second
   useEffect(() => {
     setNow(new Date())
     const t = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(t)
   }, [])
 
-  // Weather — one fetch per city, parallel. Survives if one fails.
+  // Weather, one fetch per city, parallel. Survives if one fails.
   useEffect(() => {
     let alive = true
     const load = async () => {
@@ -71,7 +71,7 @@ export default function KashmirLive() {
 
   const time = now ? new Intl.DateTimeFormat('en-IN', {
     timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true,
-  }).format(now) : '—'
+  }).format(now) : '-'
   const date = now ? new Intl.DateTimeFormat('en-IN', {
     timeZone: 'Asia/Kolkata', weekday: 'short', day: '2-digit', month: 'short',
   }).format(now) : ''
@@ -128,7 +128,7 @@ export default function KashmirLive() {
               }}>
                 <Icon size={18} strokeWidth={2} color="#00361a" />
                 <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 17, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em', lineHeight: 1 }}>
-                  {c.temp == null || Number.isNaN(c.temp) ? '—' : `${c.temp}°`}
+                  {c.temp == null || Number.isNaN(c.temp) ? '-' : `${c.temp}°`}
                 </div>
                 <div style={{ fontSize: 9, fontWeight: 700, color: '#414942', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center', whiteSpace: 'nowrap' }}>
                   {c.label}

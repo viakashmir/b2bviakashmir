@@ -4,7 +4,7 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 /**
- * Browser-side client. Public reads only — RLS allows `select` on
+ * Browser-side client. Public reads only, RLS allows `select` on
  * approved hotels and their rooms. Use this for the public board and
  * real-time subscriptions.
  */
@@ -19,7 +19,7 @@ export function browserSupabase(): SupabaseClient {
 }
 
 /**
- * Server-only client with the service-role key — bypasses RLS. Use this
+ * Server-only client with the service-role key, bypasses RLS. Use this
  * inside API routes for writes and authorised reads (after Clerk auth).
  * NEVER import this from a client component.
  */

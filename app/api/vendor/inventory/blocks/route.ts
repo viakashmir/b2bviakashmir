@@ -8,7 +8,7 @@ function vendorHotelId(userId: string) {
   return `vendor_${userId.toLowerCase()}`
 }
 
-/** POST /api/vendor/inventory/blocks — create a date-range block. */
+/** POST /api/vendor/inventory/blocks, create a date-range block. */
 export async function POST(req: Request) {
   const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 })

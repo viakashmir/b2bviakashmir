@@ -155,10 +155,10 @@ export default function MyListing() {
             {[
               { Icon: Building2, label: 'Property type',  value: `${STAR_LABELS[hotel.stars]} · ${hotel.propertyType === 'houseboat' ? 'Houseboat' : 'Hotel'}` },
               { Icon: MapPin,    label: 'Location',       value: hotel.locationLabel },
-              { Icon: MapPin,    label: 'Address',        value: hotel.address || '—' },
-              { Icon: Phone,     label: 'Phone',          value: hotel.phone || '—' },
-              { Icon: Mail,      label: 'Email',          value: hotel.email || '—' },
-              { Icon: Globe,     label: 'Website',        value: hotel.website || '—' },
+              { Icon: MapPin,    label: 'Address',        value: hotel.address || '-' },
+              { Icon: Phone,     label: 'Phone',          value: hotel.phone || '-' },
+              { Icon: Mail,      label: 'Email',          value: hotel.email || '-' },
+              { Icon: Globe,     label: 'Website',        value: hotel.website || '-' },
             ].map(row => (
               <div key={row.label} style={{ display: 'grid', gridTemplateColumns: '40px 1fr', gap: 12, alignItems: 'center' }}>
                 <div style={{
@@ -210,7 +210,7 @@ export default function MyListing() {
         <div>
           <div className="t-overline" style={{ marginBottom: 10, padding: '0 4px' }}>
             <Eye size={11} strokeWidth={2.5} style={{ verticalAlign: 'middle', marginRight: 6 }} />
-            Public preview — what agents see
+            Public preview, what agents see
           </div>
           {hotel.approved ? (
             <HotelCard hotel={hotel} index={0} />

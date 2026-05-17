@@ -34,7 +34,7 @@ function appUrl(): string {
 async function send(opts: { to: string | string[]; subject: string; html: string }) {
   const r = client()
   if (!r) {
-    console.warn('[email] RESEND_API_KEY missing — skipping send:', opts.subject)
+    console.warn('[email] RESEND_API_KEY missing, skipping send:', opts.subject)
     return
   }
   try {
@@ -50,7 +50,7 @@ async function send(opts: { to: string | string[]; subject: string; html: string
 }
 
 // ============================================================
-// Branded HTML shell — Manrope/Inter, Kashmir saffron+green palette
+// Branded HTML shell, Manrope/Inter, Kashmir saffron+green palette
 // ============================================================
 
 function layout(opts: {
@@ -155,7 +155,7 @@ function infoTable(rows: Array<[string, string]>): string {
           ${escapeHtml(k)}
         </td>
         <td style="padding:8px 0; font-size:14px; color:#191c1d; font-weight:600;">
-          ${escapeHtml(v) || '—'}
+          ${escapeHtml(v) || '-'}
         </td>
       </tr>`).join('')}
   </table>`
@@ -176,7 +176,7 @@ export async function emailListingSubmitted(args: {
   const html = layout({
     preheader: `Your listing "${args.hotelName}" is waiting for admin approval.`,
     heading: `Your listing is in review`,
-    intro: `Hi${args.vendorName ? ` ${args.vendorName}` : ''}, we received your property details for <strong>${escapeHtml(args.hotelName)}</strong> in ${escapeHtml(args.locationLabel)}. Our admin team will approve it shortly — usually within 24 hours.`,
+    intro: `Hi${args.vendorName ? ` ${args.vendorName}` : ''}, we received your property details for <strong>${escapeHtml(args.hotelName)}</strong> in ${escapeHtml(args.locationLabel)}. Our admin team will approve it shortly, usually within 24 hours.`,
     bodyHtml: `
       ${infoTable([
         ['Property', args.hotelName],
@@ -193,7 +193,7 @@ export async function emailListingSubmitted(args: {
   })
 
   await Promise.allSettled([
-    send({ to: args.vendorEmail, subject: `We've received your listing — pending approval`, html }),
+    send({ to: args.vendorEmail, subject: `We've received your listing, pending approval`, html }),
     send({
       to: adminAddr(),
       subject: `[Approval needed] ${args.hotelName} · ${args.locationLabel}`,
@@ -224,7 +224,7 @@ export async function emailHotelApproved(args: {
   const html = layout({
     preheader: `Your listing "${args.hotelName}" is now live.`,
     heading: `Your listing is live`,
-    intro: `Great news — <strong>${escapeHtml(args.hotelName)}</strong> is now visible to travel agents on the public rate board.`,
+    intro: `Great news, <strong>${escapeHtml(args.hotelName)}</strong> is now visible to travel agents on the public rate board.`,
     bodyHtml: `
       ${infoTable([
         ['Property', args.hotelName],
@@ -232,7 +232,7 @@ export async function emailHotelApproved(args: {
         ['Status',   'Approved · Live'],
       ])}
       <p style="margin:14px 0 0; font-size:14px; line-height:1.65;">
-        Keep your rates and inventory updated from the dashboard — every change publishes instantly to the public board, no admin in the loop.
+        Keep your rates and inventory updated from the dashboard, every change publishes instantly to the public board, no admin in the loop.
       </p>
     `,
     ctaLabel: 'View my public listing',
@@ -252,7 +252,7 @@ export async function emailHotelSuspended(args: {
     intro: `<strong>${escapeHtml(args.hotelName)}</strong> has been temporarily suspended by the Via Kashmir admin team. It's no longer visible to travel agents on the public rate board.`,
     bodyHtml: `
       <p style="margin:0; font-size:14px; line-height:1.65;">
-        If this seems wrong, reply to this email and we'll review. Your data, rates and inventory are preserved — re-approval brings the listing back instantly.
+        If this seems wrong, reply to this email and we'll review. Your data, rates and inventory are preserved, re-approval brings the listing back instantly.
       </p>
     `,
     ctaLabel: 'Open dashboard',
@@ -293,11 +293,11 @@ export async function emailEnquirySent(args: {
   const hotelHtml = layout({
     preheader: `${args.travellerName} just enquired about ${args.hotelName}.`,
     heading: `New enquiry just landed`,
-    intro: `<strong>${escapeHtml(args.travellerName)}</strong> opened a WhatsApp enquiry for <strong>${escapeHtml(args.hotelName)}</strong>. Their number and trip details are below — reply on WhatsApp to close the booking.`,
+    intro: `<strong>${escapeHtml(args.travellerName)}</strong> opened a WhatsApp enquiry for <strong>${escapeHtml(args.hotelName)}</strong>. Their number and trip details are below, reply on WhatsApp to close the booking.`,
     bodyHtml: `
       ${infoTable(rows)}
       <p style="margin:14px 0 4px; font-size:13px; color:#717971;">
-        We already pre-filled a WhatsApp message for them — you may have a chat waiting in your inbox right now.
+        We already pre-filled a WhatsApp message for them, you may have a chat waiting in your inbox right now.
       </p>
     `,
     ctaLabel: 'Open WhatsApp chat',
@@ -374,7 +374,7 @@ export async function emailConcernRaised(args: {
 
   await Promise.allSettled([
     send({ to: args.agentEmail, subject: `We've received your concern about ${args.hotelName}`, html: ackHtml }),
-    send({ to: adminAddr(), subject: `[Concern · ${args.priority}] ${args.hotelName} — ${args.subject}`, html: adminHtml }),
+    send({ to: adminAddr(), subject: `[Concern · ${args.priority}] ${args.hotelName}, ${args.subject}`, html: adminHtml }),
   ])
 }
 

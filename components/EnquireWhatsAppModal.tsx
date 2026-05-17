@@ -37,7 +37,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
   const next = () => {
     setError('')
     if (step === 'dates') {
-      // Dates are optional, allow skip — but if one is set, require both
+      // Dates are optional, allow skip, but if one is set, require both
       if ((checkIn && !checkOut) || (checkOut && !checkIn)) {
         setError('Pick both check-in and check-out, or leave both blank.')
         return
@@ -184,7 +184,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
 
           {step === 'dates' && (
             <>
-              <SectionTitle Icon={CalendarDays} title="When are you travelling?" hint="Tip: leave blank if your dates are flexible — the hotel will quote you anyway." />
+              <SectionTitle Icon={CalendarDays} title="When are you travelling?" hint="Tip: leave blank if your dates are flexible, the hotel will quote you anyway." />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <BrandedDatePicker label="Check-in"  value={checkIn}  min={today} max={checkOut || undefined} onChange={setCheckIn}  placeholder="Pick date" />
                 <BrandedDatePicker label="Check-out" value={checkOut} min={checkIn || today}                 onChange={setCheckOut} placeholder="Pick date" />
@@ -237,7 +237,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
                 <FieldWrap label="Your full name">
                   <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Anaya Sharma" autoFocus style={fieldStyle} />
                 </FieldWrap>
-                <FieldWrap label="Your phone — 10 digits, India">
+                <FieldWrap label="Your phone, 10 digits, India">
                   <div style={{
                     display: 'flex', alignItems: 'center',
                     borderRadius: 12, border: '1px solid rgba(0,54,26,0.14)',
@@ -276,7 +276,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
                 background: 'linear-gradient(135deg, rgba(184,240,197,0.30), rgba(255,220,196,0.18))',
                 fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#414942', lineHeight: 1.5,
               }}>
-                Hitting <strong>Send via WhatsApp</strong> opens WhatsApp with a pre-filled message — you just tap send. We log this enquiry so the Via Kashmir team can follow up if the hotel doesn't reply within 24h.
+                Hitting <strong>Send via WhatsApp</strong> opens WhatsApp with a pre-filled message, you just tap send. We log this enquiry so the Via Kashmir team can follow up if the hotel doesn't reply within 24h.
               </div>
             </>
           )}

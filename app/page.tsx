@@ -22,7 +22,7 @@ export default function PublicPage() {
   const [error, setError] = useState<string | null>(null)
 
   // Public page reads Supabase directly via anon key + RLS (which already
-  // allows SELECT on approved hotels and their rooms). No API hop — this
+  // allows SELECT on approved hotels and their rooms). No API hop, this
   // makes real-time subscriptions and refresh-after-change instant.
   const refresh = useCallback(async () => {
     let sb: ReturnType<typeof browserSupabase> | null = null

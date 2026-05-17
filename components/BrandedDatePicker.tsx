@@ -287,7 +287,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
               onClick={() => {
                 const t = new Date()
                 const iso = ymd(t)
-                // Respect min — if today is before min, jump to min instead
+                // Respect min, if today is before min, jump to min instead
                 const target = minD && iso < ymd(minD) ? ymd(minD) : iso
                 onChange(target); setOpen(false)
               }}

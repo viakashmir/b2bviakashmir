@@ -91,7 +91,7 @@ export default function HotelCard({ hotel, index }: Props) {
             {hotel.locationLabel}
           </div>
 
-          {/* Big availability banner — green / blinking yellow / red */}
+          {/* Big availability banner, green / blinking yellow / red */}
           <div
             className={`${headerAvailClass}`}
             style={{
@@ -148,7 +148,7 @@ export default function HotelCard({ hotel, index }: Props) {
           )}
         </div>
 
-        {/* Rate rows — show ALL rooms with each meal plan's rate */}
+        {/* Rate rows, show ALL rooms with each meal plan's rate */}
         <div style={{ flex: 1 }}>
           {hotel.rooms.length === 0 ? (
             <div style={{ padding: '20px', textAlign: 'center', fontSize: 12, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
@@ -227,7 +227,7 @@ export default function HotelCard({ hotel, index }: Props) {
           })}
         </div>
 
-        {/* Footer — phone hidden (revealed via Enquire), just CTA */}
+        {/* Footer, phone hidden (revealed via Enquire), just CTA */}
         <div className="hotel-card-footer" style={{
           padding: '12px 16px', background: '#ffffff', borderTop: '1px solid #edeeef',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
@@ -295,7 +295,7 @@ export default function HotelCard({ hotel, index }: Props) {
               </button>
             </div>
             <div style={{ padding: '24px 28px', overflowY: 'auto' }}>
-              {/* Hero WhatsApp CTA — primary action of the modal */}
+              {/* Hero WhatsApp CTA, primary action of the modal */}
               <button
                 onClick={() => setShowWa(true)}
                 style={{
@@ -326,13 +326,13 @@ export default function HotelCard({ hotel, index }: Props) {
                 </p>
               )}
 
-              {/* Contact rows — every icon is an inline SVG (lucide), so ad blockers can't hide them */}
+              {/* Contact rows, every icon is an inline SVG (lucide), so ad blockers can't hide them */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {[
-                  { Icon: Phone,    label: 'Phone',         value: hotel.phone || '—', href: hotel.phone ? `tel:${hotel.phone.replace(/\s+/g, '')}` : undefined },
-                  { Icon: Mail,     label: 'Email',         value: hotel.email || '—', href: hotel.email ? `mailto:${hotel.email}` : undefined },
+                  { Icon: Phone,    label: 'Phone',         value: hotel.phone || '-', href: hotel.phone ? `tel:${hotel.phone.replace(/\s+/g, '')}` : undefined },
+                  { Icon: Mail,     label: 'Email',         value: hotel.email || '-', href: hotel.email ? `mailto:${hotel.email}` : undefined },
                   { Icon: MapPin,   label: 'Address',       value: hotel.address || hotel.locationLabel, href: mapsUrl(hotel.name, hotel.address, hotel.locationLabel), action: 'Open in Maps' },
-                  { Icon: Globe,    label: 'Website',       value: hotel.website || '—', href: hotel.website ? (hotel.website.startsWith('http') ? hotel.website : `https://${hotel.website}`) : undefined },
+                  { Icon: Globe,    label: 'Website',       value: hotel.website || '-', href: hotel.website ? (hotel.website.startsWith('http') ? hotel.website : `https://${hotel.website}`) : undefined },
                   { Icon: Clock,    label: 'Rates Updated', value: fmtDate(hotel.updatedAt) },
                   { Icon: BedDouble, label: 'Available Now', value: `${availInv} rooms · ${availTypes + limitTypes}/${hotel.rooms.length} types open` },
                 ].map(({ Icon, label, value, href, action }, i, arr) => {
@@ -404,8 +404,8 @@ export default function HotelCard({ hotel, index }: Props) {
                           <div style={{ fontSize: 10, color: '#717971', fontWeight: 500 }}>{r.category} · {r.meal}</div>
                         </div>
                         <div style={{ padding: '8px 0', textAlign: 'right', fontWeight: 700, color: '#00361a', borderBottom: '1px solid #f3f4f5' }}>{fmtINR(r.double)}</div>
-                        <div style={{ padding: '8px 0', textAlign: 'right', color: '#414942', borderBottom: '1px solid #f3f4f5' }}>{r.cnb ? fmtINR(r.cnb) : '—'}</div>
-                        <div style={{ padding: '8px 0', textAlign: 'right', color: '#414942', borderBottom: '1px solid #f3f4f5' }}>{r.extraBed ? fmtINR(r.extraBed) : '—'}</div>
+                        <div style={{ padding: '8px 0', textAlign: 'right', color: '#414942', borderBottom: '1px solid #f3f4f5' }}>{r.cnb ? fmtINR(r.cnb) : '-'}</div>
+                        <div style={{ padding: '8px 0', textAlign: 'right', color: '#414942', borderBottom: '1px solid #f3f4f5' }}>{r.extraBed ? fmtINR(r.extraBed) : '-'}</div>
                         <div style={{ padding: '8px 0', textAlign: 'right', fontWeight: 700, color: '#414942', borderBottom: '1px solid #f3f4f5' }}>{r.inventory}</div>
                       </div>
                     ))}

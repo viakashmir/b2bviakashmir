@@ -35,7 +35,7 @@ export async function GET() {
   return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 }
 
-/** POST /api/concerns — customer raises a concern. */
+/** POST /api/concerns, customer raises a concern. */
 export async function POST(req: Request) {
   const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 })
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
     void emailConcernRaised({
       agentEmail:   concernRow.agent_email,
       agentName:    concernRow.agent_name,
-      agentCompany: concernRow.agent_company || '—',
+      agentCompany: concernRow.agent_company || '-',
       hotelName:    concernRow.hotel_name || 'a hotel',
       category:     concernRow.category,
       priority:     concernRow.priority,
