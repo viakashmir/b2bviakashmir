@@ -1,12 +1,13 @@
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import CustomerPortal from './CustomerPortal'
 
 export default async function CustomerPage() {
-  const { userId, sessionClaims } = await auth()
+  const { userId } = await auth()
   if (!userId) redirect('/login')
-  const role = (sessionClaims?.metadata as { role?: string } | undefined)?.role
-  // admins and vendors get bounced back to /dashboard which routes them home
+  const user = await currentUser()
+  const role = (user?.publicMetadata as { role?: string } | undefined)?.role
+  // admins and vendors get bounced back through /dashboard
   if (role === 'admin' || role === 'vendor') redirect('/dashboard')
 
   return <CustomerPortal />

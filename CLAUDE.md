@@ -17,13 +17,12 @@ No test runner. No separate typecheck script — use `next build` or `npx tsc --
 
 ### Three-role flow
 
-A `/dashboard` URL is never rendered — `middleware.ts` reads the role from `sessionClaims.metadata.role` and redirects:
+`middleware.ts` only gates whether `/dashboard`, `/admin`, `/vendor`, `/customer` require a signed-in user — **it does NOT redirect**. The redirect logic lives in [app/dashboard/page.tsx](app/dashboard/page.tsx), a server component that uses `currentUser()` (fresh metadata from the Clerk backend, not the cached JWT) to:
 
-- `role === 'admin'`  → `/admin`
-- `role === 'vendor'` → `/vendor`
-- otherwise → `/customer`
+1. **Auto-assign `role = 'vendor'`** to any signed-in user with no role yet — this is the "sign-up via `/login` creates a hotel/vendor account" rule. Done via `clerkClient().users.updateUserMetadata()`.
+2. Redirect by role: `admin → /admin`, `vendor → /vendor`, anything else (including `customer`) → `/customer`.
 
-Each portal page is a Server Component that re-checks the role server-side via `auth()`; if the role is wrong it redirects back through `/dashboard`. The portal UI itself lives in a sibling client component (`AdminPortal.tsx`, `VendorPortal.tsx`, `CustomerPortal.tsx`).
+Each portal page (`/admin/page.tsx`, `/vendor/page.tsx`, `/customer/page.tsx`) is a server component that re-checks the role via `currentUser()` (not `sessionClaims`, which lag for up to a minute after a metadata write — fatal for the just-signed-up case). The portal UI itself lives in a sibling client component (`AdminPortal.tsx`, `VendorPortal.tsx`, `CustomerPortal.tsx`).
 
 For role-aware redirects to work, the Clerk **session token** must expose `publicMetadata`. In the Clerk dashboard: **Configure → Sessions → Customize session token** add:
 ```json
