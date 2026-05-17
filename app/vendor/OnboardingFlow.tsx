@@ -54,7 +54,12 @@ type FormData = {
   rooms: RoomDraft[]
 }
 
-// Steps include both pre-existing info and the new pricing capture.
+// Lean flow: every step that doesn't directly feed the rate sheet has
+// been dropped. Description + amenities now live on the dashboard
+// Profile tab so vendors can fill them in their own time.
+//
+// The 'rates' step is the centerpiece — tariff window + 1-3 room types
+// with full meal-plan pricing on ONE screen.
 const ALL_STEPS = [
   { key: 'name'         },
   { key: 'location'     },
@@ -62,11 +67,7 @@ const ALL_STEPS = [
   { key: 'stars'        },
   { key: 'address'      },
   { key: 'contact'      },
-  { key: 'totalRooms'   },
-  { key: 'description'  },
-  { key: 'amenities'    },
-  { key: 'tariff'       }, // NEW — Tariff valid from–to
-  { key: 'roomRates'    }, // NEW — Add 1-3 room types with full pricing (skippable)
+  { key: 'rates'        }, // tariff window + at least 1 room with at least 1 meal-plan rate
   { key: 'review'       },
 ] as const
 
@@ -124,15 +125,12 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
         const digits = data.phone.replace(/\D/g, '')
         return digits.length < 10 || digits.length > 15 ? 'Phone must be 10–15 digits.' : null
       }
-      case 'totalRooms':   return !data.totalRooms || parseInt(data.totalRooms) <= 0 ? 'Total rooms must be a positive number.' : null
-      case 'description':  return data.description.trim().length < 20 ? 'Tell agents a bit more — at least a sentence (20+ chars).' : null
-      case 'tariff':       return !data.tariffStart || !data.tariffEnd
-                            ? 'Pick a tariff validity range.'
-                            : (data.tariffEnd < data.tariffStart ? 'End date must be on or after start date.' : null)
-      case 'roomRates':    {
-        // Skippable — if no rooms, allow continuing. Each row that has a name needs a positive rate.
-        for (const r of data.rooms) {
-          if (!r.type.trim()) continue
+      case 'rates': {
+        if (!data.tariffStart || !data.tariffEnd) return 'Pick when your tariff is valid from – till.'
+        if (data.tariffEnd < data.tariffStart)    return 'Tariff end date must be on or after the start date.'
+        const filledRooms = data.rooms.filter(r => r.type.trim())
+        if (filledRooms.length === 0) return 'Add at least one room type with a price — this is what agents will see.'
+        for (const r of filledRooms) {
           const hasAnyRate = [r.ep, r.cp, r.map, r.ap].some(x => parseInt(x) > 0)
           if (!hasAnyRate) return `Room "${r.type}" needs at least one meal-plan rate (EP/CP/MAP/AP).`
         }
@@ -397,86 +395,59 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
             </Prompt>
           )}
 
-          {step.key === 'totalRooms' && (
-            <Prompt title="How many rooms in total?" subtitle="Round figure is fine — you'll add specific room types and rates next.">
-              <BigNumberInput
-                refEl={inputRef as React.MutableRefObject<HTMLInputElement>}
-                value={data.totalRooms}
-                onChange={v => update('totalRooms', v)}
-                onSubmit={next}
-                placeholder="24"
-              />
-            </Prompt>
-          )}
-
-          {step.key === 'description' && (
-            <Prompt title="A line about your property" subtitle="One or two sentences — what makes you stand out?">
-              <Textarea
-                refEl={inputRef as React.MutableRefObject<HTMLTextAreaElement>}
-                value={data.description}
-                onChange={v => update('description', v)}
-                placeholder="Heritage property on the Dal Lake with cedar-wood interiors and panoramic mountain views."
-                rows={4}
-                showCounter
-              />
-            </Prompt>
-          )}
-
-          {step.key === 'amenities' && (
-            <Prompt title="Which amenities do you offer?" subtitle={`Tap to toggle — ${data.propertyType === 'houseboat' ? 'houseboat-specific' : 'hotel'} amenities.`}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {amenitiesFor(data.propertyType === 'houseboat' ? 'houseboat' : 'hotel').map(a => {
-                  const active = data.amenities.includes(a)
-                  return (
-                    <button
-                      key={a}
-                      type="button"
-                      onClick={() => toggleAmenity(a)}
-                      style={{
-                        padding: '10px 16px', borderRadius: 9999, border: '2px solid',
-                        borderColor: active ? '#00361a' : 'rgba(0,54,26,0.12)',
-                        background: active ? '#00361a' : '#ffffff',
-                        color: active ? '#ffffff' : '#414942',
-                        fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600,
-                        cursor: 'pointer', transition: 'all 0.18s',
-                        display: 'inline-flex', alignItems: 'center', gap: 7,
-                      }}
-                    >
-                      {active ? <Check size={13} strokeWidth={3} /> : <Wifi size={12} strokeWidth={2.2} opacity={0.6} />}
-                      {a}
-                    </button>
-                  )
-                })}
-              </div>
-            </Prompt>
-          )}
-
-          {step.key === 'tariff' && (
-            <Prompt title="Tariff valid from – to?" subtitle="The window these prices apply for. Most properties publish for a season (e.g. Mar–Jun, Oct–Mar). You can update later.">
-              <TariffWindow
-                start={data.tariffStart}
-                end={data.tariffEnd}
-                onStart={v => update('tariffStart', v)}
-                onEnd={v => update('tariffEnd', v)}
-              />
-            </Prompt>
-          )}
-
-          {step.key === 'roomRates' && (
+          {step.key === 'rates' && (
             <Prompt
-              title="Add 1–3 room types with rates"
-              subtitle="Quick setup — you can edit or add more from the dashboard anytime. Skip this step if you'd rather do it later."
+              title="Your rates"
+              subtitle="The headline reason you're here — what agents pay. Add 1–3 room types with meal-plan rates. You can polish description, amenities & more rooms from the dashboard later."
             >
+              {/* Tariff window — context for the rates */}
+              <div style={{
+                padding: 18, borderRadius: 14,
+                background: 'linear-gradient(135deg, rgba(255,220,196,0.30), rgba(184,240,197,0.26))',
+                border: '1px solid rgba(240,159,94,0.22)',
+                marginBottom: 22,
+              }}>
+                <div style={{
+                  fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
+                  color: '#6f3800', marginBottom: 10,
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}>
+                  <Calendar size={11} strokeWidth={2.5} />
+                  These rates apply from — to
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <BrandedDatePicker
+                    label="Valid from"
+                    value={data.tariffStart}
+                    min={new Date().toISOString().slice(0, 10)}
+                    max={data.tariffEnd || undefined}
+                    onChange={v => update('tariffStart', v)}
+                    placeholder="Pick start date"
+                  />
+                  <BrandedDatePicker
+                    label="Valid till"
+                    value={data.tariffEnd}
+                    min={data.tariffStart || new Date().toISOString().slice(0, 10)}
+                    onChange={v => update('tariffEnd', v)}
+                    placeholder="Pick end date"
+                  />
+                </div>
+              </div>
+
+              {/* Room cards */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {data.rooms.length === 0 && (
                   <div style={{
-                    background: 'rgba(255,255,255,0.55)',
-                    border: '2px dashed rgba(0,54,26,0.18)',
-                    borderRadius: 14, padding: '20px 22px',
-                    fontFamily: 'Inter, sans-serif', color: '#414942', fontSize: 13,
-                    textAlign: 'center',
+                    background: 'rgba(255,255,255,0.7)',
+                    border: '2px dashed rgba(0,54,26,0.22)',
+                    borderRadius: 16, padding: '24px 22px',
+                    fontFamily: 'Inter, sans-serif', color: '#414942', fontSize: 13.5,
+                    textAlign: 'center', lineHeight: 1.55,
                   }}>
-                    No room types added yet — click <strong>Add Room Type</strong> below, or just hit <strong>OK</strong> to skip.
+                    <strong style={{ color: '#00361a' }}>Tap below to add your first room.</strong>
+                    <div style={{ marginTop: 4, color: '#717971', fontSize: 12.5 }}>
+                      Without at least one room with a price, agents won&apos;t see anything.
+                    </div>
                   </div>
                 )}
 
@@ -502,17 +473,17 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                     type="button"
                     onClick={() => setData(d => ({ ...d, rooms: [...d.rooms, blankRoom((d.propertyType || 'hotel') as PropertyType)] }))}
                     style={{
-                      padding: '14px 18px', borderRadius: 14, border: '2px dashed rgba(0,54,26,0.25)',
+                      padding: '16px 18px', borderRadius: 14, border: '2px dashed rgba(0,54,26,0.25)',
                       background: 'transparent', color: '#00361a',
-                      fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+                      fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 800, cursor: 'pointer',
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                       transition: 'all 0.18s',
                     }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,54,26,0.05)' }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
                   >
-                    <Plus size={15} strokeWidth={2.5} />
-                    {data.rooms.length === 0 ? 'Add Room Type' : 'Add Another Room Type'}
+                    <Plus size={16} strokeWidth={2.5} />
+                    {data.rooms.length === 0 ? 'Add Your First Room' : 'Add Another Room Type'}
                     {data.rooms.length > 0 && <span style={{ opacity: 0.55, fontSize: 12 }}>({data.rooms.length}/3)</span>}
                   </button>
                 )}
@@ -532,10 +503,8 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                   <ReviewRow label="Phone"    value={data.phone} />
                   <ReviewRow label="Email"    value={data.email} />
                   {data.website && <ReviewRow label="Website" value={data.website} />}
-                  <ReviewRow label="Total rooms" value={data.totalRooms} />
                   <ReviewRow label="Tariff period" value={data.tariffStart && data.tariffEnd ? `${data.tariffStart} → ${data.tariffEnd}` : '—'} />
                   <ReviewRow label="Room types"   value={data.rooms.length ? `${data.rooms.length} added` : '—'} />
-                  <ReviewRow label="Amenities" value={data.amenities.length ? data.amenities.join(', ') : '—'} />
                 </div>
                 {data.rooms.length > 0 && (
                   <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #edeeef' }}>
@@ -558,7 +527,8 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                 )}
               </div>
               <p style={{ marginTop: 14, fontSize: 12.5, color: '#717971', fontFamily: 'Inter, sans-serif', textAlign: 'center' }}>
-                You can change anything from your dashboard after publishing.
+                Add a description, amenities and more room types from your dashboard.
+                Listing goes live the moment admin approves.
               </p>
             </Prompt>
           )}
