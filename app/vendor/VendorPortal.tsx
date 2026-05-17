@@ -6,7 +6,6 @@ import {
   Trash2, Save, Plus, Eye, Clock, BedDouble, TrendingUp,
   Coins, Building2, Contact, CheckCircle2, X as XIcon,
 } from 'lucide-react'
-import Header from '@/components/Header'
 import Toast, { ToastMessage } from '@/components/Toast'
 import OnboardingFlow from './OnboardingFlow'
 import {
@@ -134,7 +133,6 @@ export default function VendorPortal() {
   if (!hotel) {
     return (
       <>
-        <Header />
         <OnboardingFlow
           defaultName={user.firstName || user.username || ''}
           defaultEmail={user.primaryEmailAddress?.emailAddress || ''}
@@ -159,8 +157,7 @@ export default function VendorPortal() {
 
   return (
     <>
-      <Header />
-      <main className="app-shell">
+      <main>
         <div className="dash-header">
           <div>
             <span className="badge badge-primary" style={{ marginBottom: 12 }}>

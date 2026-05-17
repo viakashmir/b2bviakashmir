@@ -5,7 +5,6 @@ import {
   ChevronLeft, ChevronRight, Plus, Trash2, X as XIcon, Calendar,
   BedDouble, Lock,
 } from 'lucide-react'
-import Header from '@/components/Header'
 import Toast, { ToastMessage } from '@/components/Toast'
 import { browserSupabase } from '@/lib/supabase'
 
@@ -135,7 +134,6 @@ export default function InventoryCalendar() {
   if (loading) {
     return (
       <>
-        <Header />
         <div style={{ minHeight: '100vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading calendar…</div>
         </div>
@@ -146,8 +144,7 @@ export default function InventoryCalendar() {
   if (!data) {
     return (
       <>
-        <Header />
-        <main className="app-shell">
+        <main>
           <div className="card-elevated" style={{ padding: 28 }}>
             <p style={{ fontFamily: 'Inter, sans-serif', color: '#414942' }}>
               Couldn&apos;t load the calendar. Try refreshing the page.
@@ -164,8 +161,7 @@ export default function InventoryCalendar() {
 
   return (
     <>
-      <Header />
-      <main className="app-shell">
+      <main>
         <div className="dash-header">
           <div>
             <span className="badge badge-primary" style={{ marginBottom: 12 }}>
