@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { LOCATION_COORDS, LOCATION_LABELS, Location } from '@/lib/data'
+import {
+  Clock, Sun, Cloud, CloudSun, CloudFog, CloudRain, CloudSnow,
+  CloudLightning, Mountain,
+} from 'lucide-react'
 
 interface CityWeather {
   key: Location
@@ -12,17 +16,17 @@ interface CityWeather {
 
 const CITY_ORDER: Location[] = ['srinagar', 'gulmarg', 'pahalgam', 'sonamarg', 'gurez']
 
-/** Map WMO weather code (open-meteo) → Flaticon icon + short label */
-function wmo(code: number | null): { icon: string; label: string; color: string } {
-  if (code == null) return { icon: 'fi-rr-cloud',         label: '—',         color: '#9dd3aa' }
-  if (code === 0)   return { icon: 'fi-rr-sun',           label: 'Clear',     color: '#ffdcc4' }
-  if (code <= 3)    return { icon: 'fi-rr-cloud-sun',     label: 'Cloudy',    color: '#b8f0c5' }
-  if (code <= 48)   return { icon: 'fi-rr-smog',          label: 'Foggy',     color: '#c1c9bf' }
-  if (code <= 67)   return { icon: 'fi-rr-cloud-drizzle', label: 'Rain',      color: '#a1e7ff' }
-  if (code <= 77)   return { icon: 'fi-rr-snowflake',     label: 'Snow',      color: '#ffffff' }
-  if (code <= 82)   return { icon: 'fi-rr-cloud-showers', label: 'Showers',   color: '#a1e7ff' }
-  if (code >= 95)   return { icon: 'fi-rr-cloud-storm',   label: 'Thunder',   color: '#b8f0c5' }
-  return { icon: 'fi-rr-cloud', label: 'Cloudy', color: '#b8f0c5' }
+/** Map WMO weather code (open-meteo) → lucide icon + label */
+function wmoIcon(code: number | null) {
+  if (code == null) return { Icon: Cloud,           label: '—',         color: '#9dd3aa' }
+  if (code === 0)   return { Icon: Sun,             label: 'Clear',     color: '#ffdcc4' }
+  if (code <= 3)    return { Icon: CloudSun,        label: 'Cloudy',    color: '#b8f0c5' }
+  if (code <= 48)   return { Icon: CloudFog,        label: 'Foggy',     color: '#c1c9bf' }
+  if (code <= 67)   return { Icon: CloudRain,       label: 'Rain',      color: '#a1e7ff' }
+  if (code <= 77)   return { Icon: CloudSnow,       label: 'Snow',      color: '#ffffff' }
+  if (code <= 82)   return { Icon: CloudRain,       label: 'Showers',   color: '#a1e7ff' }
+  if (code >= 95)   return { Icon: CloudLightning,  label: 'Thunder',   color: '#b8f0c5' }
+  return              { Icon: Cloud,                label: 'Cloudy',    color: '#b8f0c5' }
 }
 
 export default function KashmirLive() {
@@ -31,34 +35,34 @@ export default function KashmirLive() {
     CITY_ORDER.map(k => ({ key: k, label: LOCATION_LABELS[k], temp: null, code: null }))
   )
 
-  // Tick clock every second (after mount to avoid SSR mismatch)
+  // Clock — ticks every second
   useEffect(() => {
     setNow(new Date())
     const t = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(t)
   }, [])
 
-  // Pull weather every 15 minutes
+  // Weather — one fetch per city, parallel. Survives if one fails.
   useEffect(() => {
     let alive = true
     const load = async () => {
-      try {
-        const lat = CITY_ORDER.map(k => LOCATION_COORDS[k].lat).join(',')
-        const lon = CITY_ORDER.map(k => LOCATION_COORDS[k].lon).join(',')
+      const results = await Promise.allSettled(CITY_ORDER.map(async k => {
+        const { lat, lon } = LOCATION_COORDS[k]
         const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=Asia%2FKolkata`)
-        if (!res.ok) return
+        if (!res.ok) throw new Error(`open-meteo ${res.status}`)
         const data = await res.json()
-        const arr = Array.isArray(data) ? data : [data]
-        if (!alive) return
-        setCities(
-          CITY_ORDER.map((k, i) => ({
-            key: k,
-            label: LOCATION_LABELS[k],
-            temp: Math.round(arr[i]?.current?.temperature_2m ?? Number.NaN),
-            code: arr[i]?.current?.weather_code ?? null,
-          })),
-        )
-      } catch { /* swallow — strip will just show — */ }
+        return {
+          key: k, label: LOCATION_LABELS[k],
+          temp: Math.round(data?.current?.temperature_2m ?? Number.NaN),
+          code: data?.current?.weather_code ?? null,
+        } as CityWeather
+      }))
+      if (!alive) return
+      setCities(results.map((r, i) =>
+        r.status === 'fulfilled'
+          ? r.value
+          : { key: CITY_ORDER[i], label: LOCATION_LABELS[CITY_ORDER[i]], temp: null, code: null }
+      ))
     }
     load()
     const t = setInterval(load, 15 * 60 * 1000)
@@ -87,11 +91,9 @@ export default function KashmirLive() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        <i className="fi fi-rr-mountains" style={{
-          position: 'absolute', right: -16, top: -10, fontSize: 110, color: 'rgba(184,240,197,0.08)', pointerEvents: 'none',
-        }} />
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#9dd3aa', fontFamily: 'Inter, sans-serif' }}>
-          <i className="fi fi-rr-clock" style={{ fontSize: 11, marginRight: 6 }} />
+        <Mountain size={110} color="rgba(184,240,197,0.08)" style={{ position: 'absolute', right: -16, top: -10, pointerEvents: 'none' }} />
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#9dd3aa', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Clock size={11} strokeWidth={2.5} />
           Kashmir Time · IST
         </div>
         <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.05, marginTop: 6 }}>
@@ -104,8 +106,8 @@ export default function KashmirLive() {
 
       {/* Weather strip */}
       <div className="card-elevated" style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#717971', fontFamily: 'Inter, sans-serif', marginBottom: 10 }}>
-          <i className="fi fi-rr-cloud-sun" style={{ fontSize: 11, marginRight: 6, color: '#13677b' }} />
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#717971', fontFamily: 'Inter, sans-serif', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <CloudSun size={12} strokeWidth={2.2} color="#13677b" />
           Live Weather
         </div>
         <div className="weather-row" style={{
@@ -114,7 +116,7 @@ export default function KashmirLive() {
           gap: 6,
         }}>
           {cities.map(c => {
-            const w = wmo(c.code)
+            const { Icon } = wmoIcon(c.code)
             return (
               <div key={c.key} style={{
                 padding: '10px 8px',
@@ -124,7 +126,7 @@ export default function KashmirLive() {
                 gap: 4,
                 fontFamily: 'Inter, sans-serif',
               }}>
-                <i className={`fi ${w.icon}`} style={{ fontSize: 18, color: '#00361a' }} />
+                <Icon size={18} strokeWidth={2} color="#00361a" />
                 <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 17, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em', lineHeight: 1 }}>
                   {c.temp == null || Number.isNaN(c.temp) ? '—' : `${c.temp}°`}
                 </div>

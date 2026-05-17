@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth, useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
+import { Eye, LogOut, Building2, Lock, LayoutDashboard, ShieldCheck, User } from 'lucide-react'
 import ViaKashmirLogo from './ViaKashmirLogo'
 
 export default function Header() {
@@ -21,10 +22,10 @@ export default function Header() {
     role === 'admin'  ? 'Admin' :
     role === 'vendor' ? 'My Hotel' :
     'My Dashboard'
-  const portalIcon =
-    role === 'admin'  ? 'fi-rr-shield-check' :
-    role === 'vendor' ? 'fi-rr-building' :
-    'fi-rr-dashboard'
+  const PortalIcon =
+    role === 'admin'  ? ShieldCheck :
+    role === 'vendor' ? Building2 :
+    LayoutDashboard
 
   const handleLogout = () => signOut(() => router.push('/'))
 
@@ -50,7 +51,7 @@ export default function Header() {
                 background: path === '/' ? 'rgba(184,240,197,0.12)' : 'transparent',
               }}
             >
-              <i className="fi fi-rr-eye" style={{ fontSize: 14 }} />
+              <Eye size={14} strokeWidth={2.2} />
               <span className="nav-label">Live Rates</span>
             </button>
           </Link>
@@ -65,7 +66,7 @@ export default function Header() {
                   background: path === portalHref ? 'rgba(184,240,197,0.12)' : 'transparent',
                 }}
               >
-                <i className={`fi ${portalIcon}`} style={{ fontSize: 14 }} />
+                <PortalIcon size={14} strokeWidth={2.2} />
                 <span className="nav-label">{portalLabel}</span>
               </button>
             </Link>
@@ -73,7 +74,7 @@ export default function Header() {
 
           {isSignedIn ? (
             <button onClick={handleLogout} className="btn-danger nav-button" style={{ padding: '10px 16px', fontSize: 13 }}>
-              <i className="fi fi-rr-sign-out-alt" style={{ fontSize: 14 }} />
+              <LogOut size={14} strokeWidth={2.2} />
               <span className="nav-label">Sign Out</span>
             </button>
           ) : (
@@ -87,7 +88,7 @@ export default function Header() {
                     background: 'rgba(255,255,255,0.14)',
                   }}
                 >
-                  <i className="fi fi-rr-building" style={{ fontSize: 14 }} />
+                  <Building2 size={14} strokeWidth={2.2} />
                   <span className="nav-label">
                     <span className="hide-on-mobile">Hotel </span>Register
                   </span>
@@ -95,7 +96,7 @@ export default function Header() {
               </Link>
               <Link href="/login" style={{ textDecoration: 'none' }}>
                 <button className="btn-tertiary nav-button" style={{ padding: '10px 18px', fontSize: 13 }}>
-                  <i className="fi fi-rr-lock" style={{ fontSize: 14 }} />
+                  <Lock size={14} strokeWidth={2.2} />
                   <span className="nav-label">
                     <span className="hide-on-mobile">Hotel </span>Login
                   </span>

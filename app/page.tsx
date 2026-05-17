@@ -1,6 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import {
+  Mountain, Leaf, CheckCircle2, Eye, Clock, Filter,
+  Search, Grid3x3, Building2, Sailboat,
+} from 'lucide-react'
 import Header from '@/components/Header'
 import HotelCard from '@/components/HotelCard'
 import KashmirLive from '@/components/KashmirLive'
@@ -73,10 +77,11 @@ export default function PublicPage() {
 
       <main className="app-shell">
         <section className="hero-section">
-          <i className="fi fi-rr-mountains" style={{
-            position: 'absolute', right: -30, top: -20,
-            fontSize: 280, color: 'rgba(184,240,197,0.08)', pointerEvents: 'none',
-          }} />
+          <Mountain
+            size={280}
+            color="rgba(184,240,197,0.08)"
+            style={{ position: 'absolute', right: -30, top: -20, pointerEvents: 'none' }}
+          />
 
           <div className="hero-live-badge">
             <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#b8f0c5', display: 'inline-block' }} />
@@ -84,7 +89,7 @@ export default function PublicPage() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-            <i className="fi fi-rr-leaf" style={{ fontSize: 18, color: '#b8f0c5' }} />
+            <Leaf size={18} strokeWidth={2.2} color="#b8f0c5" />
             <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#9dd3aa', fontFamily: 'Inter, sans-serif' }}>
               Kashmir B2B Rate Portal
             </span>
@@ -101,12 +106,12 @@ export default function PublicPage() {
 
           <div className="hero-meta-row" style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 28, flexWrap: 'wrap' }}>
             {[
-              { icon: 'fi-rr-check-circle', text: 'Live rates, zero calls' },
-              { icon: 'fi-rr-eye', text: 'No login for agents' },
-              { icon: 'fi-rr-clock', text: 'Updated in real-time' },
+              { Icon: CheckCircle2, text: 'Live rates, zero calls' },
+              { Icon: Eye,          text: 'No login for agents' },
+              { Icon: Clock,        text: 'Updated in real-time' },
             ].map((m, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.88)', fontFamily: 'Inter, sans-serif' }}>
-                <i className={`fi ${m.icon}`} style={{ fontSize: 14, color: '#b8f0c5' }} />
+                <m.Icon size={14} strokeWidth={2.2} color="#b8f0c5" />
                 {m.text}
               </div>
             ))}
@@ -117,7 +122,7 @@ export default function PublicPage() {
 
         <div className="filter-row">
           <span className="t-overline" style={{ marginRight: 6 }}>
-            <i className="fi fi-rr-filter" style={{ fontSize: 11, marginRight: 6, verticalAlign: 'middle' }} />
+            <Filter size={11} strokeWidth={2.5} style={{ marginRight: 6, verticalAlign: 'middle' }} />
             Location
           </span>
           {LOCATIONS.map(loc => {
@@ -141,7 +146,7 @@ export default function PublicPage() {
           })}
 
           <div className="search-wrap">
-            <i className="fi fi-rr-search" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: '#717971', pointerEvents: 'none', zIndex: 1 }} />
+            <Search size={14} strokeWidth={2.2} color="#717971" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', zIndex: 1 }} />
             <input
               type="search"
               value={search}
@@ -161,14 +166,14 @@ export default function PublicPage() {
         {filter === 'srinagar' && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: -12, marginBottom: 28, flexWrap: 'wrap' }}>
             <span className="t-overline" style={{ marginRight: 6 }}>
-              <i className="fi fi-rr-filter" style={{ fontSize: 11, marginRight: 6, verticalAlign: 'middle' }} />
+              <Filter size={11} strokeWidth={2.5} style={{ marginRight: 6, verticalAlign: 'middle' }} />
               Property
             </span>
             {([
-              { key: 'all',       label: 'All',        icon: 'fi-rr-grid' },
-              { key: 'hotel',     label: 'Hotels',     icon: 'fi-rr-building' },
-              { key: 'houseboat', label: 'Houseboats', icon: 'fi-rr-sailboat' },
-            ] as { key: PropFilter; label: string; icon: string }[]).map(p => {
+              { key: 'all',       label: 'All',        Icon: Grid3x3 },
+              { key: 'hotel',     label: 'Hotels',     Icon: Building2 },
+              { key: 'houseboat', label: 'Houseboats', Icon: Sailboat },
+            ] as { key: PropFilter; label: string; Icon: typeof Grid3x3 }[]).map(p => {
               const active = propFilter === p.key
               return (
                 <button
@@ -183,7 +188,7 @@ export default function PublicPage() {
                     display: 'inline-flex', alignItems: 'center', gap: 6,
                   }}
                 >
-                  <i className={`fi ${p.icon}`} style={{ fontSize: 11 }} />
+                  <p.Icon size={11} strokeWidth={2.3} />
                   {p.label}
                 </button>
               )
@@ -200,13 +205,13 @@ export default function PublicPage() {
 
         {hotels.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-            <i className="fi fi-rr-mountains" style={{ fontSize: 40, color: '#c1c9bf', marginBottom: 12, display: 'block' }} />
+            <Mountain size={40} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 12px' }} />
             <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels published yet</p>
             <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Approved hotel listings will appear here in real-time.</p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-            <i className="fi fi-rr-search" style={{ fontSize: 40, color: '#c1c9bf', marginBottom: 12, display: 'block' }} />
+            <Search size={40} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 12px' }} />
             <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels found</p>
             <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Try adjusting your location filter or search term.</p>
           </div>

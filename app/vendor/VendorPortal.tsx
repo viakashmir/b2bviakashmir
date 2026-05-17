@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@clerk/nextjs'
+import {
+  Trash2, Save, Plus, Eye, Clock, BedDouble, TrendingUp,
+  Coins, Building2, IdCard, CheckCircle2, X as XIcon,
+} from 'lucide-react'
 import Header from '@/components/Header'
 import Toast, { ToastMessage } from '@/components/Toast'
 import OnboardingFlow from './OnboardingFlow'
@@ -147,10 +151,10 @@ export default function VendorPortal() {
   const soldTypes = hotel.rooms.filter(r => r.status === 'Sold Out').length
 
   const statCards = [
-    { label: 'Rooms Available Today', value: String(availInv), sub: `${availTypes} types open`, icon: 'fi-rr-bed-alt', accent: '#13677b' },
-    { label: 'Total Inventory', value: String(totalInv), sub: `${soldTypes} sold out`, icon: 'fi-rr-chart-line-up', accent: '#00361a' },
-    { label: 'Avg Double Rate', value: fmtINR(avgDbl), sub: 'Per night · net B2B', icon: 'fi-rr-coins', accent: '#f09f5e' },
-    { label: 'Last Updated', value: timeAgo(hotel.updatedAt), sub: fmtDate(hotel.updatedAt), icon: 'fi-rr-clock', accent: '#00361a', small: true },
+    { label: 'Rooms Available Today', value: String(availInv), sub: `${availTypes} types open`, Icon: BedDouble, accent: '#13677b' },
+    { label: 'Total Inventory', value: String(totalInv), sub: `${soldTypes} sold out`, Icon: TrendingUp, accent: '#00361a' },
+    { label: 'Avg Double Rate', value: fmtINR(avgDbl), sub: 'Per night · net B2B', Icon: Coins, accent: '#f09f5e' },
+    { label: 'Last Updated', value: timeAgo(hotel.updatedAt), sub: fmtDate(hotel.updatedAt), Icon: Clock, accent: '#00361a', small: true },
   ]
 
   return (
@@ -160,14 +164,14 @@ export default function VendorPortal() {
         <div className="dash-header">
           <div>
             <span className="badge badge-primary" style={{ marginBottom: 12 }}>
-              <i className="fi fi-rr-building" style={{ fontSize: 11 }} /> {STAR_LABELS[hotel.stars]}
+              <Building2 size={11} strokeWidth={2.5} /> {STAR_LABELS[hotel.stars]}
             </span>
             <h1 className="dash-title">{hotel.name}</h1>
             <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
               {hotel.locationLabel} · {hotel.phone}
               {!hotel.approved && (
                 <span className="badge badge-tertiary" style={{ marginLeft: 12 }}>
-                  <i className="fi fi-rr-clock" style={{ fontSize: 10 }} /> Pending approval
+                  <Clock size={10} strokeWidth={2.5} /> Pending approval
                 </span>
               )}
             </p>
@@ -175,12 +179,12 @@ export default function VendorPortal() {
           <div className="dash-actions">
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600, color: '#414942', padding: '10px 18px', background: '#ffffff', borderRadius: 9999, fontFamily: 'Inter, sans-serif', boxShadow: '0 1px 3px rgba(25,28,29,0.04)' }}>
               <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#13677b', display: 'inline-block' }} />
-              <i className="fi fi-rr-clock" style={{ fontSize: 12, opacity: 0.6 }} />
+              <Clock size={12} strokeWidth={2} style={{ opacity: 0.6 }} />
               {fmtDate(hotel.updatedAt)}
             </div>
             <a href="/" style={{ textDecoration: 'none' }}>
               <button className="btn-secondary" style={{ padding: '10px 18px', fontSize: 13 }}>
-                <i className="fi fi-rr-eye" style={{ fontSize: 13 }} /> View Live
+                <Eye size={13} strokeWidth={2.2} /> View Live
               </button>
             </a>
           </div>
@@ -189,8 +193,8 @@ export default function VendorPortal() {
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, borderBottom: '1px solid #edeeef' }}>
           {([
-            { key: 'rooms', label: 'Rooms & Rates', icon: 'fi-rr-bed-alt' },
-            { key: 'profile', label: 'Profile', icon: 'fi-rr-id-card-clip-alt' },
+            { key: 'rooms', label: 'Inventory & Rates', Icon: BedDouble },
+            { key: 'profile', label: 'Hotel Profile', Icon: IdCard },
           ] as const).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
               padding: '12px 18px', border: 'none', background: 'transparent',
@@ -199,7 +203,7 @@ export default function VendorPortal() {
               borderBottom: tab === t.key ? '3px solid #00361a' : '3px solid transparent',
               marginBottom: -1, display: 'inline-flex', alignItems: 'center', gap: 8,
             }}>
-              <i className={`fi ${t.icon}`} style={{ fontSize: 13 }} />
+              <t.Icon size={13} strokeWidth={2.2} />
               {t.label}
             </button>
           ))}
@@ -213,7 +217,7 @@ export default function VendorPortal() {
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
                     <div className="t-overline">{c.label}</div>
                     <div style={{ width: 36, height: 36, borderRadius: 9999, background: '#f3f4f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className={`fi ${c.icon}`} style={{ fontSize: 16, color: c.accent }} />
+                      <c.Icon size={16} strokeWidth={2.2} color={c.accent} />
                     </div>
                   </div>
                   <div className={`stat-value${c.small ? ' small' : ''}`}>{c.value}</div>
@@ -232,7 +236,7 @@ export default function VendorPortal() {
                 </div>
               </div>
               <button onClick={() => setShowForm(f => !f)} className="btn-primary" style={{ padding: '12px 22px', fontSize: 13 }}>
-                <i className="fi fi-rr-plus" style={{ fontSize: 13 }} /> Add Room Type
+                <Plus size={13} strokeWidth={2.5} /> Add Room Type
               </button>
             </div>
 
@@ -254,7 +258,7 @@ export default function VendorPortal() {
                   {hotel.rooms.length === 0 ? (
                     <tr>
                       <td colSpan={9} style={{ textAlign: 'center', padding: '48px 20px', color: '#717971', fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 500 }}>
-                        <i className="fi fi-rr-bed-alt" style={{ fontSize: 28, color: '#c1c9bf', display: 'block', marginBottom: 8 }} />
+                        <BedDouble size={28} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 8px' }} />
                         No room types yet. Add your first room type above.
                       </td>
                     </tr>
@@ -315,12 +319,12 @@ export default function VendorPortal() {
                   </div>
                   {formError && (
                     <p style={{ fontSize: 12, color: '#93000a', margin: '4px 0 12px', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
-                      <i className="fi fi-rs-exclamation" style={{ fontSize: 13, marginRight: 6 }} /> {formError}
+                      <XIcon size={13} strokeWidth={2.5} style={{ marginRight: 6, verticalAlign: 'middle' }} /> {formError}
                     </p>
                   )}
                   <div style={{ display: 'flex', gap: 10 }}>
                     <button onClick={addRoom} className="btn-primary" style={{ padding: '12px 24px', fontSize: 13 }}>
-                      <i className="fi fi-rr-plus" style={{ fontSize: 13 }} /> Add Room Type
+                      <Plus size={13} strokeWidth={2.5} /> Add Room Type
                     </button>
                     <button onClick={() => { setShowForm(false); setFormError('') }} className="btn-secondary" style={{ padding: '12px 22px', fontSize: 13 }}>Cancel</button>
                   </div>
@@ -381,7 +385,7 @@ export default function VendorPortal() {
                       fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600,
                       cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
                     }}>
-                      <i className={`fi ${active ? 'fi-rs-check-circle' : 'fi-rr-plus-small'}`} style={{ fontSize: 12 }} />
+                      {active ? <CheckCircle2 size={12} strokeWidth={2.5} /> : <Plus size={12} strokeWidth={2.5} />}
                       {a}
                     </button>
                   )
@@ -391,7 +395,7 @@ export default function VendorPortal() {
 
             <div style={{ marginTop: 24 }}>
               <button onClick={saveProfile} className="btn-primary" style={{ padding: '12px 24px', fontSize: 13 }}>
-                <i className="fi fi-rr-disk" style={{ fontSize: 13 }} /> Save Profile
+                <Save size={13} strokeWidth={2.3} /> Save Profile
               </button>
             </div>
           </div>
@@ -448,19 +452,33 @@ function RoomRow({ room, propertyType, saved, onSave, onDelete, statusClass }: {
       </td>
       <td style={{ padding: '14px 16px', whiteSpace: 'nowrap', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          <button onClick={() => { onSave(draft); setDraft({}) }} className={saved ? 'btn-primary' : 'btn-secondary'} style={{ padding: '7px 14px', fontSize: 11, background: saved ? 'linear-gradient(135deg, #13677b, #18697e)' : undefined, color: saved ? '#ffffff' : undefined }}>
-            {saved ? (<><i className="fi fi-rs-check-circle" style={{ fontSize: 11 }} /> Saved</>) : (<><i className="fi fi-rr-disk" style={{ fontSize: 11 }} /> Save</>)}
+          <button
+            onClick={() => { onSave(draft); setDraft({}) }}
+            className={saved ? 'btn-primary' : 'btn-primary'}
+            style={{
+              padding: '8px 14px', fontSize: 11.5,
+              background: saved ? 'linear-gradient(135deg, #13677b, #18697e)' : undefined,
+              boxShadow: saved ? '0 4px 12px rgba(19,103,123,0.25)' : '0 4px 12px rgba(0,54,26,0.22)',
+            }}
+          >
+            {saved
+              ? (<><CheckCircle2 size={12} strokeWidth={2.5} /> Saved</>)
+              : (<><Save size={12} strokeWidth={2.3} /> Save</>)}
           </button>
-          <button onClick={onDelete} style={{
-            width: 34, height: 34, borderRadius: 9999, border: 'none',
-            background: '#ffdad6', color: '#93000a', cursor: 'pointer',
-            transition: 'all 0.18s', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ba1a1a'; (e.currentTarget as HTMLElement).style.color = '#ffffff' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#ffdad6'; (e.currentTarget as HTMLElement).style.color = '#93000a' }}
+          <button
+            onClick={onDelete}
+            style={{
+              padding: '8px 12px', borderRadius: 9999, border: 'none',
+              background: '#ba1a1a', color: '#ffffff',
+              fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 800,
+              cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
+              transition: 'all 0.18s', boxShadow: '0 4px 12px rgba(186,26,26,0.25)',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#93000a' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#ba1a1a' }}
             aria-label="Delete row"
           >
-            <i className="fi fi-rr-trash" style={{ fontSize: 14 }} />
+            <Trash2 size={12} strokeWidth={2.3} /> Delete
           </button>
         </div>
       </td>
