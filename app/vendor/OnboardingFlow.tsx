@@ -8,7 +8,7 @@ import {
 } from '@/lib/data'
 import {
   ArrowRight, ArrowLeft, Check, Building2, Sailboat, MapPin,
-  Sparkles, Mountain, Wifi, Plus, Trash2,
+  Sparkles, Mountain, Wifi, Plus, Trash2, Calendar,
 } from 'lucide-react'
 import BrandedDatePicker from '@/components/BrandedDatePicker'
 
