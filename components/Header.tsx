@@ -83,18 +83,22 @@ export default function Header() {
                   className="btn-ghost nav-button"
                   style={{
                     padding: '10px 16px', fontSize: 13,
-                    color: 'rgba(255,255,255,0.85)',
-                    background: 'rgba(255,255,255,0.06)',
+                    color: '#ffffff',
+                    background: 'rgba(255,255,255,0.14)',
                   }}
                 >
                   <i className="fi fi-rr-building" style={{ fontSize: 14 }} />
-                  <span className="nav-label">Hotel Register</span>
+                  <span className="nav-label">
+                    <span className="hide-on-mobile">Hotel </span>Register
+                  </span>
                 </button>
               </Link>
               <Link href="/login" style={{ textDecoration: 'none' }}>
                 <button className="btn-tertiary nav-button" style={{ padding: '10px 18px', fontSize: 13 }}>
                   <i className="fi fi-rr-lock" style={{ fontSize: 14 }} />
-                  <span className="nav-label">Hotel Login</span>
+                  <span className="nav-label">
+                    <span className="hide-on-mobile">Hotel </span>Login
+                  </span>
                 </button>
               </Link>
             </>

@@ -380,10 +380,15 @@ body {
 /* Mobile */
 @media (max-width: 600px) {
   .app-shell { padding: 24px 16px; }
-  .app-header-row { padding: 0 16px; height: 64px; gap: 8px; }
+  .app-header-row { padding: 0 12px; height: 60px; gap: 6px; }
   .app-header-row .logo-sub { display: none; }
-  .nav-label { display: none; }
-  .nav-button { padding: 10px 12px !important; }
+  /* Keep nav labels visible on mobile but compact — empty icon-only
+     buttons looked broken. */
+  .nav-button { padding: 7px 10px !important; font-size: 11.5px !important; }
+  .nav-button .nav-label { font-size: 11.5px; }
+  .nav-button i { font-size: 12px !important; }
+  /* "Hotel Register" → "Register", "Hotel Login" → "Login" on phones */
+  .hide-on-mobile { display: none; }
   .hero-section { padding: 28px 22px; border-radius: 16px; margin-bottom: 28px; }
   .hero-title { font-size: 30px; line-height: 1.1; }
   .hero-subtitle { font-size: 14px; margin-top: 14px; }
