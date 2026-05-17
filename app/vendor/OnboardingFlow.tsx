@@ -22,6 +22,29 @@ type RoomDraft = {
   gst: GstStatus
   notes: string
 }
+/**
+ * Format a tariff window like "2 months · 14 days" or "45 days" — gives
+ * the vendor a friendly sanity-check that their pricing window is what
+ * they actually meant.
+ */
+function formatTariffDuration(start: string, end: string): string {
+  const a = new Date(start), b = new Date(end)
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return ''
+  const totalDays = Math.round((b.getTime() - a.getTime()) / 86400000) + 1
+  if (totalDays <= 0) return ''
+  if (totalDays < 31) return `${totalDays} day${totalDays === 1 ? '' : 's'}`
+
+  // Calendar-month diff for human readability
+  let months = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth())
+  const dayDiff = b.getDate() - a.getDate()
+  if (dayDiff < 0) months -= 1
+  const remainder = totalDays - Math.round(months * 30.4375)
+  const monthsLabel = `${months} month${months === 1 ? '' : 's'}`
+  if (Math.abs(remainder) < 4) return monthsLabel
+  if (remainder > 0) return `${monthsLabel} · ${remainder} day${remainder === 1 ? '' : 's'}`
+  return `${monthsLabel}`
+}
+
 function blankRoom(forPropertyType: PropertyType): RoomDraft {
   return {
     type: '', category: forPropertyType === 'houseboat' ? 'Houseboat Deluxe' : 'Deluxe',
@@ -261,10 +284,17 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
         </div>
       </div>
 
-      {/* Centered content */}
+      {/* Centered content — scrolls when the step content (e.g. rates) is
+          taller than the viewport. `safe center` keeps the top accessible
+          when content overflows instead of clipping above the container. */}
       <div style={{
-        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '20px 24px 80px',
+        flex: 1, minHeight: 0,
+        display: 'flex',
+        alignItems: 'safe center' as React.CSSProperties['alignItems'],
+        justifyContent: 'center',
+        overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
+        padding: '20px 24px 120px',
       }}>
         <div
           key={step.key}
@@ -492,6 +522,21 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                     placeholder="Pick end date"
                   />
                 </div>
+
+                {/* Duration chip — appears once both dates are picked */}
+                {data.tariffStart && data.tariffEnd && data.tariffEnd >= data.tariffStart && (
+                  <div style={{
+                    marginTop: 14, padding: '8px 14px',
+                    background: 'rgba(255,255,255,0.65)',
+                    borderRadius: 9999,
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 700,
+                    color: '#6f3800',
+                  }}>
+                    <Check size={12} strokeWidth={3} />
+                    These rates will be valid for {formatTariffDuration(data.tariffStart, data.tariffEnd)}
+                  </div>
+                )}
               </div>
 
               {/* Room cards */}
