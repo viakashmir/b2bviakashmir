@@ -289,19 +289,30 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 .spin { animation: spin 0.7s linear infinite; }
 
-/* Availability indicator: green = plenty, blinking yellow = low, red = none */
+/* Availability indicator — Kashmiri saffron palette so it pops on
+   dark green card headers. Blinking amber when low, red when sold out. */
 @keyframes blink-amber {
-  0%, 100% { background: #fef3c7; color: #6f3800; box-shadow: 0 0 0 0 rgba(240,159,94,0.35); }
-  50%      { background: #ffdcc4; color: #2f1400; box-shadow: 0 0 0 4px rgba(240,159,94,0.18); }
+  0%, 100% { background: rgba(255,220,196,0.18); color: #ffdcc4; box-shadow: 0 0 0 0 rgba(240,159,94,0.45); }
+  50%      { background: rgba(240,159,94,0.40); color: #ffffff;  box-shadow: 0 0 0 6px rgba(240,159,94,0.20); }
 }
 .avail-green {
-  background: rgba(19,103,123,0.10);
-  color: #13677b;
+  background: rgba(255,220,196,0.18);
+  color: #ffdcc4;
 }
 .avail-amber {
-  animation: blink-amber 1.4s ease-in-out infinite;
+  animation: blink-amber 1.2s ease-in-out infinite;
 }
 .avail-red {
+  background: rgba(255,180,171,0.18);
+  color: #ffb4ab;
+}
+/* When the same indicators appear on light backgrounds (the per-row
+   inventory pill in the rate table), use the deeper saffron variants. */
+.card-elevated > div:not(.hotel-card-header) .avail-green {
+  background: rgba(255,220,196,0.55);
+  color: #6f3800;
+}
+.card-elevated > div:not(.hotel-card-header) .avail-red {
   background: rgba(186,26,26,0.10);
   color: #93000a;
 }
