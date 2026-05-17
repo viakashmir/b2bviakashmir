@@ -53,6 +53,8 @@ export interface Hotel {
   propertyType: PropertyType
   address: string
   phone: string
+  /** WhatsApp number — falls back to `phone` when the vendor uses one number for both. */
+  whatsapp: string
   email: string
   website: string
   description: string
@@ -89,6 +91,23 @@ export interface Concern {
   updatedAt: number
   adminResponse: string
   adminResponseAt: number
+}
+
+export interface Enquiry {
+  id: string
+  hotelId: string
+  hotelName: string
+  travellerName: string
+  travellerPhone: string
+  checkIn: string   // YYYY-MM-DD or ''
+  checkOut: string  // YYYY-MM-DD or ''
+  nights: number
+  rooms: number
+  adults: number
+  children: number
+  notes: string
+  whatsappLink: string
+  createdAt: number
 }
 
 export type HotelsMap = Record<string, Hotel>
@@ -179,6 +198,7 @@ type HotelRow = {
   address: string; phone: string; email: string; website: string; description: string
   amenities: string[]; approved: boolean; created_at: string; updated_at: string
   tariff_start: string | null; tariff_end: string | null
+  whatsapp_phone: string | null
 }
 type RoomRow = {
   id: string; hotel_id: string; type: string; category: string; meal: string
@@ -199,7 +219,9 @@ export function rowToHotel(row: HotelRow, rooms: RoomRow[] = []): Hotel {
     id: row.id, name: row.name, stars: row.stars as StarCategory,
     location: row.location as Location, locationLabel: row.location_label,
     propertyType: (row.property_type as PropertyType | null) || 'hotel',
-    address: row.address, phone: row.phone, email: row.email,
+    address: row.address, phone: row.phone,
+    whatsapp: (row.whatsapp_phone || row.phone || '').trim(),
+    email: row.email,
     website: row.website, description: row.description, amenities: row.amenities,
     approved: row.approved,
     tariffStart: row.tariff_start ?? '',
@@ -228,6 +250,26 @@ export function rowToRoom(row: RoomRow): Room {
     updatedAt: new Date(row.updated_at).getTime(),
     double: cp || fallback,
     cnb: row.child_wob ?? row.cnb ?? 0,
+  }
+}
+
+type EnquiryRow = {
+  id: string; hotel_id: string; hotel_name: string
+  traveller_name: string; traveller_phone: string
+  check_in: string | null; check_out: string | null
+  nights: number; rooms: number; adults: number; children: number
+  notes: string; whatsapp_link: string
+  created_at: string
+}
+
+export function rowToEnquiry(row: EnquiryRow): Enquiry {
+  return {
+    id: row.id, hotelId: row.hotel_id, hotelName: row.hotel_name,
+    travellerName: row.traveller_name, travellerPhone: row.traveller_phone,
+    checkIn: row.check_in ?? '', checkOut: row.check_out ?? '',
+    nights: row.nights, rooms: row.rooms, adults: row.adults, children: row.children,
+    notes: row.notes, whatsappLink: row.whatsapp_link,
+    createdAt: new Date(row.created_at).getTime(),
   }
 }
 

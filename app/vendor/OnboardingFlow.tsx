@@ -44,6 +44,10 @@ type FormData = {
   address: string
   stars: StarCategory | 0
   phone: string
+  /** 'yes' | 'no' | '' — has the vendor told us whether their phone is also WhatsApp? */
+  whatsappSameAsPhone: 'yes' | 'no' | ''
+  /** Only relevant when whatsappSameAsPhone === 'no' */
+  whatsapp: string
   email: string
   website: string
   totalRooms: string
@@ -74,7 +78,8 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
   const [stepIdx, setStepIdx] = useState(0)
   const [data, setData] = useState<FormData>({
     name: '', location: '', propertyType: '', address: '', stars: 0,
-    phone: '', email: defaultEmail || '', website: '', totalRooms: '',
+    phone: '', whatsappSameAsPhone: '', whatsapp: '',
+    email: defaultEmail || '', website: '', totalRooms: '',
     description: '', amenities: [],
     tariffStart: '', tariffEnd: '',
     rooms: [],
@@ -133,7 +138,13 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
       case 'stars':        return !data.stars ? 'Select your star category.' : null
       case 'contact':      {
         const digits = data.phone.replace(/\D/g, '')
-        return digits.length < 10 || digits.length > 15 ? 'Phone must be 10–15 digits.' : null
+        if (digits.length < 10 || digits.length > 15) return 'Phone must be 10–15 digits.'
+        if (!data.whatsappSameAsPhone) return 'Tell us whether this number is also WhatsApp.'
+        if (data.whatsappSameAsPhone === 'no') {
+          const wa = data.whatsapp.replace(/\D/g, '')
+          if (wa.length < 10 || wa.length > 15) return 'WhatsApp number must be 10–15 digits.'
+        }
+        return null
       }
       case 'rates': {
         if (!data.tariffStart || !data.tariffEnd) return 'Pick when your tariff is valid from – till.'
@@ -189,6 +200,8 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           propertyType,
           address: data.address.trim(),
           phone: phoneDigits,
+          whatsappSameAsPhone: data.whatsappSameAsPhone === 'yes',
+          whatsapp: data.whatsapp.trim(),
           email: data.email.trim(),
           website: data.website.trim(),
           description: data.description.trim(),
@@ -373,6 +386,64 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                     placeholder="9194245678901"
                   />
                 </LabeledField>
+
+                {/* WhatsApp conditional — required, drives the public "Enquire on WhatsApp" link */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 12, fontWeight: 800, color: '#414942',
+                    marginBottom: 8, fontFamily: 'Inter, sans-serif',
+                    letterSpacing: '0.02em',
+                  }}>
+                    Is this also your WhatsApp number?
+                    <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 700, color: '#13677b' }}>
+                      We use this to build the enquiry link travel agents click.
+                    </span>
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                    {(['yes', 'no'] as const).map(opt => {
+                      const active = data.whatsappSameAsPhone === opt
+                      return (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => update('whatsappSameAsPhone', opt)}
+                          style={{
+                            padding: '12px 14px', borderRadius: 12,
+                            border: `1.5px solid ${active ? '#1a5128' : 'rgba(0,54,26,0.14)'}`,
+                            background: active ? 'linear-gradient(135deg, rgba(184,240,197,0.36), rgba(255,220,196,0.28))' : '#ffffff',
+                            color: active ? '#00361a' : '#414942',
+                            fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 800,
+                            cursor: 'pointer',
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                            transition: 'all 0.18s',
+                          }}
+                        >
+                          {active && <Check size={14} strokeWidth={3} />}
+                          {opt === 'yes' ? 'Yes — same number' : 'No — different number'}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {data.whatsappSameAsPhone === 'no' && (
+                  <LabeledField label="WhatsApp number — digits only">
+                    <TextField
+                      type="tel"
+                      inputMode="numeric"
+                      value={data.whatsapp}
+                      onChange={v => {
+                        const cleaned = v.startsWith('+')
+                          ? '+' + v.slice(1).replace(/\D/g, '')
+                          : v.replace(/\D/g, '')
+                        update('whatsapp', cleaned)
+                      }}
+                      placeholder="9194245678901"
+                    />
+                  </LabeledField>
+                )}
+
                 <LabeledField label="Email">
                   <TextField
                     type="email"
@@ -395,9 +466,15 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
 
           {step.key === 'rates' && (
             <Prompt
-              title="Your rates"
-              subtitle="The headline reason you're here — what agents pay. Add 1–3 room types with meal-plan rates. You can polish description, amenities & more rooms from the dashboard later."
+              title="Your rates — the only thing agents actually search by"
+              subtitle="Every rate you add multiplies the number of agents who can quote you. Three minutes here usually pays for itself by tonight."
             >
+              {/* Gamified listing-power panel — grows as the vendor fills rates */}
+              <ListingPowerPanel
+                tariffSet={!!(data.tariffStart && data.tariffEnd)}
+                rooms={data.rooms}
+              />
+
               {/* Tariff window — context for the rates */}
               <div style={{
                 padding: 18, borderRadius: 14,
@@ -456,19 +533,58 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                     type="button"
                     onClick={() => setData(d => ({ ...d, rooms: [...d.rooms, blankRoom((d.propertyType || 'hotel') as PropertyType)] }))}
                     style={{
-                      padding: '16px 18px', borderRadius: 14, border: '2px dashed rgba(0,54,26,0.25)',
-                      background: 'transparent', color: '#00361a',
-                      fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 800, cursor: 'pointer',
-                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      padding: '16px 20px', borderRadius: 16,
+                      border: 'none',
+                      background: data.rooms.length === 0
+                        ? 'linear-gradient(135deg, #f09f5e 0%, #d2691e 100%)'
+                        : 'linear-gradient(135deg, rgba(0,54,26,0.04), rgba(184,240,197,0.30))',
+                      color: data.rooms.length === 0 ? '#ffffff' : '#00361a',
+                      fontFamily: 'Manrope, sans-serif', fontSize: 14.5, fontWeight: 800, cursor: 'pointer',
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                      boxShadow: data.rooms.length === 0 ? '0 8px 24px rgba(240,159,94,0.32)' : 'none',
                       transition: 'all 0.18s',
                     }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,54,26,0.05)' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                    onMouseEnter={e => {
+                      const el = e.currentTarget as HTMLElement
+                      el.style.transform = 'translateY(-1px)'
+                      el.style.boxShadow = data.rooms.length === 0
+                        ? '0 12px 28px rgba(240,159,94,0.40)'
+                        : '0 6px 18px rgba(0,54,26,0.10)'
+                    }}
+                    onMouseLeave={e => {
+                      const el = e.currentTarget as HTMLElement
+                      el.style.transform = 'translateY(0)'
+                      el.style.boxShadow = data.rooms.length === 0
+                        ? '0 8px 24px rgba(240,159,94,0.32)'
+                        : 'none'
+                    }}
                   >
-                    <Plus size={16} strokeWidth={2.5} />
-                    {data.rooms.length === 0 ? 'Add Your First Room' : 'Add Another Room Type'}
-                    {data.rooms.length > 0 && <span style={{ opacity: 0.55, fontSize: 12 }}>({data.rooms.length}/3)</span>}
+                    <Plus size={18} strokeWidth={2.8} />
+                    {data.rooms.length === 0
+                      ? 'Add Your First Room — let agents quote you'
+                      : data.rooms.length === 1
+                        ? 'Add a second category · double your reach'
+                        : 'Add one more · max-out your visibility'}
+                    {data.rooms.length > 0 && (
+                      <span style={{
+                        marginLeft: 4,
+                        padding: '3px 9px', borderRadius: 9999,
+                        background: 'rgba(0,54,26,0.10)', color: '#00361a',
+                        fontSize: 11, fontWeight: 800,
+                      }}>{data.rooms.length}/3</span>
+                    )}
                   </button>
+                )}
+                {data.rooms.length >= 3 && (
+                  <div style={{
+                    padding: '14px 18px', borderRadius: 14,
+                    background: 'linear-gradient(135deg, rgba(184,240,197,0.40), rgba(0,54,26,0.06))',
+                    color: '#00361a', fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700,
+                    textAlign: 'center', border: '1px solid rgba(0,54,26,0.10)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  }}>
+                    <Sparkles size={14} strokeWidth={2.5} /> Maxed out — you can add more room categories from your dashboard once you publish.
+                  </div>
                 )}
               </div>
             </Prompt>
@@ -760,6 +876,124 @@ function ChoiceGrid({ options, value, onChange, cols = 0, big = false }: {
   )
 }
 
+/**
+ * Promotional "Listing Power" panel shown above the tariff + rooms.
+ *
+ * The point is psychology, not data: vendors who add prices are
+ * rewarded with milestone chips ("Tariff locked!", "First rate live!",
+ * "All 4 meal plans!"). The progress bar fills as they hit milestones,
+ * so adding rates feels like levelling up rather than data entry.
+ */
+function ListingPowerPanel({ tariffSet, rooms }: { tariffSet: boolean; rooms: RoomDraft[] }) {
+  const filledRooms = rooms.filter(r => r.type.trim().length > 0)
+  const ratesFilled = filledRooms.reduce(
+    (n, r) => n + (['ep','cp','map','ap'] as const).filter(k => parseInt((r as Record<string, string | unknown>)[k] as string) > 0).length, 0,
+  )
+  const hasAnyRate = ratesFilled > 0
+  const hasAllPlansOnAny = filledRooms.some(r => (['ep','cp','map','ap'] as const).every(k => parseInt((r as Record<string, string | unknown>)[k] as string) > 0))
+  const has2Rooms = filledRooms.length >= 2
+  const has3Rooms = filledRooms.length >= 3
+
+  const milestones: Array<{ key: string; label: string; hit: boolean; reward: string }> = [
+    { key: 'tariff', label: 'Tariff locked', hit: tariffSet, reward: '+ Card shows your active window' },
+    { key: 'first',  label: 'First rate live', hit: hasAnyRate, reward: '+ You appear in agent search' },
+    { key: 'plans',  label: 'All 4 meal plans on a room', hit: hasAllPlansOnAny, reward: '+ Agents quote you for every meal style' },
+    { key: 'second', label: 'Second room category', hit: has2Rooms, reward: '+ 2× the quote requests on average' },
+    { key: 'third',  label: 'Third room category', hit: has3Rooms, reward: '+ Top-tier listing — featured chip' },
+  ]
+  const hits = milestones.filter(m => m.hit).length
+  const pct = Math.round((hits / milestones.length) * 100)
+
+  // Encouragement copy
+  let mood = 'Let’s get your rates live'
+  if (hits >= 5) mood = 'You’re a Via Kashmir Top Vendor 🏔'
+  else if (hits >= 4) mood = 'You’re unstoppable — one more to max out'
+  else if (hits >= 3) mood = 'Power vendor status unlocked'
+  else if (hits >= 2) mood = 'You’re ahead of 70% of listings'
+  else if (hits === 1) mood = 'First milestone — keep going'
+
+  return (
+    <div style={{
+      position: 'relative', overflow: 'hidden',
+      padding: '20px 22px',
+      borderRadius: 18,
+      background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 60%, #004e5f 100%)',
+      color: '#ffffff',
+      marginBottom: 22,
+      boxShadow: '0 18px 50px rgba(0,54,26,0.22)',
+    }}>
+      {/* sparkles motif */}
+      <span style={{
+        position: 'absolute', right: -20, top: -28, width: 140, height: 140, borderRadius: 9999,
+        background: 'radial-gradient(circle, rgba(240,159,94,0.30) 0%, rgba(0,0,0,0) 70%)',
+      }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+        <div>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase',
+            color: '#ffdcc4', background: 'rgba(255,220,196,0.10)',
+            padding: '4px 10px', borderRadius: 9999,
+          }}>
+            <Sparkles size={11} strokeWidth={2.6} /> Listing Power
+          </div>
+          <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, lineHeight: 1.2, marginTop: 8, letterSpacing: '-0.01em' }}>
+            {mood}
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 32, fontWeight: 900, lineHeight: 1, color: '#ffffff' }}>
+            {pct}%
+          </div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#9dd3aa', letterSpacing: '0.06em' }}>
+            {hits}/{milestones.length} milestones · {ratesFilled} rate{ratesFilled === 1 ? '' : 's'} live
+          </div>
+        </div>
+      </div>
+
+      {/* progress bar */}
+      <div style={{
+        height: 8, borderRadius: 9999, background: 'rgba(255,255,255,0.10)', overflow: 'hidden', marginBottom: 16,
+      }}>
+        <div style={{
+          height: '100%', width: `${pct}%`,
+          background: 'linear-gradient(90deg, #f09f5e 0%, #ffdcc4 60%, #b8f0c5 100%)',
+          borderRadius: 9999, transition: 'width 0.45s cubic-bezier(.4,.0,.2,1)',
+          boxShadow: pct > 0 ? '0 0 20px rgba(255,220,196,0.55)' : 'none',
+        }} />
+      </div>
+
+      {/* milestone chips */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {milestones.map(m => (
+          <div
+            key={m.key}
+            title={m.reward}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '6px 12px', borderRadius: 9999,
+              fontSize: 11.5, fontWeight: 700, fontFamily: 'Inter, sans-serif',
+              background: m.hit ? 'rgba(184,240,197,0.18)' : 'rgba(255,255,255,0.06)',
+              color: m.hit ? '#b8f0c5' : 'rgba(255,255,255,0.50)',
+              border: `1px solid ${m.hit ? 'rgba(184,240,197,0.40)' : 'rgba(255,255,255,0.08)'}`,
+              transition: 'all 0.22s',
+            }}
+          >
+            <span style={{
+              width: 14, height: 14, borderRadius: 9999,
+              background: m.hit ? '#b8f0c5' : 'transparent',
+              border: m.hit ? 'none' : '1.5px dashed rgba(255,255,255,0.30)',
+              color: '#00361a', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 9, fontWeight: 900,
+            }}>{m.hit ? '✓' : ''}</span>
+            {m.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
     <>
@@ -911,19 +1145,47 @@ function RoomDraftCard({
           ))}
         </div>
 
-        {/* Progressive disclosure: extras + display defaults */}
+        {/* Promotional toggle — frames extras as upsells, not chores */}
         <button
           type="button"
           onClick={() => setShowMore(s => !s)}
           style={{
-            width: '100%', padding: '10px 14px', borderRadius: 10,
-            border: '1px dashed rgba(0,54,26,0.18)', background: 'transparent',
-            color: '#00361a', fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 700,
+            width: '100%', padding: '14px 18px', borderRadius: 14,
+            border: 'none',
+            background: showMore
+              ? 'rgba(0,54,26,0.06)'
+              : 'linear-gradient(135deg, rgba(255,220,196,0.55) 0%, rgba(184,240,197,0.40) 100%)',
+            color: '#00361a', fontFamily: 'Manrope, sans-serif', fontSize: 13.5, fontWeight: 800,
             cursor: 'pointer',
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+            transition: 'all 0.18s',
+            textAlign: 'left',
           }}
         >
-          {showMore ? '− Hide' : '+ Add'} extra bed, child rate, GST &amp; meal-plan defaults <span style={{ opacity: 0.55, fontWeight: 600 }}>(optional)</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+            <span style={{
+              width: 28, height: 28, borderRadius: 9999,
+              background: '#00361a', color: '#ffdcc4',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 900,
+            }}>★</span>
+            <span style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: 13.5, fontWeight: 800 }}>
+                {showMore ? 'Hide bonus details' : 'Boost this room · add extras & GST'}
+              </span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#414942', marginTop: 2 }}>
+                {showMore ? 'Collapse' : 'Extra bed, child rate, GST treatment & headline meal plan — takes 20 seconds.'}
+              </span>
+            </span>
+          </span>
+          <span style={{
+            padding: '4px 10px', borderRadius: 9999,
+            background: showMore ? 'rgba(0,54,26,0.10)' : 'rgba(0,54,26,0.10)',
+            fontSize: 10.5, fontWeight: 800, letterSpacing: '0.06em',
+            color: '#00361a', whiteSpace: 'nowrap',
+          }}>
+            {showMore ? 'Tap to hide' : '+5% match rate'}
+          </span>
         </button>
 
         {showMore && (

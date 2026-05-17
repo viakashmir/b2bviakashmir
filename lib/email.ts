@@ -261,6 +261,68 @@ export async function emailHotelSuspended(args: {
   await send({ to: args.vendorEmail, subject: `${args.hotelName} suspended on Via Kashmir`, html })
 }
 
+/** Traveller hit "Enquire on WhatsApp" on a hotel card. */
+export async function emailEnquirySent(args: {
+  vendorEmail?: string
+  hotelName: string
+  travellerName: string
+  travellerPhone: string
+  checkIn: string
+  checkOut: string
+  nights: number
+  rooms: number
+  adults: number
+  children: number
+  notes: string
+  whatsappLink: string
+}) {
+  const dateRange = args.checkIn && args.checkOut
+    ? `${args.checkIn} → ${args.checkOut} (${args.nights} night${args.nights === 1 ? '' : 's'})`
+    : 'Not specified'
+  const pax = `${args.rooms} room${args.rooms === 1 ? '' : 's'} · ${args.adults} adult${args.adults === 1 ? '' : 's'}${args.children > 0 ? ` + ${args.children} child${args.children === 1 ? '' : 'ren'}` : ''}`
+
+  const rows: Array<[string, string]> = [
+    ['Hotel',          args.hotelName],
+    ['Traveller',      args.travellerName],
+    ['Phone',          args.travellerPhone],
+    ['Stay',           dateRange],
+    ['Party',          pax],
+  ]
+  if (args.notes) rows.push(['Notes', args.notes])
+
+  const hotelHtml = layout({
+    preheader: `${args.travellerName} just enquired about ${args.hotelName}.`,
+    heading: `New enquiry just landed`,
+    intro: `<strong>${escapeHtml(args.travellerName)}</strong> opened a WhatsApp enquiry for <strong>${escapeHtml(args.hotelName)}</strong>. Their number and trip details are below — reply on WhatsApp to close the booking.`,
+    bodyHtml: `
+      ${infoTable(rows)}
+      <p style="margin:14px 0 4px; font-size:13px; color:#717971;">
+        We already pre-filled a WhatsApp message for them — you may have a chat waiting in your inbox right now.
+      </p>
+    `,
+    ctaLabel: 'Open WhatsApp chat',
+    ctaHref: args.whatsappLink,
+    footnote: `This enquiry is also logged in the admin panel for the Via Kashmir team.`,
+  })
+
+  const adminHtml = layout({
+    preheader: `${args.travellerName} → ${args.hotelName}`,
+    heading: `Enquiry logged · ${args.hotelName}`,
+    intro: `<strong>${escapeHtml(args.travellerName)}</strong> sent a WhatsApp enquiry to <strong>${escapeHtml(args.hotelName)}</strong>.`,
+    bodyHtml: infoTable(rows),
+    ctaLabel: 'Open admin enquiries',
+    ctaHref: `${appUrl()}/admin`,
+  })
+
+  const sends: Promise<unknown>[] = [
+    send({ to: adminAddr(), subject: `[Enquiry] ${args.hotelName} · ${args.travellerName}`, html: adminHtml }),
+  ]
+  if (args.vendorEmail) {
+    sends.push(send({ to: args.vendorEmail, subject: `New enquiry · ${args.travellerName} (${args.travellerPhone})`, html: hotelHtml }))
+  }
+  await Promise.allSettled(sends)
+}
+
 /** Customer (travel agent) raised a concern. */
 export async function emailConcernRaised(args: {
   agentEmail: string

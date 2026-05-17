@@ -104,6 +104,9 @@ export default function VendorPortal() {
         location: profileDraft.location, locationLabel: profileDraft.locationLabel,
         propertyType: profileDraft.propertyType,
         address: profileDraft.address, phone: profileDraft.phone, email: profileDraft.email,
+        // Preserve WhatsApp on every save so it doesn't get wiped to ''
+        whatsapp: profileDraft.whatsapp || profileDraft.phone,
+        whatsappSameAsPhone: !profileDraft.whatsapp || profileDraft.whatsapp === profileDraft.phone,
         website: profileDraft.website, description: profileDraft.description,
         amenities: profileDraft.amenities,
         tariffStart: profileDraft.tariffStart || null,

@@ -43,10 +43,14 @@ export async function POST(req: Request) {
 
   const propertyType = body.propertyType === 'houseboat' ? 'houseboat' : 'hotel'
   // Strip non-digits from phone for storage consistency, preserve leading +
-  const rawPhone = String(body.phone ?? '').trim()
-  const phone = rawPhone.startsWith('+')
-    ? '+' + rawPhone.slice(1).replace(/\D/g, '')
-    : rawPhone.replace(/\D/g, '')
+  const normPhone = (raw: unknown) => {
+    const s = String(raw ?? '').trim()
+    if (!s) return ''
+    return s.startsWith('+') ? '+' + s.slice(1).replace(/\D/g, '') : s.replace(/\D/g, '')
+  }
+  const phone = normPhone(body.phone)
+  // WhatsApp: if the vendor said "same as phone" we mirror, otherwise normalise
+  const whatsapp = body.whatsappSameAsPhone === true ? phone : normPhone(body.whatsapp)
 
   const row = {
     id: hotelId,
@@ -57,6 +61,7 @@ export async function POST(req: Request) {
     property_type: propertyType,
     address: String(body.address ?? '').trim(),
     phone,
+    whatsapp_phone: whatsapp,
     email: String(body.email ?? '').trim(),
     website: String(body.website ?? '').trim(),
     description: String(body.description ?? '').trim(),

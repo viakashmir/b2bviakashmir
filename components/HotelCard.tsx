@@ -4,8 +4,9 @@ import { Hotel, STAR_LABELS, fmtINR, fmtDate, bestStatus } from '@/lib/data'
 import { useState } from 'react'
 import {
   MapPin, Phone, Mail, Globe, Clock, BedDouble, Send, X,
-  Mountain, Sparkles,
+  Mountain, Sparkles, MessageCircle,
 } from 'lucide-react'
+import EnquireWhatsAppModal from '@/components/EnquireWhatsAppModal'
 
 interface Props {
   hotel: Hotel
@@ -14,6 +15,7 @@ interface Props {
 
 export default function HotelCard({ hotel, index }: Props) {
   const [showEnquire, setShowEnquire] = useState(false)
+  const [showWa, setShowWa] = useState(false)
   const status = bestStatus(hotel.rooms)
   const availInv = hotel.rooms.filter(r => r.status === 'Available').reduce((a, r) => a + (r.inventory || 0), 0)
   const availTypes = hotel.rooms.filter(r => r.status === 'Available').length
@@ -293,6 +295,31 @@ export default function HotelCard({ hotel, index }: Props) {
               </button>
             </div>
             <div style={{ padding: '24px 28px', overflowY: 'auto' }}>
+              {/* Hero WhatsApp CTA — primary action of the modal */}
+              <button
+                onClick={() => setShowWa(true)}
+                style={{
+                  width: '100%', marginBottom: 22, padding: '16px 22px',
+                  borderRadius: 16, border: 'none',
+                  background: 'linear-gradient(135deg, #25d366 0%, #128c7e 100%)',
+                  color: '#ffffff', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+                  fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 15,
+                  boxShadow: '0 14px 36px rgba(37,211,102,0.30)',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)' }}
+              >
+                <MessageCircle size={18} strokeWidth={2.6} />
+                Enquire on WhatsApp
+                <span style={{
+                  padding: '3px 9px', borderRadius: 9999,
+                  background: 'rgba(255,255,255,0.18)',
+                  fontSize: 10.5, fontWeight: 800, letterSpacing: '0.06em',
+                }}>30 seconds</span>
+              </button>
+
               {hotel.description && (
                 <p style={{ fontSize: 13.5, color: '#414942', fontFamily: 'Inter, sans-serif', lineHeight: 1.6, margin: '0 0 22px' }}>
                   {hotel.description}
@@ -388,6 +415,10 @@ export default function HotelCard({ hotel, index }: Props) {
             </div>
           </div>
         </div>
+      )}
+
+      {showWa && (
+        <EnquireWhatsAppModal hotel={hotel} onClose={() => setShowWa(false)} />
       )}
     </>
   )

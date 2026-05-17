@@ -1,19 +1,20 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Fragment } from 'react'
 import {
   ShieldCheck, RefreshCw, Building2, Clock, MessageSquare, TrendingUp,
   Trash2, Pause, CheckCircle2, AlertTriangle, Send, BarChart3, LayoutDashboard,
+  ChevronDown, ChevronUp, MessageCircle, Phone, Mail, MapPin, BedDouble,
 } from 'lucide-react'
 import Header from '@/components/Header'
 import Toast, { ToastMessage } from '@/components/Toast'
 import {
-  Concern, ConcernStatus, Hotel, STAR_LABELS,
-  timeAgo, totalInventory, availableInventory,
+  Concern, ConcernStatus, Enquiry, Hotel, STAR_LABELS, GST_LABELS,
+  timeAgo, totalInventory, availableInventory, fmtINR,
 } from '@/lib/data'
 import { browserSupabase } from '@/lib/supabase'
 
-type Tab = 'overview' | 'hotels' | 'concerns'
+type Tab = 'overview' | 'hotels' | 'enquiries' | 'concerns'
 
 const STATUS_BADGE: Record<ConcernStatus, string> = {
   open: 'badge-error', 'in-progress': 'badge-tertiary',
@@ -26,24 +27,28 @@ const PRIORITY_BADGE: Record<'low' | 'medium' | 'high', string> = {
 export default function AdminPortal() {
   const [hotels, setHotels] = useState<Hotel[]>([])
   const [concerns, setConcerns] = useState<Concern[]>([])
+  const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [tab, setTab] = useState<Tab>('overview')
   const [toasts, setToasts] = useState<ToastMessage[]>([])
   const [loading, setLoading] = useState(true)
   const [replyId, setReplyId] = useState<string | null>(null)
   const [replyText, setReplyText] = useState('')
+  const [expandedHotelId, setExpandedHotelId] = useState<string | null>(null)
 
   const [authError, setAuthError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
     try {
-      const [hRes, cRes] = await Promise.all([
+      const [hRes, cRes, eRes] = await Promise.all([
         fetch('/api/admin/hotels', { cache: 'no-store' }),
         fetch('/api/concerns', { cache: 'no-store' }),
+        fetch('/api/enquiries', { cache: 'no-store' }),
       ])
       if (hRes.status === 401 || hRes.status === 403) {
         setAuthError('Your Clerk user is missing publicMetadata.role = "admin". Open Clerk Dashboard → Users → your user → Metadata → Public, set the role, and reload.')
       } else if (hRes.ok) { const j = await hRes.json(); setHotels(j.hotels ?? []); setAuthError(null) }
       if (cRes.ok) { const j = await cRes.json(); setConcerns(j.concerns ?? []) }
+      if (eRes.ok) { const j = await eRes.json(); setEnquiries(j.enquiries ?? []) }
     } finally { setLoading(false) }
   }, [])
 
@@ -121,6 +126,7 @@ export default function AdminPortal() {
   const TABS: { key: Tab; label: string; Icon: Lucide; badge?: number }[] = [
     { key: 'overview', label: 'Overview', Icon: LayoutDashboard },
     { key: 'hotels', label: 'Hotels', Icon: Building2, badge: pending.length },
+    { key: 'enquiries', label: 'Enquiries', Icon: MessageCircle, badge: enquiries.length },
     { key: 'concerns', label: 'Concerns', Icon: MessageSquare, badge: openConcerns.length },
   ]
 
@@ -197,14 +203,29 @@ export default function AdminPortal() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
-                  {['Hotel', 'Location', 'Star', 'Inventory', 'Status', 'Created', 'Actions'].map(h => (
+                  {['', 'Hotel', 'Location', 'Star', 'Inventory', 'Status', 'Created', 'Actions'].map(h => (
                     <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {hotels.map(h => (
-                  <tr key={h.id}>
+                  <Fragment key={h.id}>
+                  <tr>
+                    <td style={{ padding: '14px 8px', width: 36, background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                      <button
+                        onClick={() => setExpandedHotelId(prev => prev === h.id ? null : h.id)}
+                        title="View details submitted by hotel"
+                        style={{
+                          width: 28, height: 28, borderRadius: 9999, border: 'none',
+                          background: expandedHotelId === h.id ? '#00361a' : '#f3f4f5',
+                          color: expandedHotelId === h.id ? '#ffffff' : '#414942',
+                          cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        }}
+                      >
+                        {expandedHotelId === h.id ? <ChevronUp size={14} strokeWidth={2.4} /> : <ChevronDown size={14} strokeWidth={2.4} />}
+                      </button>
+                    </td>
                     <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <div style={{ fontWeight: 700, fontSize: 14, color: '#191c1d', fontFamily: 'Inter, sans-serif' }}>{h.name}</div>
                       <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: 'Inter, sans-serif' }}>{h.email}</div>
@@ -267,13 +288,25 @@ export default function AdminPortal() {
                       </div>
                     </td>
                   </tr>
+                  {expandedHotelId === h.id && (
+                    <tr>
+                      <td colSpan={8} style={{ padding: 0, background: '#fafbfa', borderBottom: '1px solid #edeeef' }}>
+                        <HotelDetailPanel hotel={h} />
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 ))}
                 {hotels.length === 0 && (
-                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: '48px 20px', color: '#717971', fontFamily: 'Inter, sans-serif' }}>No hotels yet.</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '48px 20px', color: '#717971', fontFamily: 'Inter, sans-serif' }}>No hotels yet.</td></tr>
                 )}
               </tbody>
             </table>
           </div>
+        )}
+
+        {tab === 'enquiries' && (
+          <EnquiriesPanel enquiries={enquiries} />
         )}
 
         {tab === 'concerns' && (
@@ -338,5 +371,169 @@ export default function AdminPortal() {
       </main>
       <Toast toasts={toasts} onRemove={id => setToasts(p => p.filter(t => t.id !== id))} />
     </>
+  )
+}
+
+// =====================================================================
+// Detail panel — shown when an admin expands a hotel row. Renders the
+// full submission so admin can decide approve/reject without leaving the
+// table.
+// =====================================================================
+function HotelDetailPanel({ hotel }: { hotel: Hotel }) {
+  return (
+    <div style={{ padding: '20px 24px', borderTop: '1px solid #edeeef' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 18 }}>
+        <DetailRow Icon={Phone}   label="Phone"        value={hotel.phone || '—'} />
+        <DetailRow Icon={MessageCircle} label="WhatsApp" value={hotel.whatsapp || '—'} />
+        <DetailRow Icon={Mail}    label="Email"        value={hotel.email || '—'} />
+        <DetailRow Icon={MapPin}  label="Address"      value={hotel.address || '—'} />
+        <DetailRow Icon={Building2} label="Type"       value={hotel.propertyType === 'houseboat' ? 'Houseboat' : 'Hotel'} />
+        <DetailRow Icon={Clock}   label="Tariff window" value={hotel.tariffStart && hotel.tariffEnd ? `${hotel.tariffStart} → ${hotel.tariffEnd}` : 'Not set'} />
+      </div>
+
+      {hotel.description && (
+        <div style={{ padding: 14, borderRadius: 10, background: '#ffffff', border: '1px solid #edeeef', marginBottom: 18 }}>
+          <div className="t-overline" style={{ marginBottom: 6 }}>Description</div>
+          <div style={{ fontSize: 13, color: '#414942', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>{hotel.description}</div>
+        </div>
+      )}
+
+      {hotel.amenities && hotel.amenities.length > 0 && (
+        <div style={{ marginBottom: 18 }}>
+          <div className="t-overline" style={{ marginBottom: 8 }}>Amenities ({hotel.amenities.length})</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {hotel.amenities.map(a => (
+              <span key={a} className="badge badge-neutral" style={{ fontSize: 11 }}>{a}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <div className="t-overline" style={{ marginBottom: 8 }}>Rooms ({hotel.rooms.length})</div>
+        {hotel.rooms.length === 0 ? (
+          <div style={{ padding: 14, borderRadius: 10, background: '#fff4f4', color: '#93000a', fontSize: 12.5, fontWeight: 600, border: '1px dashed #ba1a1a' }}>
+            <AlertTriangle size={13} strokeWidth={2.4} style={{ verticalAlign: 'middle', marginRight: 6 }} />
+            No rooms submitted — nothing for agents to see. Consider rejecting until vendor adds rates.
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto', borderRadius: 10, border: '1px solid #edeeef', background: '#ffffff' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, fontFamily: 'Inter, sans-serif' }}>
+              <thead>
+                <tr style={{ background: '#f8f9fa' }}>
+                  {['Room', 'Category', 'EP', 'CP', 'MAP', 'AP', 'Extra Bed', 'Child WOB', 'GST', 'Inv', 'Status'].map(h => (
+                    <th key={h} style={{ padding: '10px 12px', fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#717971', textAlign: 'left', whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {hotel.rooms.map(r => (
+                  <tr key={r.id} style={{ borderTop: '1px solid #edeeef' }}>
+                    <td style={{ padding: '10px 12px', fontWeight: 700, color: '#191c1d' }}>{r.type}</td>
+                    <td style={{ padding: '10px 12px', color: '#414942' }}>{r.category}</td>
+                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.ep ? fmtINR(r.ep) : '—'}</td>
+                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.cp ? fmtINR(r.cp) : '—'}</td>
+                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.map ? fmtINR(r.map) : '—'}</td>
+                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.ap ? fmtINR(r.ap) : '—'}</td>
+                    <td style={{ padding: '10px 12px', color: '#414942' }}>{r.extraBed ? fmtINR(r.extraBed) : '—'}</td>
+                    <td style={{ padding: '10px 12px', color: '#414942' }}>{r.childWob ? fmtINR(r.childWob) : '—'}</td>
+                    <td style={{ padding: '10px 12px', color: '#717971', fontSize: 11 }}>{GST_LABELS[r.gst] || r.gst}</td>
+                    <td style={{ padding: '10px 12px', color: '#414942', fontWeight: 700 }}>{r.inventory}</td>
+                    <td style={{ padding: '10px 12px' }}>
+                      <span className={`badge ${r.status === 'Available' ? 'badge-success' : r.status === 'Limited' ? 'badge-tertiary' : 'badge-error'}`} style={{ fontSize: 10 }}>{r.status}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function DetailRow({ Icon, label, value }: { Icon: typeof Phone; label: string; value: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+      <div style={{
+        width: 32, height: 32, borderRadius: 9999, background: '#f3f4f5',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+      }}>
+        <Icon size={14} strokeWidth={2.2} color="#00361a" />
+      </div>
+      <div style={{ minWidth: 0 }}>
+        <div className="t-overline" style={{ fontSize: 9 }}>{label}</div>
+        <div style={{ fontSize: 13, color: '#191c1d', fontFamily: 'Inter, sans-serif', fontWeight: 600, wordBreak: 'break-word' }}>{value}</div>
+      </div>
+    </div>
+  )
+}
+
+// =====================================================================
+// Enquiries log — every WhatsApp enquiry that travellers submit.
+// =====================================================================
+function EnquiriesPanel({ enquiries }: { enquiries: Enquiry[] }) {
+  if (enquiries.length === 0) {
+    return (
+      <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
+        <MessageCircle size={40} color="#c1c9bf" style={{ marginBottom: 12, display: 'block', margin: '0 auto 12px' }} />
+        <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No enquiries yet</p>
+        <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Travellers who hit &quot;Enquire on WhatsApp&quot; on the public board show up here.</p>
+      </div>
+    )
+  }
+  return (
+    <div className="card-elevated table-scroll" style={{ overflow: 'auto' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
+            {['Sent', 'Traveller', 'Phone', 'Hotel', 'Stay', 'Party', 'Notes', 'WhatsApp'].map(h => (
+              <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {enquiries.map(e => (
+            <tr key={e.id} style={{ borderTop: '1px solid #edeeef' }}>
+              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#717971', whiteSpace: 'nowrap' }}>{timeAgo(e.createdAt)}</td>
+              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#191c1d', fontWeight: 700 }}>{e.travellerName}</td>
+              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#414942' }}>
+                <a href={`tel:${e.travellerPhone}`} style={{ color: '#13677b', textDecoration: 'none' }}>{e.travellerPhone}</a>
+              </td>
+              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#414942' }}>{e.hotelName}</td>
+              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
+                {e.checkIn && e.checkOut ? (
+                  <>
+                    {e.checkIn} → {e.checkOut}
+                    <div style={{ fontSize: 11, color: '#717971' }}>{e.nights} night{e.nights === 1 ? '' : 's'}</div>
+                  </>
+                ) : <span style={{ color: '#9aa19f' }}>Flexible</span>}
+              </td>
+              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
+                <BedDouble size={11} strokeWidth={2.4} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                {e.rooms} rm · {e.adults}A{e.children > 0 ? ` + ${e.children}C` : ''}
+              </td>
+              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#414942', maxWidth: 260 }}>
+                {e.notes || <span style={{ color: '#9aa19f' }}>—</span>}
+              </td>
+              <td style={{ padding: '12px 16px' }}>
+                <a
+                  href={e.whatsappLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '6px 12px', borderRadius: 9999, textDecoration: 'none',
+                    background: 'linear-gradient(135deg, #25d366 0%, #128c7e 100%)',
+                    color: '#ffffff', fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 800,
+                  }}
+                ><MessageCircle size={11} strokeWidth={2.6} /> Open chat</a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
