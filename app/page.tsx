@@ -59,25 +59,24 @@ export default function PublicPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
             <i className="fi fi-rr-leaf" style={{ fontSize: 18, color: '#b8f0c5' }} />
             <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#9dd3aa', fontFamily: 'Inter, sans-serif' }}>
-              Verified B2B Rates · Updated Daily
+              Kashmir B2B Rate Portal
             </span>
           </div>
 
           <h1 className="hero-title">
-            Kashmir Hotel Rates<br />
-            <span style={{ color: '#9dd3aa' }}>for Travel Agents</span>
+            No More<br />
+            <span style={{ color: '#9dd3aa' }}>Back-and-Forth.</span>
           </h1>
           <p className="hero-subtitle">
-            Agents track inventory and rates live, no need to call hotels.
-            Hotels stop replying to every enquiry. Both sides save time and
-            focus on revenue growth.
+            Hotels publish once. Agents book confidently.<br />
+            Live B2B rates across Srinagar, Houseboats, Gulmarg, Pahalgam, Sonamarg &amp; Gurez.
           </p>
 
           <div className="hero-meta-row" style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 28, flexWrap: 'wrap' }}>
             {[
-              { icon: 'fi-rr-clock', text: 'Live rates updated today' },
-              { icon: 'fi-rr-shield-check', text: 'No login required to browse' },
-              { icon: 'fi-rr-phone-call', text: 'Direct hotel contact' },
+              { icon: 'fi-rr-check-circle', text: 'Live rates, zero calls' },
+              { icon: 'fi-rr-eye', text: 'No login for agents' },
+              { icon: 'fi-rr-clock', text: 'Updated in real-time' },
             ].map((m, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.88)', fontFamily: 'Inter, sans-serif' }}>
                 <i className={`fi ${m.icon}`} style={{ fontSize: 14, color: '#b8f0c5' }} />

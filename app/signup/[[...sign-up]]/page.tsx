@@ -1,13 +1,12 @@
 'use client'
 
-import { SignIn } from '@clerk/nextjs'
+import { SignUp, useAuth } from '@clerk/nextjs'
 import Header from '@/components/Header'
 import ViaKashmirLogo from '@/components/ViaKashmirLogo'
-import { useAuth } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const { isSignedIn, isLoaded } = useAuth()
   const router = useRouter()
 
@@ -41,15 +40,15 @@ export default function LoginPage() {
                 fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase',
                 color: 'rgba(255,255,255,0.65)', marginTop: 14, fontFamily: 'Inter, sans-serif',
               }}>
-                Hotel Rate Management Portal
+                List Your Hotel on the Portal
               </p>
             </div>
 
             <div className="login-card-body" style={{ display: 'flex', justifyContent: 'center' }}>
-              <SignIn
+              <SignUp
                 routing="path"
-                path="/login"
-                signUpUrl="/signup"
+                path="/signup"
+                signInUrl="/login"
                 fallbackRedirectUrl="/dashboard"
                 forceRedirectUrl="/dashboard"
               />

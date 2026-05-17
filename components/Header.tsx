@@ -77,12 +77,27 @@ export default function Header() {
               <span className="nav-label">Sign Out</span>
             </button>
           ) : (
-            <Link href="/login" style={{ textDecoration: 'none' }}>
-              <button className="btn-tertiary nav-button" style={{ padding: '10px 18px', fontSize: 13 }}>
-                <i className="fi fi-rr-lock" style={{ fontSize: 14 }} />
-                <span className="nav-label">Sign In</span>
-              </button>
-            </Link>
+            <>
+              <Link href="/signup" style={{ textDecoration: 'none' }}>
+                <button
+                  className="btn-ghost nav-button"
+                  style={{
+                    padding: '10px 16px', fontSize: 13,
+                    color: 'rgba(255,255,255,0.85)',
+                    background: 'rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <i className="fi fi-rr-building" style={{ fontSize: 14 }} />
+                  <span className="nav-label">List Hotel</span>
+                </button>
+              </Link>
+              <Link href="/login" style={{ textDecoration: 'none' }}>
+                <button className="btn-tertiary nav-button" style={{ padding: '10px 18px', fontSize: 13 }}>
+                  <i className="fi fi-rr-lock" style={{ fontSize: 14 }} />
+                  <span className="nav-label">Hotel Login</span>
+                </button>
+              </Link>
+            </>
           )}
         </nav>
       </div>
