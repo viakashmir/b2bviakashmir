@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { serverSupabase } from '@/lib/supabase'
 import { rowToConcern } from '@/lib/data'
+import { emailConcernRaised } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
   const sb = serverSupabase()
   const id = 'con_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36)
 
-  const { error } = await sb.from('concerns').insert({
+  const concernRow = {
     id,
     hotel_id: String(body.hotelId ?? ''),
     hotel_name: String(body.hotelName ?? ''),
@@ -60,7 +61,24 @@ export async function POST(req: Request) {
     priority: String(body.priority ?? 'medium'),
     admin_response: '',
     admin_response_at: null,
-  })
+  }
+
+  const { error } = await sb.from('concerns').insert(concernRow)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Notify both the agent (ack) and the admin (action needed)
+  if (concernRow.agent_email) {
+    void emailConcernRaised({
+      agentEmail:   concernRow.agent_email,
+      agentName:    concernRow.agent_name,
+      agentCompany: concernRow.agent_company || '—',
+      hotelName:    concernRow.hotel_name || 'a hotel',
+      category:     concernRow.category,
+      priority:     concernRow.priority,
+      subject:      concernRow.subject,
+      description:  concernRow.description,
+    })
+  }
+
   return NextResponse.json({ ok: true, id })
 }

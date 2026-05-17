@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { serverSupabase } from '@/lib/supabase'
+import { emailHotelApproved, emailHotelSuspended } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,8 +22,32 @@ export async function PATCH(req: Request, ctx: { params: { id: string } }) {
   if (Object.keys(update).length === 0) return NextResponse.json({ error: 'no fields' }, { status: 400 })
 
   const sb = serverSupabase()
+
+  // Pull the previous row so we know what changed + who to email.
+  const { data: existing } = await sb.from('hotels')
+    .select('approved, name, email, location_label')
+    .eq('id', ctx.params.id)
+    .maybeSingle()
+
   const { error } = await sb.from('hotels').update(update).eq('id', ctx.params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Email triggers — fire only when approved status actually flipped.
+  if (existing && typeof body.approved === 'boolean' && body.approved !== existing.approved && existing.email) {
+    if (body.approved) {
+      void emailHotelApproved({
+        vendorEmail:   existing.email,
+        hotelName:     existing.name,
+        locationLabel: existing.location_label || '',
+      })
+    } else {
+      void emailHotelSuspended({
+        vendorEmail: existing.email,
+        hotelName:   existing.name,
+      })
+    }
+  }
+
   return NextResponse.json({ ok: true })
 }
 

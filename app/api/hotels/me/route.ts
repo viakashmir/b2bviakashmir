@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { serverSupabase } from '@/lib/supabase'
 import { rowToHotel } from '@/lib/data'
+import { emailListingSubmitted } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,6 +69,22 @@ export async function POST(req: Request) {
 
   const { error } = await sb.from('hotels').upsert(row, { onConflict: 'id' })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Fire the welcome email exactly once — on first submission.
+  // (existing was null → this is a brand-new listing.)
+  const isFirstSubmission = !existing
+  if (isFirstSubmission) {
+    const user = await currentUser()
+    const vendorEmail = row.email || user?.primaryEmailAddress?.emailAddress
+    if (vendorEmail) {
+      void emailListingSubmitted({
+        vendorEmail,
+        vendorName: user?.firstName || undefined,
+        hotelName: row.name,
+        locationLabel: row.location_label || row.location,
+      })
+    }
+  }
 
   // Optional: bulk-create rooms passed in onboarding
   if (Array.isArray(body.rooms) && body.rooms.length > 0) {
