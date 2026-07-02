@@ -37,9 +37,8 @@ export default function HotelCard({ hotel, index }: Props) {
   return (
     <>
       <article
-        className="card-elevated"
+        className="card-elevated hcard"
         style={{
-          display: 'flex', flexDirection: 'column',
           transition: 'box-shadow 0.2s, transform 0.2s',
           animation: `card-in 0.4s ease ${index * 0.06}s both`,
         }}
@@ -52,198 +51,129 @@ export default function HotelCard({ hotel, index }: Props) {
           ;(e.currentTarget as HTMLElement).style.boxShadow = '0 4px 40px rgba(25,28,29,0.06)'
         }}
       >
-        {/* Header */}
-        <div className="hotel-card-header" style={{
-          background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)',
-          padding: '18px 20px 14px', position: 'relative', overflow: 'hidden',
-        }}>
-          <Mountain
-            size={120}
-            color="rgba(184,240,197,0.08)"
-            style={{ position: 'absolute', right: -14, top: -14, pointerEvents: 'none' }}
-          />
+        {/* LEFT — identity panel */}
+        <div className="hcard-side">
+          <Mountain size={140} color="rgba(184,240,197,0.08)" style={{ position: 'absolute', right: -18, top: -18, pointerEvents: 'none' }} />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 800,
-              letterSpacing: '0.16em', textTransform: 'uppercase',
-              color: '#b8f0c5',
-            }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#b8f0c5' }}>
               <Sparkles size={11} strokeWidth={2.5} />
               {STAR_LABELS[hotel.stars]}
             </span>
             <span className={`badge ${statusBadge}`} style={{ padding: '3px 10px', fontSize: 10 }}>{status}</span>
           </div>
 
-          <h3 style={{
-            fontFamily: 'Manrope, sans-serif', fontSize: 19, fontWeight: 800,
-            color: '#ffffff', lineHeight: 1.18, margin: 0, letterSpacing: '-0.015em',
-          }}>
+          <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 20, fontWeight: 800, color: '#ffffff', lineHeight: 1.2, margin: 0, letterSpacing: '-0.015em' }}>
             {hotel.name}
           </h3>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 5, marginTop: 5,
-            fontSize: 11.5, fontWeight: 500, color: 'rgba(255,255,255,0.7)',
-            fontFamily: 'Inter, sans-serif',
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 5, fontSize: 11.5, fontWeight: 500, color: 'rgba(255,255,255,0.7)', fontFamily: 'Inter, sans-serif' }}>
             <MapPin size={12} strokeWidth={2} />
             {hotel.locationLabel}
           </div>
 
-          {/* Big availability banner, green / blinking yellow / red */}
-          <div
-            className={`${headerAvailClass}`}
-            style={{
-              marginTop: 12,
-              padding: '10px 14px',
-              borderRadius: 10,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-              filter: status === 'Sold Out' ? 'none' : undefined,
-            }}
-          >
+          <div className={headerAvailClass} style={{ marginTop: 14, padding: '10px 14px', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <BedDouble size={18} strokeWidth={2.3} />
               <div>
-                <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 20, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em' }}>
-                  {availInv}
-                </div>
-                <div style={{ fontSize: 9, fontWeight: 800, marginTop: 2, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                  Available
-                </div>
+                <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 20, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em' }}>{availInv}</div>
+                <div style={{ fontSize: 9, fontWeight: 800, marginTop: 2, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Available</div>
               </div>
             </div>
             <div style={{ textAlign: 'right', fontFamily: 'Inter, sans-serif', fontSize: 11 }}>
               <div style={{ fontWeight: 800 }}>{availTypes + limitTypes}/{hotel.rooms.length}</div>
-              <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>
-                types open
-              </div>
+              <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>types open</div>
             </div>
           </div>
-        </div>
 
-        {/* Tariff window + updated strip */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          gap: 8, padding: '8px 16px', background: '#f3f4f5',
-          fontSize: 10, color: '#717971', fontFamily: 'Inter, sans-serif',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span className="pulse-dot" style={{ width: 5, height: 5, borderRadius: '50%', background: '#13677b', display: 'inline-block', flexShrink: 0 }} />
-            <Clock size={10} strokeWidth={2} />
-            Updated <strong style={{ color: '#414942', fontWeight: 700, marginLeft: 2 }}>{fmtDate(hotel.updatedAt)}</strong>
-          </div>
           {hotel.tariffStart && hotel.tariffEnd && (
-            <span style={{
-              fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase',
-              color: '#6f3800',
-              background: 'rgba(255,220,196,0.55)',
-              padding: '3px 9px', borderRadius: 9999,
-            }}>
+            <span style={{ display: 'inline-block', marginTop: 12, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2f1400', background: 'rgba(255,220,196,0.9)', padding: '4px 10px', borderRadius: 9999 }}>
               Tariff {shortRange(hotel.tariffStart, hotel.tariffEnd)}
             </span>
           )}
         </div>
 
-        {/* Rate rows, show ALL rooms with each meal plan's rate */}
-        <div style={{ flex: 1 }}>
+        {/* RIGHT — rates & CTA */}
+        <div className="hcard-body">
+          <div className="hcard-updated">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span className="pulse-dot" style={{ width: 5, height: 5, borderRadius: '50%', background: '#13677b', display: 'inline-block', flexShrink: 0 }} />
+              <Clock size={10} strokeWidth={2} />
+              Updated <strong style={{ color: '#414942', fontWeight: 700, marginLeft: 2 }}>{fmtDate(hotel.updatedAt)}</strong>
+            </div>
+            <span style={{ fontWeight: 700 }}>{hotel.rooms.length} room {hotel.rooms.length === 1 ? 'type' : 'types'}</span>
+          </div>
+
           {hotel.rooms.length === 0 ? (
-            <div style={{ padding: '20px', textAlign: 'center', fontSize: 12, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+            <div style={{ flex: 1, padding: '28px 20px', textAlign: 'center', fontSize: 13, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
               No rates published yet
             </div>
-          ) : hotel.rooms.map((r, ri) => {
-            const lowStock = r.status === 'Sold Out' || r.inventory === 0
-              ? 'avail-red'
-              : (r.status === 'Limited' || r.inventory <= 3)
-                ? 'avail-amber'
-                : 'avail-green'
-            // pick the headline rate by the room's declared meal plan
-            const headline =
-              r.meal === 'EP'  ? r.ep :
-              r.meal === 'MAP' ? r.map :
-              r.meal === 'AP'  ? r.ap :
-              r.cp || r.double
-            const offered = [
-              { code: 'EP',  val: r.ep },
-              { code: 'CP',  val: r.cp || (r.meal === 'CP' ? r.double : 0) },
-              { code: 'MAP', val: r.map },
-              { code: 'AP',  val: r.ap },
-            ].filter(p => p.val > 0)
-            return (
-              <div key={r.id} style={{
-                padding: '12px 16px',
-                background: ri % 2 === 1 ? '#f8f9fa' : '#ffffff',
-                borderBottom: ri < hotel.rooms.length - 1 ? '1px solid #edeeef' : 'none',
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
-                  <div style={{ minWidth: 0, flex: 1 }}>
-                    <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 700, color: '#191c1d', lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.type}</div>
-                    <div style={{ fontSize: 9.5, color: '#13677b', marginTop: 2, fontFamily: 'Inter, sans-serif', fontWeight: 600, letterSpacing: '0.02em' }}>
-                      {r.category}
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, justifyContent: 'flex-end' }}>
-                      <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', color: '#13677b' }}>{r.meal}</span>
-                      <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 16, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>
-                        {fmtINR(headline)}
+          ) : (
+            <div className="hcard-rates">
+              {hotel.rooms.map(r => {
+                const lowStock = r.status === 'Sold Out' || r.inventory === 0 ? 'avail-red'
+                  : (r.status === 'Limited' || r.inventory <= 3) ? 'avail-amber' : 'avail-green'
+                const headline = r.meal === 'EP' ? r.ep : r.meal === 'MAP' ? r.map : r.meal === 'AP' ? r.ap : r.cp || r.double
+                const offered = [
+                  { code: 'EP',  val: r.ep },
+                  { code: 'CP',  val: r.cp || (r.meal === 'CP' ? r.double : 0) },
+                  { code: 'MAP', val: r.map },
+                  { code: 'AP',  val: r.ap },
+                ].filter(p => p.val > 0)
+                return (
+                  <div key={r.id} className="rate-cell">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, color: '#191c1d', lineHeight: 1.25 }}>{r.type}</div>
+                        <div style={{ fontSize: 9.5, color: '#13677b', marginTop: 2, fontFamily: 'Inter, sans-serif', fontWeight: 600, letterSpacing: '0.02em' }}>{r.category}</div>
+                      </div>
+                      <span className={lowStock} style={{ flexShrink: 0, display: 'inline-block', padding: '3px 9px', borderRadius: 9999, fontSize: 9.5, fontWeight: 800, fontFamily: 'Inter, sans-serif' }}>
+                        {r.inventory} {r.inventory === 1 ? 'room' : 'rooms'}
                       </span>
                     </div>
-                    <span className={lowStock} style={{ display: 'inline-block', minWidth: 30, padding: '3px 9px', borderRadius: 9999, fontSize: 10, fontWeight: 800, fontFamily: 'Inter, sans-serif', marginTop: 4 }}>
-                      {r.inventory} {r.inventory === 1 ? 'room' : 'rooms'}
-                    </span>
-                  </div>
-                </div>
 
-                {/* All offered meal-plan rates as small chips */}
-                {offered.length > 1 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 8 }}>
-                    {offered.map(p => (
-                      <span key={p.code} style={{
-                        fontSize: 9.5, fontWeight: 700, fontFamily: 'Inter, sans-serif',
-                        padding: '3px 8px', borderRadius: 9999,
-                        background: p.code === r.meal ? 'rgba(0,54,26,0.08)' : '#f3f4f5',
-                        color: p.code === r.meal ? '#00361a' : '#414942',
-                        border: p.code === r.meal ? '1px solid rgba(0,54,26,0.15)' : '1px solid transparent',
-                      }}>
-                        <strong>{p.code}</strong> {fmtINR(p.val)}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', color: '#13677b' }}>{r.meal}</span>
+                      <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>{fmtINR(headline)}</span>
+                      <span style={{ fontSize: 10, color: '#717971', fontWeight: 600 }}>/night</span>
+                    </div>
 
-                {/* Extras */}
-                {(r.extraBed || r.childWob) && (
-                  <div style={{ display: 'flex', gap: 10, marginTop: 6, fontSize: 9.5, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
-                    {r.extraBed > 0 && <span>Extra Bed <strong style={{ color: '#414942' }}>{fmtINR(r.extraBed)}</strong></span>}
-                    {r.childWob > 0 && <span>Child WOB <strong style={{ color: '#414942' }}>{fmtINR(r.childWob)}</strong></span>}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
+                    {offered.length > 1 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 8 }}>
+                        {offered.map(p => (
+                          <span key={p.code} style={{
+                            fontSize: 10, fontWeight: 700, fontFamily: 'Inter, sans-serif', padding: '3px 8px', borderRadius: 9999,
+                            background: p.code === r.meal ? 'rgba(0,54,26,0.08)' : '#eef0ef',
+                            color: p.code === r.meal ? '#00361a' : '#414942',
+                            border: p.code === r.meal ? '1px solid rgba(0,54,26,0.15)' : '1px solid transparent',
+                          }}>
+                            <strong>{p.code}</strong> {fmtINR(p.val)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
-        {/* Footer, phone hidden (revealed via Enquire), just CTA */}
-        <div className="hotel-card-footer" style={{
-          padding: '12px 16px', background: '#ffffff', borderTop: '1px solid #edeeef',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
-        }}>
-          <div style={{ fontSize: 11, color: '#717971', lineHeight: 1.5, fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Mail size={12} strokeWidth={2} />
-            <span style={{ fontWeight: 600, color: '#414942' }}>Contact via Enquire</span>
+                    {(r.extraBed > 0 || r.childWob > 0) && (
+                      <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 10, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+                        {r.extraBed > 0 && <span>Extra Bed <strong style={{ color: '#414942' }}>{fmtINR(r.extraBed)}</strong></span>}
+                        {r.childWob > 0 && <span>Child WOB <strong style={{ color: '#414942' }}>{fmtINR(r.childWob)}</strong></span>}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          <div className="hcard-foot">
+            <div style={{ fontSize: 11.5, color: '#717971', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Mail size={13} strokeWidth={2} />
+              <span style={{ fontWeight: 600, color: '#414942' }}>Contact via Enquire</span>
+            </div>
+            <button onClick={() => setShowEnquire(true)} className="btn-primary" style={{ padding: '9px 20px', fontSize: 12.5, flexShrink: 0 }}>
+              <Send size={13} strokeWidth={2.5} />
+              Enquire
+            </button>
           </div>
-          <button
-            onClick={() => setShowEnquire(true)}
-            className="btn-primary"
-            style={{ padding: '8px 16px', fontSize: 11.5, flexShrink: 0 }}
-          >
-            <Send size={12} strokeWidth={2.5} />
-            Enquire
-          </button>
         </div>
       </article>
 
