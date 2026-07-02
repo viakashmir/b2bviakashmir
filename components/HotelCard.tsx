@@ -63,30 +63,30 @@ export default function HotelCard({ hotel, index }: Props) {
             <span className={`badge ${statusBadge}`} style={{ padding: '3px 10px', fontSize: 10 }}>{status}</span>
           </div>
 
-          <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 20, fontWeight: 800, color: '#ffffff', lineHeight: 1.2, margin: 0, letterSpacing: '-0.015em' }}>
+          <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 18, fontWeight: 800, color: '#ffffff', lineHeight: 1.18, margin: 0, letterSpacing: '-0.015em' }}>
             {hotel.name}
           </h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 5, fontSize: 11.5, fontWeight: 500, color: 'rgba(255,255,255,0.7)', fontFamily: 'Inter, sans-serif' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4, fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.7)', fontFamily: 'Inter, sans-serif' }}>
             <MapPin size={12} strokeWidth={2} />
             {hotel.locationLabel}
           </div>
 
-          <div className={headerAvailClass} style={{ marginTop: 14, padding: '10px 14px', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <BedDouble size={18} strokeWidth={2.3} />
+          <div className={headerAvailClass} style={{ marginTop: 12, padding: '8px 12px', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <BedDouble size={16} strokeWidth={2.3} />
               <div>
-                <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 20, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em' }}>{availInv}</div>
-                <div style={{ fontSize: 9, fontWeight: 800, marginTop: 2, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Available</div>
+                <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 18, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em' }}>{availInv}</div>
+                <div style={{ fontSize: 8.5, fontWeight: 800, marginTop: 2, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Available</div>
               </div>
             </div>
-            <div style={{ textAlign: 'right', fontFamily: 'Inter, sans-serif', fontSize: 11 }}>
+            <div style={{ textAlign: 'right', fontFamily: 'Inter, sans-serif', fontSize: 10.5 }}>
               <div style={{ fontWeight: 800 }}>{availTypes + limitTypes}/{hotel.rooms.length}</div>
-              <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>types open</div>
+              <div style={{ fontSize: 8.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>types open</div>
             </div>
           </div>
 
           {hotel.tariffStart && hotel.tariffEnd && (
-            <span style={{ display: 'inline-block', marginTop: 12, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2f1400', background: 'rgba(255,220,196,0.9)', padding: '4px 10px', borderRadius: 9999 }}>
+            <span style={{ display: 'inline-block', marginTop: 10, fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2f1400', background: 'rgba(255,220,196,0.9)', padding: '4px 10px', borderRadius: 9999 }}>
               Tariff {shortRange(hotel.tariffStart, hotel.tariffEnd)}
             </span>
           )}
@@ -112,39 +112,40 @@ export default function HotelCard({ hotel, index }: Props) {
               {hotel.rooms.map(r => {
                 const lowStock = r.status === 'Sold Out' || r.inventory === 0 ? 'avail-red'
                   : (r.status === 'Limited' || r.inventory <= 3) ? 'avail-amber' : 'avail-green'
-                const headline = r.meal === 'EP' ? r.ep : r.meal === 'MAP' ? r.map : r.meal === 'AP' ? r.ap : r.cp || r.double
                 const offered = [
                   { code: 'EP',  val: r.ep },
                   { code: 'CP',  val: r.cp || (r.meal === 'CP' ? r.double : 0) },
                   { code: 'MAP', val: r.map },
                   { code: 'AP',  val: r.ap },
                 ].filter(p => p.val > 0)
+                // Headline = the room's declared plan if it has a rate, else the first quoted plan.
+                const primary = offered.find(p => p.code === r.meal) ?? offered[0] ?? { code: r.meal, val: 0 }
                 return (
                   <div key={r.id} className="rate-cell">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, color: '#191c1d', lineHeight: 1.25 }}>{r.type}</div>
-                        <div style={{ fontSize: 9.5, color: '#13677b', marginTop: 2, fontFamily: 'Inter, sans-serif', fontWeight: 600, letterSpacing: '0.02em' }}>{r.category}</div>
+                        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 700, color: '#191c1d', lineHeight: 1.2 }}>{r.type}</div>
+                        <div style={{ fontSize: 9, color: '#13677b', marginTop: 1, fontFamily: 'Inter, sans-serif', fontWeight: 600, letterSpacing: '0.02em' }}>{r.category}</div>
                       </div>
-                      <span className={lowStock} style={{ flexShrink: 0, display: 'inline-block', padding: '3px 9px', borderRadius: 9999, fontSize: 9.5, fontWeight: 800, fontFamily: 'Inter, sans-serif' }}>
+                      <span className={lowStock} style={{ flexShrink: 0, display: 'inline-block', padding: '2px 8px', borderRadius: 9999, fontSize: 9, fontWeight: 800, fontFamily: 'Inter, sans-serif' }}>
                         {r.inventory} {r.inventory === 1 ? 'room' : 'rooms'}
                       </span>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 8 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', color: '#13677b' }}>{r.meal}</span>
-                      <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>{fmtINR(headline)}</span>
-                      <span style={{ fontSize: 10, color: '#717971', fontWeight: 600 }}>/night</span>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 6 }}>
+                      <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', color: '#13677b' }}>{primary.code}</span>
+                      <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 18, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>{primary.val ? fmtINR(primary.val) : '—'}</span>
+                      <span style={{ fontSize: 9.5, color: '#717971', fontWeight: 600 }}>/night</span>
                     </div>
 
                     {offered.length > 1 && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 8 }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
                         {offered.map(p => (
                           <span key={p.code} style={{
-                            fontSize: 10, fontWeight: 700, fontFamily: 'Inter, sans-serif', padding: '3px 8px', borderRadius: 9999,
-                            background: p.code === r.meal ? 'rgba(0,54,26,0.08)' : '#eef0ef',
-                            color: p.code === r.meal ? '#00361a' : '#414942',
-                            border: p.code === r.meal ? '1px solid rgba(0,54,26,0.15)' : '1px solid transparent',
+                            fontSize: 9.5, fontWeight: 700, fontFamily: 'Inter, sans-serif', padding: '2px 7px', borderRadius: 9999,
+                            background: p.code === primary.code ? 'rgba(0,54,26,0.08)' : '#eef0ef',
+                            color: p.code === primary.code ? '#00361a' : '#414942',
+                            border: p.code === primary.code ? '1px solid rgba(0,54,26,0.15)' : '1px solid transparent',
                           }}>
                             <strong>{p.code}</strong> {fmtINR(p.val)}
                           </span>
@@ -153,7 +154,7 @@ export default function HotelCard({ hotel, index }: Props) {
                     )}
 
                     {(r.extraBed > 0 || r.childWob > 0) && (
-                      <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 10, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+                      <div style={{ display: 'flex', gap: 10, marginTop: 6, fontSize: 9.5, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
                         {r.extraBed > 0 && <span>Extra Bed <strong style={{ color: '#414942' }}>{fmtINR(r.extraBed)}</strong></span>}
                         {r.childWob > 0 && <span>Child WOB <strong style={{ color: '#414942' }}>{fmtINR(r.childWob)}</strong></span>}
                       </div>

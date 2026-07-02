@@ -407,12 +407,12 @@ body {
 
 /* Horizontal hotel card: identity panel (left) + rates & CTA (right) */
 .hcard { display: grid; grid-template-columns: 300px 1fr; overflow: hidden; padding: 0; }
-.hcard-side { background: linear-gradient(135deg, #00361a 0%, #1a4d2e 100%); padding: 20px; position: relative; overflow: hidden; color: #fff; }
+.hcard-side { background: linear-gradient(135deg, #00361a 0%, #1a4d2e 100%); padding: 18px; position: relative; overflow: hidden; color: #fff; }
 .hcard-body { display: flex; flex-direction: column; min-width: 0; }
-.hcard-updated { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 18px; background: #f3f4f5; font-size: 10.5px; color: #717971; font-family: 'Inter', sans-serif; }
-.hcard-rates { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; padding: 16px 18px; }
-.rate-cell { padding: 13px 15px; border-radius: 12px; background: #f8f9fa; border: 1px solid #edeeef; }
-.hcard-foot { padding: 12px 18px; background: #fff; border-top: 1px solid #edeeef; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.hcard-updated { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 16px; background: #f3f4f5; font-size: 10.5px; color: #717971; font-family: 'Inter', sans-serif; }
+.hcard-rates { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; padding: 13px 16px; }
+.rate-cell { padding: 11px 13px; border-radius: 11px; background: #f8f9fa; border: 1px solid #edeeef; }
+.hcard-foot { padding: 10px 16px; background: #fff; border-top: 1px solid #edeeef; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 @media (max-width: 720px) {
   .hcard { grid-template-columns: 1fr; }
   .hcard-rates { grid-template-columns: 1fr; }
