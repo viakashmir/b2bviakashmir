@@ -332,3 +332,14 @@ export function totalInventory(rooms: Room[]): number {
 export function availableInventory(rooms: Room[]): number {
   return rooms.filter(r => r.status === 'Available').reduce((a, r) => a + (r.inventory || 0), 0)
 }
+
+/** Lowest positive nightly rate (₹) across a hotel's rooms; 0 if none. */
+export function hotelFromPrice(hotel: { rooms: Room[] }): number {
+  let min = 0
+  for (const r of hotel.rooms) {
+    for (const v of [r.ep, r.cp, r.map, r.ap, r.double]) {
+      if (v && v > 0 && (min === 0 || v < min)) min = v
+    }
+  }
+  return min
+}

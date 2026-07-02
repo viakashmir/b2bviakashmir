@@ -2,22 +2,43 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import {
-  Mountain, Leaf, Filter,
+  Mountain, Leaf, SlidersHorizontal,
   Search, Grid3x3, Building2, Sailboat,
 } from 'lucide-react'
 import Header from '@/components/Header'
 import HotelCard from '@/components/HotelCard'
 import KashmirLive from '@/components/KashmirLive'
-import { Hotel, LOCATIONS, Location, PropertyType, rowToHotel } from '@/lib/data'
+import {
+  Hotel, LOCATIONS, Location, PropertyType, rowToHotel,
+  hotelFromPrice, HOTEL_AMENITIES, HOUSEBOAT_AMENITIES,
+} from '@/lib/data'
 import { browserSupabase } from '@/lib/supabase'
 
 type PropFilter = 'all' | PropertyType
+type SortKey = 'recommended' | 'price_asc' | 'price_desc' | 'newest'
+
+const SORTS: { key: SortKey; label: string }[] = [
+  { key: 'recommended', label: 'Recommended' },
+  { key: 'price_asc',   label: 'Price ↑' },
+  { key: 'price_desc',  label: 'Price ↓' },
+  { key: 'newest',      label: 'Newest' },
+]
+const PROP_OPTS: { key: PropFilter; label: string; Icon: typeof Grid3x3 }[] = [
+  { key: 'all',       label: 'All',        Icon: Grid3x3 },
+  { key: 'hotel',     label: 'Hotels',     Icon: Building2 },
+  { key: 'houseboat', label: 'Houseboats', Icon: Sailboat },
+]
+const AMENITY_OPTS = Array.from(new Set([...HOTEL_AMENITIES, ...HOUSEBOAT_AMENITIES]))
 
 export default function PublicPage() {
   const [hotels, setHotels] = useState<Hotel[]>([])
   const [filter, setFilter] = useState<Location | 'all'>('all')
   const [propFilter, setPropFilter] = useState<PropFilter>('all')
   const [search, setSearch] = useState('')
+  const [sort, setSort] = useState<SortKey>('recommended')
+  const [priceMin, setPriceMin] = useState('')
+  const [priceMax, setPriceMax] = useState('')
+  const [amenitySel, setAmenitySel] = useState<string[]>([])
   const [mounted, setMounted] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -55,13 +76,29 @@ export default function PublicPage() {
 
   const filtered = hotels.filter(h => {
     const locMatch = filter === 'all' || h.location === filter
-    // Property-type filter only applies to Srinagar (other cities are hotels-only)
-    const propMatch =
-      filter !== 'srinagar' || propFilter === 'all' || h.propertyType === propFilter
+    const propMatch = propFilter === 'all' || h.propertyType === propFilter
     const s = search.toLowerCase().trim()
     const searchMatch = !s || h.name.toLowerCase().includes(s) || h.locationLabel.toLowerCase().includes(s)
-    return locMatch && propMatch && searchMatch
+    const p = hotelFromPrice(h)
+    const minOk = !priceMin || (p > 0 && p >= Number(priceMin))
+    const maxOk = !priceMax || (p > 0 && p <= Number(priceMax))
+    const amenOk = amenitySel.length === 0 || amenitySel.every(a => h.amenities.includes(a))
+    return locMatch && propMatch && searchMatch && minOk && maxOk && amenOk
   })
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === 'price_asc')  return (hotelFromPrice(a) || Infinity) - (hotelFromPrice(b) || Infinity)
+    if (sort === 'price_desc') return (hotelFromPrice(b) || 0) - (hotelFromPrice(a) || 0)
+    if (sort === 'newest')     return b.createdAt - a.createdAt
+    return 0 // recommended: keep server order (created_at desc)
+  })
+
+  const resetAll = () => {
+    setFilter('all'); setPropFilter('all'); setSearch('')
+    setPriceMin(''); setPriceMax(''); setAmenitySel([]); setSort('recommended')
+  }
+  const toggleAmenity = (a: string) =>
+    setAmenitySel(prev => prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a])
 
   if (!mounted) {
     return (
@@ -99,108 +136,107 @@ export default function PublicPage() {
 
         <KashmirLive />
 
-        <div className="filter-row">
-          <span className="t-overline" style={{ marginRight: 6 }}>
-            <Filter size={11} strokeWidth={2.5} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-            Location
-          </span>
-          {LOCATIONS.map(loc => {
-            const active = filter === loc.value
-            return (
-              <button
-                key={loc.value}
-                onClick={() => { setFilter(loc.value as Location | 'all'); if (loc.value !== 'srinagar') setPropFilter('all') }}
-                style={{
-                  padding: '8px 16px', borderRadius: 9999, border: 'none',
-                  background: active ? 'linear-gradient(135deg, #00361a, #1a4d2e)' : '#ffffff',
-                  color: active ? '#ffffff' : '#414942',
-                  fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600,
-                  cursor: 'pointer', transition: 'all 0.18s',
-                  boxShadow: active ? '0 4px 16px rgba(0,54,26,0.18)' : '0 1px 3px rgba(25,28,29,0.04)',
-                }}
-              >
-                {loc.label}
+        {/* Sort bar */}
+        <div className="sort-bar">
+          <span className="sort-count">{sorted.length} {sorted.length === 1 ? 'hotel' : 'hotels'} found</span>
+          <div className="sort-chips">
+            <span className="t-overline" style={{ marginRight: 2 }}>Sort by</span>
+            {SORTS.map(s => (
+              <button key={s.key} className={sort === s.key ? 'sort-chip active' : 'sort-chip'} onClick={() => setSort(s.key)}>
+                {s.label}
               </button>
-            )
-          })}
-
-          <div className="search-wrap">
-            <Search size={14} strokeWidth={2.2} color="#717971" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', zIndex: 1 }} />
-            <input
-              type="search"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search hotel…"
-              className="input-field"
-              style={{ padding: '10px 14px 10px 42px', fontSize: 13 }}
-            />
-          </div>
-
-          <span className="filter-count" style={{ fontSize: 12, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
-            {filtered.length} of {hotels.length}
-          </span>
-        </div>
-
-        {/* Srinagar sub-filter: Hotels / Houseboats */}
-        {filter === 'srinagar' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: -12, marginBottom: 28, flexWrap: 'wrap' }}>
-            <span className="t-overline" style={{ marginRight: 6 }}>
-              <Filter size={11} strokeWidth={2.5} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-              Property
-            </span>
-            {([
-              { key: 'all',       label: 'All',        Icon: Grid3x3 },
-              { key: 'hotel',     label: 'Hotels',     Icon: Building2 },
-              { key: 'houseboat', label: 'Houseboats', Icon: Sailboat },
-            ] as { key: PropFilter; label: string; Icon: typeof Grid3x3 }[]).map(p => {
-              const active = propFilter === p.key
-              return (
-                <button
-                  key={p.key}
-                  onClick={() => setPropFilter(p.key)}
-                  style={{
-                    padding: '7px 14px', borderRadius: 9999, border: 'none',
-                    background: active ? 'linear-gradient(135deg, #13677b, #18697e)' : '#f3f4f5',
-                    color: active ? '#ffffff' : '#414942',
-                    fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 700,
-                    cursor: 'pointer', transition: 'all 0.18s',
-                    display: 'inline-flex', alignItems: 'center', gap: 6,
-                  }}
-                >
-                  <p.Icon size={11} strokeWidth={2.3} />
-                  {p.label}
-                </button>
-              )
-            })}
-          </div>
-        )}
-
-        {error && (
-          <div className="card" style={{ padding: '20px 24px', marginBottom: 24, borderLeft: '4px solid #ba1a1a', fontFamily: 'Inter, sans-serif', color: '#93000a' }}>
-            <strong style={{ display: 'block', marginBottom: 4 }}>Couldn&apos;t load hotels</strong>
-            <span style={{ fontSize: 13 }}>{error}</span>
-          </div>
-        )}
-
-        {hotels.length === 0 ? (
-          <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-            <Mountain size={40} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 12px' }} />
-            <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels published yet</p>
-            <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Approved hotel listings will appear here in real-time.</p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-            <Search size={40} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 12px' }} />
-            <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels found</p>
-            <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Try adjusting your location filter or search term.</p>
-          </div>
-        ) : (
-          <div className="hotel-grid">
-            {filtered.map((hotel, i) => (
-              <HotelCard key={hotel.id} hotel={hotel} index={i} />
             ))}
           </div>
-        )}
+          <div className="search-wrap">
+            <Search size={14} strokeWidth={2.2} color="#717971" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', zIndex: 1 }} />
+            <input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search hotel…" className="input-field" style={{ padding: '10px 14px 10px 42px', fontSize: 13 }} />
+          </div>
+        </div>
+
+        <div className="board-layout">
+          {/* Filters sidebar */}
+          <aside className="filters-panel">
+            <div className="fp-head">
+              <span><SlidersHorizontal size={15} strokeWidth={2.4} /> Filters</span>
+              <button className="fp-reset" onClick={resetAll}>Reset all</button>
+            </div>
+
+            <div className="fp-group">
+              <div className="fp-label">Location</div>
+              <div className="fp-chips">
+                {LOCATIONS.map(loc => (
+                  <button key={loc.value} className={filter === loc.value ? 'fp-chip active' : 'fp-chip'}
+                    onClick={() => setFilter(loc.value as Location | 'all')}>
+                    {loc.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="fp-group">
+              <div className="fp-label">Property type</div>
+              <div className="fp-chips">
+                {PROP_OPTS.map(p => (
+                  <button key={p.key} className={propFilter === p.key ? 'fp-chip active' : 'fp-chip'}
+                    onClick={() => setPropFilter(p.key)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <p.Icon size={11} strokeWidth={2.3} /> {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="fp-group">
+              <div className="fp-label">Price / night (₹)</div>
+              <div className="fp-price">
+                <input type="number" min={0} inputMode="numeric" placeholder="Min" value={priceMin} onChange={e => setPriceMin(e.target.value)} />
+                <span style={{ color: '#9dabae' }}>–</span>
+                <input type="number" min={0} inputMode="numeric" placeholder="Max" value={priceMax} onChange={e => setPriceMax(e.target.value)} />
+              </div>
+            </div>
+
+            <div className="fp-group">
+              <div className="fp-label">Amenities</div>
+              <div className="fp-checks">
+                {AMENITY_OPTS.map(a => (
+                  <label key={a} className="fp-check">
+                    <input type="checkbox" checked={amenitySel.includes(a)} onChange={() => toggleAmenity(a)} />
+                    {a}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          {/* Results */}
+          <div className="results-col">
+            {error && (
+              <div className="card" style={{ padding: '20px 24px', marginBottom: 24, borderLeft: '4px solid #ba1a1a', fontFamily: 'Inter, sans-serif', color: '#93000a' }}>
+                <strong style={{ display: 'block', marginBottom: 4 }}>Couldn&apos;t load hotels</strong>
+                <span style={{ fontSize: 13 }}>{error}</span>
+              </div>
+            )}
+
+            {hotels.length === 0 ? (
+              <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
+                <Mountain size={40} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 12px' }} />
+                <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels published yet</p>
+                <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Approved hotel listings will appear here in real-time.</p>
+              </div>
+            ) : sorted.length === 0 ? (
+              <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
+                <Search size={40} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 12px' }} />
+                <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels found</p>
+                <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Try adjusting your filters, price range or search term.</p>
+              </div>
+            ) : (
+              <div className="hotel-grid">
+                {sorted.map((hotel, i) => (
+                  <HotelCard key={hotel.id} hotel={hotel} index={i} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </main>
     </>
   )
