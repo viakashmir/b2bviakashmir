@@ -72,7 +72,7 @@ export default function CustomerPortal() {
   if (!isLoaded || loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading…</div>
+        <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading…</div>
       </div>
     )
   }
@@ -128,7 +128,7 @@ export default function CustomerPortal() {
               <i className="fi fi-rr-user" style={{ fontSize: 11 }} /> Travel Agent
             </span>
             <h1 className="dash-title">Welcome, {agentName.split(' ')[0]}</h1>
-            <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+            <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
               Browse live B2B rates and raise concerns when something doesn&apos;t add up.
             </p>
           </div>
@@ -138,7 +138,7 @@ export default function CustomerPortal() {
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
               padding: '12px 18px', border: 'none', background: 'transparent',
-              fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700,
+              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 700,
               color: tab === t.key ? '#00361a' : '#717971', cursor: 'pointer',
               borderBottom: tab === t.key ? '3px solid #00361a' : '3px solid transparent',
               marginBottom: -1, display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -159,7 +159,7 @@ export default function CustomerPortal() {
             {filteredHotels.length === 0 ? (
               <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
                 <i className="fi fi-rr-search" style={{ fontSize: 36, color: '#c1c9bf', display: 'block', marginBottom: 10 }} />
-                <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 18, fontWeight: 700, color: '#414942' }}>No hotels available</p>
+                <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 18, fontWeight: 700, color: '#414942' }}>No hotels available</p>
               </div>
             ) : (
               <div className="hotel-grid">
@@ -171,8 +171,8 @@ export default function CustomerPortal() {
 
         {tab === 'raise' && (
           <div className="card-elevated" style={{ padding: 28, maxWidth: 720 }}>
-            <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', marginBottom: 6 }}>Raise a Concern</div>
-            <p style={{ fontSize: 13, color: '#717971', margin: '0 0 24px', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+            <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', marginBottom: 6 }}>Raise a Concern</div>
+            <p style={{ fontSize: 13, color: '#717971', margin: '0 0 24px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
               Tell our team what went wrong. Admin will reach out and update the status.
             </p>
 
@@ -213,7 +213,7 @@ export default function CustomerPortal() {
             </div>
 
             {formError && (
-              <p style={{ fontSize: 12, color: '#93000a', margin: '14px 0', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+              <p style={{ fontSize: 12, color: '#93000a', margin: '14px 0', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600 }}>
                 <i className="fi fi-rs-exclamation" style={{ fontSize: 13, marginRight: 6 }} /> {formError}
               </p>
             )}
@@ -231,8 +231,8 @@ export default function CustomerPortal() {
             {myConcerns.length === 0 ? (
               <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
                 <i className="fi fi-rr-comment-alt-middle" style={{ fontSize: 40, color: '#c1c9bf', marginBottom: 12, display: 'block' }} />
-                <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No concerns yet</p>
-                <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>When you raise one, it will appear here with admin responses.</p>
+                <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No concerns yet</p>
+                <p style={{ fontSize: 14, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#717971' }}>When you raise one, it will appear here with admin responses.</p>
               </div>
             ) : myConcerns.map(c => (
               <div key={c.id} className="card-elevated" style={{ padding: 22 }}>
@@ -240,15 +240,15 @@ export default function CustomerPortal() {
                   <span className={`badge ${STATUS_BADGE[c.status]}`}>{c.status.replace('-', ' ')}</span>
                   <span className="badge badge-neutral">{c.category}</span>
                 </div>
-                <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 17, fontWeight: 700, color: '#00361a', margin: 0 }}>{c.subject}</h3>
-                <div style={{ fontSize: 12, color: '#717971', marginTop: 4, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                <h3 style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 17, fontWeight: 700, color: '#00361a', margin: 0 }}>{c.subject}</h3>
+                <div style={{ fontSize: 12, color: '#717971', marginTop: 4, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
                   <strong style={{ color: '#414942' }}>{c.hotelName}</strong> · {timeAgo(c.createdAt)}
                 </div>
-                <p style={{ fontSize: 13.5, color: '#414942', fontFamily: 'Inter, sans-serif', lineHeight: 1.6, margin: '12px 0 14px' }}>{c.description}</p>
+                <p style={{ fontSize: 13.5, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.6, margin: '12px 0 14px' }}>{c.description}</p>
                 {c.adminResponse && (
                   <div className="card-section" style={{ padding: 14 }}>
                     <div className="t-overline" style={{ marginBottom: 6 }}>Admin response · {timeAgo(c.adminResponseAt)}</div>
-                    <div style={{ fontSize: 13, color: '#191c1d', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>{c.adminResponse}</div>
+                    <div style={{ fontSize: 13, color: '#191c1d', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.55 }}>{c.adminResponse}</div>
                   </div>
                 )}
               </div>

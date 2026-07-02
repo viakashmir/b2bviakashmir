@@ -50,15 +50,15 @@ export default function VendorShell({ children }: Props) {
               width: 38, height: 38, borderRadius: 10,
               background: 'linear-gradient(135deg, #b8f0c5, #9dd3aa)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#00361a', fontFamily: 'Manrope, sans-serif', fontWeight: 900, fontSize: 18,
+              color: '#00361a', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 900, fontSize: 18,
             }}>
               V
             </span>
             <div>
-              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 17, letterSpacing: '-0.01em', lineHeight: 1 }}>
+              <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 800, fontSize: 17, letterSpacing: '-0.01em', lineHeight: 1 }}>
                 Via Kashmir
               </div>
-              <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(184,240,197,0.7)', marginTop: 4 }}>
+              <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(184,240,197,0.7)', marginTop: 4 }}>
                 Vendor Portal
               </div>
             </div>
@@ -79,7 +79,7 @@ export default function VendorShell({ children }: Props) {
 
         {/* Nav */}
         <nav style={{ flex: 1, padding: '8px 14px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={{ padding: '12px 8px 6px', fontFamily: 'Inter, sans-serif', fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(184,240,197,0.55)' }}>
+          <div style={{ padding: '12px 8px 6px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(184,240,197,0.55)' }}>
             Main
           </div>
           {NAV.map(item => {
@@ -93,7 +93,7 @@ export default function VendorShell({ children }: Props) {
                   color: active ? '#b8f0c5' : 'rgba(255,255,255,0.78)',
                   transition: 'background 0.15s, color 0.15s',
                   cursor: 'pointer',
-                  fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: active ? 700 : 500,
+                  fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13.5, fontWeight: active ? 700 : 500,
                 }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <item.Icon size={16} strokeWidth={2.2} />
@@ -105,7 +105,7 @@ export default function VendorShell({ children }: Props) {
             )
           })}
 
-          <div style={{ padding: '20px 8px 6px', fontFamily: 'Inter, sans-serif', fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(184,240,197,0.55)' }}>
+          <div style={{ padding: '20px 8px 6px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(184,240,197,0.55)' }}>
             Quick links
           </div>
           <Link href="/" onClick={() => setOpen(false)} style={{ textDecoration: 'none' }}>
@@ -113,7 +113,7 @@ export default function VendorShell({ children }: Props) {
               display: 'flex', alignItems: 'center', gap: 12,
               padding: '11px 14px', borderRadius: 10,
               color: 'rgba(255,255,255,0.78)', cursor: 'pointer',
-              fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 500,
+              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13.5, fontWeight: 500,
             }}>
               <Eye size={16} strokeWidth={2.2} />
               Public Rate Board
@@ -131,16 +131,16 @@ export default function VendorShell({ children }: Props) {
             width: 38, height: 38, borderRadius: 9999,
             background: 'linear-gradient(135deg, #b8f0c5, #9dd3aa)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#00361a', fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 14,
+            color: '#00361a', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 800, fontSize: 14,
             flexShrink: 0,
           }}>
             {displayName.charAt(0).toUpperCase()}
           </div>
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 700, color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {displayName}
             </div>
-            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 10.5, color: 'rgba(255,255,255,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 2 }}>
+            <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 10.5, color: 'rgba(255,255,255,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 2 }}>
               {email}
             </div>
           </div>

@@ -56,17 +56,17 @@ export default function HotelCard({ hotel, index }: Props) {
           <Mountain size={140} color="rgba(184,240,197,0.08)" style={{ position: 'absolute', right: -18, top: -18, pointerEvents: 'none' }} />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#b8f0c5' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#b8f0c5' }}>
               <Sparkles size={11} strokeWidth={2.5} />
               {STAR_LABELS[hotel.stars]}
             </span>
             <span className={`badge ${statusBadge}`} style={{ padding: '3px 10px', fontSize: 10 }}>{status}</span>
           </div>
 
-          <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 18, fontWeight: 800, color: '#ffffff', lineHeight: 1.18, margin: 0, letterSpacing: '-0.015em' }}>
+          <h3 style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 18, fontWeight: 800, color: '#ffffff', lineHeight: 1.18, margin: 0, letterSpacing: '-0.015em' }}>
             {hotel.name}
           </h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4, fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.7)', fontFamily: 'Inter, sans-serif' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4, fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.7)', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
             <MapPin size={12} strokeWidth={2} />
             {hotel.locationLabel}
           </div>
@@ -75,11 +75,11 @@ export default function HotelCard({ hotel, index }: Props) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
               <BedDouble size={16} strokeWidth={2.3} />
               <div>
-                <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 18, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em' }}>{availInv}</div>
+                <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 18, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em' }}>{availInv}</div>
                 <div style={{ fontSize: 8.5, fontWeight: 800, marginTop: 2, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Available</div>
               </div>
             </div>
-            <div style={{ textAlign: 'right', fontFamily: 'Inter, sans-serif', fontSize: 10.5 }}>
+            <div style={{ textAlign: 'right', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 10.5 }}>
               <div style={{ fontWeight: 800 }}>{availTypes + limitTypes}/{hotel.rooms.length}</div>
               <div style={{ fontSize: 8.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>types open</div>
             </div>
@@ -104,7 +104,7 @@ export default function HotelCard({ hotel, index }: Props) {
           </div>
 
           {hotel.rooms.length === 0 ? (
-            <div style={{ flex: 1, padding: '28px 20px', textAlign: 'center', fontSize: 13, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+            <div style={{ flex: 1, padding: '28px 20px', textAlign: 'center', fontSize: 13, color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
               No rates published yet
             </div>
           ) : (
@@ -124,17 +124,17 @@ export default function HotelCard({ hotel, index }: Props) {
                   <div key={r.id} className="rate-cell">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 700, color: '#191c1d', lineHeight: 1.2 }}>{r.type}</div>
-                        <div style={{ fontSize: 9, color: '#13677b', marginTop: 1, fontFamily: 'Inter, sans-serif', fontWeight: 600, letterSpacing: '0.02em' }}>{r.category}</div>
+                        <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12.5, fontWeight: 700, color: '#191c1d', lineHeight: 1.2 }}>{r.type}</div>
+                        <div style={{ fontSize: 9, color: '#13677b', marginTop: 1, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600, letterSpacing: '0.02em' }}>{r.category}</div>
                       </div>
-                      <span className={lowStock} style={{ flexShrink: 0, display: 'inline-block', padding: '2px 8px', borderRadius: 9999, fontSize: 9, fontWeight: 800, fontFamily: 'Inter, sans-serif' }}>
+                      <span className={lowStock} style={{ flexShrink: 0, display: 'inline-block', padding: '2px 8px', borderRadius: 9999, fontSize: 9, fontWeight: 800, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
                         {r.inventory} {r.inventory === 1 ? 'room' : 'rooms'}
                       </span>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 6 }}>
                       <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', color: '#13677b' }}>{primary.code}</span>
-                      <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 18, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>{primary.val ? fmtINR(primary.val) : '—'}</span>
+                      <span style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 18, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>{primary.val ? fmtINR(primary.val) : '—'}</span>
                       <span style={{ fontSize: 9.5, color: '#717971', fontWeight: 600 }}>/night</span>
                     </div>
 
@@ -142,7 +142,7 @@ export default function HotelCard({ hotel, index }: Props) {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
                         {offered.map(p => (
                           <span key={p.code} style={{
-                            fontSize: 9.5, fontWeight: 700, fontFamily: 'Inter, sans-serif', padding: '2px 7px', borderRadius: 9999,
+                            fontSize: 9.5, fontWeight: 700, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', padding: '2px 7px', borderRadius: 9999,
                             background: p.code === primary.code ? 'rgba(0,54,26,0.08)' : '#eef0ef',
                             color: p.code === primary.code ? '#00361a' : '#414942',
                             border: p.code === primary.code ? '1px solid rgba(0,54,26,0.15)' : '1px solid transparent',
@@ -154,7 +154,7 @@ export default function HotelCard({ hotel, index }: Props) {
                     )}
 
                     {(r.extraBed > 0 || r.childWob > 0) && (
-                      <div style={{ display: 'flex', gap: 10, marginTop: 6, fontSize: 9.5, color: '#717971', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+                      <div style={{ display: 'flex', gap: 10, marginTop: 6, fontSize: 9.5, color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600 }}>
                         {r.extraBed > 0 && <span>Extra Bed <strong style={{ color: '#414942' }}>{fmtINR(r.extraBed)}</strong></span>}
                         {r.childWob > 0 && <span>Child WOB <strong style={{ color: '#414942' }}>{fmtINR(r.childWob)}</strong></span>}
                       </div>
@@ -166,7 +166,7 @@ export default function HotelCard({ hotel, index }: Props) {
           )}
 
           <div className="hcard-foot">
-            <div style={{ fontSize: 11.5, color: '#717971', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ fontSize: 11.5, color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
               <Mail size={13} strokeWidth={2} />
               <span style={{ fontWeight: 600, color: '#414942' }}>Contact via Enquire</span>
             </div>
@@ -199,7 +199,7 @@ export default function HotelCard({ hotel, index }: Props) {
               <div>
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
-                  fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 800,
+                  fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 10, fontWeight: 800,
                   letterSpacing: '0.14em', textTransform: 'uppercase',
                   color: '#b8f0c5',
                   background: 'rgba(184,240,197,0.12)',
@@ -208,10 +208,10 @@ export default function HotelCard({ hotel, index }: Props) {
                   <Sparkles size={11} strokeWidth={2.5} />
                   {STAR_LABELS[hotel.stars]}
                 </span>
-                <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 24, color: '#ffffff', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{hotel.name}</h3>
+                <h3 style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 24, color: '#ffffff', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{hotel.name}</h3>
                 <p style={{
                   fontSize: 12.5, color: 'rgba(255,255,255,0.72)',
-                  margin: '6px 0 0', fontFamily: 'Inter, sans-serif', fontWeight: 500,
+                  margin: '6px 0 0', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500,
                   display: 'inline-flex', alignItems: 'center', gap: 5,
                 }}>
                   <MapPin size={12} strokeWidth={2} /> {hotel.locationLabel}
@@ -235,7 +235,7 @@ export default function HotelCard({ hotel, index }: Props) {
                   background: 'linear-gradient(135deg, #25d366 0%, #128c7e 100%)',
                   color: '#ffffff', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
-                  fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 15,
+                  fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 800, fontSize: 15,
                   boxShadow: '0 14px 36px rgba(37,211,102,0.30)',
                   transition: 'all 0.2s',
                 }}
@@ -252,7 +252,7 @@ export default function HotelCard({ hotel, index }: Props) {
               </button>
 
               {hotel.description && (
-                <p style={{ fontSize: 13.5, color: '#414942', fontFamily: 'Inter, sans-serif', lineHeight: 1.6, margin: '0 0 22px' }}>
+                <p style={{ fontSize: 13.5, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.6, margin: '0 0 22px' }}>
                   {hotel.description}
                 </p>
               )}
@@ -276,7 +276,7 @@ export default function HotelCard({ hotel, index }: Props) {
                         <Icon size={17} strokeWidth={2} />
                       </div>
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
                           {label}
                           {href && action && (
                             <span style={{
@@ -286,7 +286,7 @@ export default function HotelCard({ hotel, index }: Props) {
                             }}>{action}</span>
                           )}
                         </div>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: href ? '#00361a' : '#191c1d', marginTop: 3, fontFamily: 'Inter, sans-serif', overflowWrap: 'anywhere', textDecoration: href ? 'underline' : 'none', textDecorationColor: 'rgba(0,54,26,0.25)', textUnderlineOffset: 3 }}>{value}</div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: href ? '#00361a' : '#191c1d', marginTop: 3, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', overflowWrap: 'anywhere', textDecoration: href ? 'underline' : 'none', textDecorationColor: 'rgba(0,54,26,0.25)', textUnderlineOffset: 3 }}>{value}</div>
                       </div>
                     </>
                   )
@@ -308,7 +308,7 @@ export default function HotelCard({ hotel, index }: Props) {
 
               {hotel.amenities?.length > 0 && (
                 <div style={{ marginTop: 22 }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', fontFamily: 'Inter, sans-serif', marginBottom: 10 }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', marginBottom: 10 }}>
                     Amenities
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -321,10 +321,10 @@ export default function HotelCard({ hotel, index }: Props) {
 
               {hotel.rooms.length > 0 && (
                 <div style={{ marginTop: 22 }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', fontFamily: 'Inter, sans-serif', marginBottom: 10 }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', marginBottom: 10 }}>
                     All Rates (per night, ₹)
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 0.8fr 0.9fr 0.7fr', gap: 4, fontSize: 11, fontFamily: 'Inter, sans-serif' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 0.8fr 0.9fr 0.7fr', gap: 4, fontSize: 11, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
                     {['Room', 'Double', 'CNB', 'X-Bed', 'Avail.'].map((h, i) => (
                       <div key={h} style={{ fontWeight: 800, fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#717971', textAlign: i > 0 ? 'right' : 'left', paddingBottom: 6, borderBottom: '1px solid #edeeef' }}>{h}</div>
                     ))}

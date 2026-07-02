@@ -103,7 +103,7 @@ export default function PublicPage() {
   if (!mounted) {
     return (
       <div style={{ minHeight: '100vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading rates…</div>
+        <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading rates…</div>
       </div>
     )
   }
@@ -210,7 +210,7 @@ export default function PublicPage() {
           {/* Results */}
           <div className="results-col">
             {error && (
-              <div className="card" style={{ padding: '20px 24px', marginBottom: 24, borderLeft: '4px solid #ba1a1a', fontFamily: 'Inter, sans-serif', color: '#93000a' }}>
+              <div className="card" style={{ padding: '20px 24px', marginBottom: 24, borderLeft: '4px solid #ba1a1a', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#93000a' }}>
                 <strong style={{ display: 'block', marginBottom: 4 }}>Couldn&apos;t load hotels</strong>
                 <span style={{ fontSize: 13 }}>{error}</span>
               </div>
@@ -219,14 +219,14 @@ export default function PublicPage() {
             {hotels.length === 0 ? (
               <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
                 <Mountain size={40} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 12px' }} />
-                <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels published yet</p>
-                <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Approved hotel listings will appear here in real-time.</p>
+                <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels published yet</p>
+                <p style={{ fontSize: 14, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#717971' }}>Approved hotel listings will appear here in real-time.</p>
               </div>
             ) : sorted.length === 0 ? (
               <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
                 <Search size={40} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 12px' }} />
-                <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels found</p>
-                <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Try adjusting your filters, price range or search term.</p>
+                <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 8 }}>No hotels found</p>
+                <p style={{ fontSize: 14, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#717971' }}>Try adjusting your filters, price range or search term.</p>
               </div>
             ) : (
               <div className="hotel-grid">

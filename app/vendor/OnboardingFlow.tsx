@@ -249,7 +249,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
       position: 'fixed', inset: 0,
       background: 'linear-gradient(160deg, #f8f9fa 0%, #e7f3ec 60%, #d5e8dc 100%)',
       display: 'flex', flexDirection: 'column',
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
       zIndex: 200,
     }}>
       {/* Progress bar, full width, top */}
@@ -268,7 +268,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#00361a' }}>
           <Mountain size={20} strokeWidth={2.3} />
-          <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 16, letterSpacing: '-0.01em' }}>
+          <span style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 800, fontSize: 16, letterSpacing: '-0.01em' }}>
             Via Kashmir
           </span>
           <span style={{
@@ -378,7 +378,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                         borderColor: active ? '#00361a' : 'rgba(0,54,26,0.12)',
                         background: active ? 'linear-gradient(135deg, #00361a, #1a4d2e)' : '#ffffff',
                         color: active ? '#ffffff' : '#191c1d',
-                        fontFamily: 'Manrope, sans-serif', fontWeight: 800,
+                        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 800,
                         cursor: 'pointer', transition: 'all 0.18s',
                         boxShadow: active ? '0 10px 24px rgba(0,54,26,0.22)' : '0 1px 3px rgba(25,28,29,0.04)',
                       }}
@@ -415,7 +415,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                   <label style={{
                     display: 'block',
                     fontSize: 12, fontWeight: 800, color: '#414942',
-                    marginBottom: 8, fontFamily: 'Inter, sans-serif',
+                    marginBottom: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
                     letterSpacing: '0.02em',
                   }}>
                     Is this also your WhatsApp number?
@@ -436,7 +436,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                             border: `1.5px solid ${active ? '#1a5128' : 'rgba(0,54,26,0.14)'}`,
                             background: active ? 'linear-gradient(135deg, rgba(184,240,197,0.36), rgba(255,220,196,0.28))' : '#ffffff',
                             color: active ? '#00361a' : '#414942',
-                            fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 800,
+                            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 800,
                             cursor: 'pointer',
                             display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                             transition: 'all 0.18s',
@@ -530,7 +530,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                     background: 'rgba(255,255,255,0.65)',
                     borderRadius: 9999,
                     display: 'inline-flex', alignItems: 'center', gap: 8,
-                    fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 700,
+                    fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, fontWeight: 700,
                     color: '#6f3800',
                   }}>
                     <Check size={12} strokeWidth={3} />
@@ -569,7 +569,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                         ? 'linear-gradient(135deg, #f09f5e 0%, #d2691e 100%)'
                         : 'linear-gradient(135deg, rgba(0,54,26,0.04), rgba(184,240,197,0.30))',
                       color: data.rooms.length === 0 ? '#ffffff' : '#00361a',
-                      fontFamily: 'Manrope, sans-serif', fontSize: 14.5, fontWeight: 800, cursor: 'pointer',
+                      fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14.5, fontWeight: 800, cursor: 'pointer',
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                       boxShadow: data.rooms.length === 0 ? '0 8px 24px rgba(240,159,94,0.32)' : 'none',
                       transition: 'all 0.18s',
@@ -609,7 +609,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                   <div style={{
                     padding: '14px 18px', borderRadius: 14,
                     background: 'linear-gradient(135deg, rgba(184,240,197,0.40), rgba(0,54,26,0.06))',
-                    color: '#00361a', fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700,
+                    color: '#00361a', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 700,
                     textAlign: 'center', border: '1px solid rgba(0,54,26,0.10)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   }}>
@@ -623,7 +623,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           {step.key === 'review' && (
             <Prompt title="Ready to publish your listing?" subtitle="Looks right? Hit Publish, your listing goes live after admin approval.">
               <div style={{ background: '#ffffff', borderRadius: 18, padding: 24, boxShadow: '0 12px 40px rgba(0,54,26,0.08)' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '8px 18px', fontFamily: 'Inter, sans-serif', fontSize: 14 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '8px 18px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14 }}>
                   <ReviewRow label="Name"     value={data.name} />
                   <ReviewRow label="Type"     value={data.propertyType === 'houseboat' ? 'Houseboat' : 'Hotel'} />
                   <ReviewRow label="Location" value={data.location ? LOCATION_LABELS[data.location as Location] : ''} />
@@ -654,7 +654,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                   </div>
                 )}
               </div>
-              <p style={{ marginTop: 14, fontSize: 12.5, color: '#717971', fontFamily: 'Inter, sans-serif', textAlign: 'center' }}>
+              <p style={{ marginTop: 14, fontSize: 12.5, color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', textAlign: 'center' }}>
                 Add a description, amenities and more room types from your dashboard.
                 Listing goes live the moment admin approves.
               </p>
@@ -665,7 +665,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           {error && (
             <p style={{
               marginTop: 18, fontSize: 13, color: '#93000a', fontWeight: 600,
-              fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8,
+              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', display: 'flex', alignItems: 'center', gap: 8,
             }}>
               <span style={{ width: 6, height: 6, borderRadius: 9999, background: '#93000a' }} />
               {error}
@@ -690,7 +690,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           style={{
             background: 'transparent', border: 'none', cursor: stepIdx === 0 ? 'default' : 'pointer',
             color: stepIdx === 0 ? '#c1c9bf' : '#414942',
-            fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 13,
+            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 700, fontSize: 13,
             display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 12px',
           }}
         >
@@ -707,7 +707,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
             padding: '12px 22px', borderRadius: 9999, border: 'none',
             background: 'linear-gradient(135deg, #00361a, #1a4d2e)',
             color: '#ffffff', cursor: 'pointer',
-            fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 14,
+            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 800, fontSize: 14,
             display: 'inline-flex', alignItems: 'center', gap: 8,
             boxShadow: '0 8px 24px rgba(0,54,26,0.25)',
             opacity: submitting ? 0.7 : 1,
@@ -739,7 +739,7 @@ function Prompt({ title, subtitle, children }: { title: string; subtitle?: strin
   return (
     <div>
       <h2 style={{
-        fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(28px, 4vw, 38px)',
+        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 'clamp(28px, 4vw, 38px)',
         fontWeight: 800, color: '#00361a', letterSpacing: '-0.025em', lineHeight: 1.12,
         margin: 0,
       }}>
@@ -775,7 +775,7 @@ function TextField({ refEl, type = 'text', inputMode, value, onChange, onSubmit,
         width: '100%',
         background: 'transparent',
         border: 'none', borderBottom: '2px solid rgba(0,54,26,0.18)',
-        fontFamily: 'Manrope, sans-serif', fontSize: 26, fontWeight: 600,
+        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 26, fontWeight: 600,
         color: '#00361a', padding: '10px 0', outline: 'none',
         transition: 'border-color 0.2s',
       }}
@@ -802,7 +802,7 @@ function PhoneInputIN({ inputRef, value, onChange }: {
       transition: 'border-color 0.2s',
     }}>
       <span style={{
-        fontFamily: 'Manrope, sans-serif', fontSize: 26, fontWeight: 700,
+        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 26, fontWeight: 700,
         color: '#717971', paddingBottom: 10, marginRight: 12,
         display: 'inline-flex', alignItems: 'center', gap: 6,
       }}>
@@ -822,13 +822,13 @@ function PhoneInputIN({ inputRef, value, onChange }: {
         style={{
           flex: 1, minWidth: 0,
           background: 'transparent', border: 'none', outline: 'none',
-          fontFamily: 'Manrope, sans-serif', fontSize: 26, fontWeight: 600,
+          fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 26, fontWeight: 600,
           color: '#00361a', padding: '10px 0',
           letterSpacing: '0.02em',
         }}
       />
       <span style={{
-        fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700,
+        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11, fontWeight: 700,
         color: value.length === 10 ? '#1a5128' : '#9aa19f',
         paddingBottom: 14, marginLeft: 8, whiteSpace: 'nowrap',
       }}>
@@ -856,7 +856,7 @@ function BigNumberInput({ refEl, value, onChange, onSubmit, placeholder }: {
         width: '100%',
         background: 'transparent',
         border: 'none', borderBottom: '2px solid rgba(0,54,26,0.18)',
-        fontFamily: 'Manrope, sans-serif', fontSize: 60, fontWeight: 800,
+        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 60, fontWeight: 800,
         color: '#00361a', padding: '8px 0', outline: 'none', letterSpacing: '-0.02em',
         textAlign: 'left',
       }}
@@ -882,7 +882,7 @@ function Textarea({ refEl, value, onChange, placeholder, rows = 3, showCounter }
         style={{
           width: '100%', background: 'transparent',
           border: 'none', borderBottom: '2px solid rgba(0,54,26,0.18)',
-          fontFamily: 'Inter, sans-serif', fontSize: 19, fontWeight: 500,
+          fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 19, fontWeight: 500,
           color: '#00361a', padding: '10px 0', outline: 'none',
           resize: 'vertical', lineHeight: 1.5,
           transition: 'border-color 0.2s',
@@ -933,7 +933,7 @@ function ChoiceGrid({ options, value, onChange, cols = 0, big = false }: {
               borderColor: active ? '#00361a' : 'rgba(0,54,26,0.12)',
               background: active ? 'linear-gradient(135deg, #00361a, #1a4d2e)' : '#ffffff',
               color: active ? '#ffffff' : '#191c1d',
-              fontFamily: 'Inter, sans-serif', cursor: 'pointer',
+              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', cursor: 'pointer',
               transition: 'all 0.18s', textAlign: 'left',
               boxShadow: active ? '0 10px 24px rgba(0,54,26,0.22)' : '0 1px 3px rgba(25,28,29,0.04)',
               display: 'flex', alignItems: big ? 'flex-start' : 'center', gap: 10,
@@ -943,7 +943,7 @@ function ChoiceGrid({ options, value, onChange, cols = 0, big = false }: {
           >
             {o.Icon && <o.Icon size={big ? 22 : 16} strokeWidth={2.3} color={active ? '#b8f0c5' : '#00361a'} />}
             <div>
-              <div style={{ fontFamily: big ? 'Manrope, sans-serif' : 'Inter, sans-serif', fontSize: big ? 17 : 14, fontWeight: big ? 800 : 700 }}>
+              <div style={{ fontFamily: big ? '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' : '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: big ? 17 : 14, fontWeight: big ? 800 : 700 }}>
                 {o.label}
               </div>
               {o.blurb && (
@@ -1020,12 +1020,12 @@ function ListingPowerPanel({ tariffSet, rooms }: { tariffSet: boolean; rooms: Ro
           }}>
             <Sparkles size={11} strokeWidth={2.6} /> Listing Power
           </div>
-          <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, lineHeight: 1.2, marginTop: 8, letterSpacing: '-0.01em' }}>
+          <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 800, lineHeight: 1.2, marginTop: 8, letterSpacing: '-0.01em' }}>
             {mood}
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 32, fontWeight: 900, lineHeight: 1, color: '#ffffff' }}>
+          <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 32, fontWeight: 900, lineHeight: 1, color: '#ffffff' }}>
             {pct}%
           </div>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#9dd3aa', letterSpacing: '0.06em' }}>
@@ -1055,7 +1055,7 @@ function ListingPowerPanel({ tariffSet, rooms }: { tariffSet: boolean; rooms: Ro
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '6px 12px', borderRadius: 9999,
-              fontSize: 11.5, fontWeight: 700, fontFamily: 'Inter, sans-serif',
+              fontSize: 11.5, fontWeight: 700, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
               background: m.hit ? 'rgba(184,240,197,0.18)' : 'rgba(255,255,255,0.06)',
               color: m.hit ? '#b8f0c5' : 'rgba(255,255,255,0.50)',
               border: `1px solid ${m.hit ? 'rgba(184,240,197,0.40)' : 'rgba(255,255,255,0.08)'}`,
@@ -1091,7 +1091,7 @@ function ReviewRow({ label, value }: { label: string; value: string }) {
 const kbd: React.CSSProperties = {
   display: 'inline-block', padding: '3px 8px', background: '#ffffff',
   border: '1px solid rgba(0,54,26,0.15)',
-  borderRadius: 6, fontSize: 11, fontWeight: 700, fontFamily: 'Inter, sans-serif',
+  borderRadius: 6, fontSize: 11, fontWeight: 700, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
   color: '#414942',
 }
 
@@ -1100,7 +1100,7 @@ const tfInput: React.CSSProperties = {
   background: '#ffffff',
   border: '1px solid rgba(0,54,26,0.14)',
   borderRadius: 10,
-  fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 600,
+  fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 600,
   color: '#191c1d', padding: '11px 14px', outline: 'none',
 }
 
@@ -1140,7 +1140,7 @@ function RoomDraftCard({
       borderRadius: 20,
       padding: 0,
       boxShadow: '0 8px 32px rgba(0,54,26,0.06)',
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
       overflow: 'hidden',
     }}>
       {/* Header strip */}
@@ -1157,7 +1157,7 @@ function RoomDraftCard({
             color: '#ffffff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 12, fontWeight: 900, boxShadow: '0 4px 10px rgba(0,54,26,0.2)',
           }}>{index + 1}</span>
-          <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 800, color: '#00361a', letterSpacing: '-0.01em' }}>
+          <span style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 800, color: '#00361a', letterSpacing: '-0.01em' }}>
             {room.type.trim() || `Room Type ${index + 1}`}
           </span>
           <span style={{
@@ -1178,7 +1178,7 @@ function RoomDraftCard({
             padding: '7px 12px', borderRadius: 9999, border: 'none',
             background: 'transparent', color: '#717971',
             cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
-            fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700,
+            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11, fontWeight: 700,
             transition: 'all 0.18s',
           }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(186,26,26,0.08)'; (e.currentTarget as HTMLElement).style.color = '#ba1a1a' }}
@@ -1238,7 +1238,7 @@ function RoomDraftCard({
             background: showMore
               ? 'rgba(0,54,26,0.06)'
               : 'linear-gradient(135deg, rgba(255,220,196,0.55) 0%, rgba(184,240,197,0.40) 100%)',
-            color: '#00361a', fontFamily: 'Manrope, sans-serif', fontSize: 13.5, fontWeight: 800,
+            color: '#00361a', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13.5, fontWeight: 800,
             cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
             transition: 'all 0.18s',
@@ -1250,7 +1250,7 @@ function RoomDraftCard({
               width: 28, height: 28, borderRadius: 9999,
               background: '#00361a', color: '#ffdcc4',
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 900,
+              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 900,
             }}>★</span>
             <span style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: 13.5, fontWeight: 800 }}>
@@ -1326,7 +1326,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
       <label style={{
         display: 'block',
         fontSize: 11, fontWeight: 700, color: '#414942',
-        marginBottom: 7, fontFamily: 'Inter, sans-serif',
+        marginBottom: 7, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
       }}>{label}</label>
       {children}
       {hint && <div style={{ marginTop: 5, fontSize: 10.5, color: '#9aa19f' }}>{hint}</div>}
@@ -1355,7 +1355,7 @@ function RatePill({ code, label, hint, value, onChange }: {
         background: 'linear-gradient(135deg, #00361a, #1a4d2e)',
         color: '#ffdcc4',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        fontFamily: 'Manrope, sans-serif',
+        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
       }}>
         <div style={{ fontSize: 14, fontWeight: 900, lineHeight: 1 }}>{code}</div>
         <div style={{ fontSize: 7.5, fontWeight: 700, marginTop: 3, opacity: 0.85, letterSpacing: '0.06em' }}>RATE</div>
@@ -1397,7 +1397,7 @@ function Stepper({ value, onChange, min = 0, max = 999999, step = 1, prefix }: {
         {prefix && (
           <span style={{
             position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
-            color: '#9aa19f', fontWeight: 600, fontFamily: 'Inter, sans-serif', fontSize: 13,
+            color: '#9aa19f', fontWeight: 600, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13,
             pointerEvents: 'none',
           }}>{prefix}</span>
         )}
@@ -1410,7 +1410,7 @@ function Stepper({ value, onChange, min = 0, max = 999999, step = 1, prefix }: {
           style={{
             width: '100%', border: 'none', outline: 'none', background: 'transparent',
             padding: prefix ? '11px 12px 11px 22px' : '11px 12px',
-            fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 700, color: '#191c1d',
+            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 700, color: '#191c1d',
             textAlign: 'center',
           }}
         />
@@ -1429,7 +1429,7 @@ function Stepper({ value, onChange, min = 0, max = 999999, step = 1, prefix }: {
 
 const stepperBtn: React.CSSProperties = {
   width: 36, border: 'none', background: '#ffffff', cursor: 'pointer',
-  fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 18,
+  fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 800, fontSize: 18,
   color: '#00361a',
   transition: 'background 0.15s',
   borderLeft: '1px solid rgba(0,54,26,0.08)',
@@ -1466,7 +1466,7 @@ function TariffWindow({ start, end, onStart, onEnd }: {
           : 'rgba(0,54,26,0.04)',
         border: '1px solid rgba(0,54,26,0.08)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
-        fontFamily: 'Inter, sans-serif',
+        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
       }}>
         <span style={{ fontSize: 13, color: '#414942', fontWeight: 600 }}>
           {nights > 0
@@ -1478,7 +1478,7 @@ function TariffWindow({ start, end, onStart, onEnd }: {
         </span>
         {nights > 0 && <ArrowRight size={14} strokeWidth={2.5} color="#1a4d2e" />}
       </div>
-      <div style={{ marginTop: 12, fontSize: 12, color: '#717971', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ marginTop: 12, fontSize: 12, color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
         Example: <strong>15 Mar 2026 → 30 Jun 2026</strong> for the spring/summer season.
       </div>
     </div>
@@ -1495,7 +1495,7 @@ function BrandedDateField({ label, value, min, max, onChange }: {
       <label style={{
         display: 'block',
         fontSize: 11, fontWeight: 700, color: '#414942',
-        marginBottom: 7, fontFamily: 'Inter, sans-serif',
+        marginBottom: 7, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
       }}>{label}</label>
       <div style={{
         position: 'relative',
@@ -1514,7 +1514,7 @@ function BrandedDateField({ label, value, min, max, onChange }: {
             width: '100%',
             border: 'none', outline: 'none', background: 'transparent',
             padding: '12px 14px',
-            fontFamily: 'Manrope, sans-serif', fontSize: 14, fontWeight: 700,
+            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 700,
             color: '#00361a',
           }}
           onFocus={e => {
@@ -1536,5 +1536,5 @@ function BrandedDateField({ label, value, min, max, onChange }: {
 const tfLabel: React.CSSProperties = {
   display: 'block',
   fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
-  color: '#717971', marginBottom: 5, fontFamily: 'Inter, sans-serif',
+  color: '#717971', marginBottom: 5, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
 }

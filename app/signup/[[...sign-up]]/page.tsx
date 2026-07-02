@@ -38,7 +38,7 @@ export default function SignUpPage() {
               </div>
               <p style={{
                 fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.65)', marginTop: 14, fontFamily: 'Inter, sans-serif',
+                color: 'rgba(255,255,255,0.65)', marginTop: 14, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
               }}>
                 List Your Hotel on the Portal
               </p>
@@ -55,7 +55,7 @@ export default function SignUpPage() {
             </div>
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: 20, fontSize: 13, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+          <div style={{ textAlign: 'center', marginTop: 20, fontSize: 13, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
             <a href="/" style={{ color: '#00361a', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <i className="fi fi-rr-angle-small-left" style={{ fontSize: 14 }} /> Back to Live Rates
             </a>

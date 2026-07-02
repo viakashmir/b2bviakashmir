@@ -131,7 +131,7 @@ export default function VendorPortal() {
   if (!isLoaded || !user || loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading…</div>
+        <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading…</div>
       </div>
     )
   }
@@ -171,7 +171,7 @@ export default function VendorPortal() {
               <Building2 size={11} strokeWidth={2.5} /> {STAR_LABELS[hotel.stars]}
             </span>
             <h1 className="dash-title">{hotel.name}</h1>
-            <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+            <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
               {hotel.locationLabel} · {hotel.phone}
               {!hotel.approved && (
                 <span className="badge badge-tertiary" style={{ marginLeft: 12 }}>
@@ -181,7 +181,7 @@ export default function VendorPortal() {
             </p>
           </div>
           <div className="dash-actions">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600, color: '#414942', padding: '10px 18px', background: '#ffffff', borderRadius: 9999, fontFamily: 'Inter, sans-serif', boxShadow: '0 1px 3px rgba(25,28,29,0.04)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600, color: '#414942', padding: '10px 18px', background: '#ffffff', borderRadius: 9999, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', boxShadow: '0 1px 3px rgba(25,28,29,0.04)' }}>
               <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#13677b', display: 'inline-block' }} />
               <Clock size={12} strokeWidth={2} style={{ opacity: 0.6 }} />
               {fmtDate(hotel.updatedAt)}
@@ -216,7 +216,7 @@ export default function VendorPortal() {
                 display: 'inline-flex', alignItems: 'center', gap: 5,
                 background: hotel.approved ? 'rgba(184,240,197,0.18)' : 'rgba(255,220,196,0.22)',
                 color: hotel.approved ? '#b8f0c5' : '#ffdcc4',
-                fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 800,
+                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 10, fontWeight: 800,
                 letterSpacing: '0.12em', textTransform: 'uppercase',
                 padding: '5px 12px', borderRadius: 9999,
               }}>
@@ -230,10 +230,10 @@ export default function VendorPortal() {
               <Eye size={10} strokeWidth={2.5} style={{ verticalAlign: 'middle', marginRight: 6 }} />
               Your Listing
             </div>
-            <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', margin: '0 0 6px' }}>
+            <h2 style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', margin: '0 0 6px' }}>
               {hotel.name}
             </h2>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', margin: 0, fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', margin: 0, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 <Building2 size={12} strokeWidth={2.2} /> {STAR_LABELS[hotel.stars]} · {hotel.propertyType === 'houseboat' ? 'Houseboat' : 'Hotel'}
               </span>
@@ -255,7 +255,7 @@ export default function VendorPortal() {
                   style={{
                     background: 'rgba(255,220,196,0.18)', color: '#ffdcc4', border: 'none', cursor: 'pointer',
                     padding: '2px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
-                    fontFamily: 'Inter, sans-serif', display: 'inline-flex', alignItems: 'center', gap: 4,
+                    fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', display: 'inline-flex', alignItems: 'center', gap: 4,
                   }}
                 >
                   <Calendar size={11} strokeWidth={2.4} />
@@ -275,7 +275,7 @@ export default function VendorPortal() {
             ].map(row => (
               <div key={row.label}>
                 <div className="t-overline" style={{ marginBottom: 4 }}>{row.label}</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#191c1d', fontFamily: 'Inter, sans-serif', wordBreak: 'break-word' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#191c1d', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', wordBreak: 'break-word' }}>
                   {row.value}
                 </div>
               </div>
@@ -283,7 +283,7 @@ export default function VendorPortal() {
           </div>
 
           {hotel.description && (
-            <div style={{ padding: '0 24px 16px', fontSize: 13.5, color: '#414942', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>
+            <div style={{ padding: '0 24px 16px', fontSize: 13.5, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.55 }}>
               {hotel.description}
             </div>
           )}
@@ -304,7 +304,7 @@ export default function VendorPortal() {
               padding: '14px 24px',
               background: '#fff8ed',
               borderTop: '1px solid #ffdcc4',
-              fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#6f3800',
+              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#6f3800',
               display: 'flex', alignItems: 'center', gap: 8,
             }}>
               <Clock size={14} strokeWidth={2.3} />
@@ -323,7 +323,7 @@ export default function VendorPortal() {
             background: 'linear-gradient(135deg, rgba(255,220,196,0.45), rgba(184,240,197,0.45))',
             cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14,
-            fontFamily: 'Inter, sans-serif',
+            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
             marginBottom: 24,
             transition: 'transform 0.18s, box-shadow 0.18s',
             boxShadow: '0 4px 20px rgba(240,159,94,0.18)',
@@ -343,7 +343,7 @@ export default function VendorPortal() {
               <Plus size={22} strokeWidth={2.6} />
             </div>
             <div>
-              <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 16, fontWeight: 800, color: '#00361a', letterSpacing: '-0.01em' }}>
+              <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 16, fontWeight: 800, color: '#00361a', letterSpacing: '-0.01em' }}>
                 Add another room category
               </div>
               <div style={{ fontSize: 12, color: '#414942', marginTop: 3, fontWeight: 500 }}>
@@ -354,7 +354,7 @@ export default function VendorPortal() {
           <div style={{
             padding: '8px 14px', borderRadius: 9999,
             background: '#ffffff', color: '#00361a',
-            fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 12,
+            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 800, fontSize: 12,
             display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0,
           }}>
             Add now →
@@ -369,7 +369,7 @@ export default function VendorPortal() {
           ] as const).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
               padding: '12px 18px', border: 'none', background: 'transparent',
-              fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700,
+              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 700,
               color: tab === t.key ? '#00361a' : '#717971', cursor: 'pointer',
               borderBottom: tab === t.key ? '3px solid #00361a' : '3px solid transparent',
               marginBottom: -1, display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -392,17 +392,17 @@ export default function VendorPortal() {
                     </div>
                   </div>
                   <div className={`stat-value${c.small ? ' small' : ''}`}>{c.value}</div>
-                  <div style={{ fontSize: 12, color: '#717971', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>{c.sub}</div>
+                  <div style={{ fontSize: 12, color: '#717971', marginTop: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>{c.sub}</div>
                 </div>
               ))}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, gap: 12, flexWrap: 'wrap' }}>
               <div>
-                <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(20px, 4vw, 26px)', fontWeight: 700, color: '#00361a', letterSpacing: '-0.02em' }}>
+                <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 'clamp(20px, 4vw, 26px)', fontWeight: 700, color: '#00361a', letterSpacing: '-0.02em' }}>
                   Room Rates &amp; Inventory
                 </div>
-                <div style={{ fontSize: 13, color: '#717971', marginTop: 4, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                <div style={{ fontSize: 13, color: '#717971', marginTop: 4, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
                   All rates in ₹ per night · B2B Net · Click any value to edit
                 </div>
               </div>
@@ -420,7 +420,7 @@ export default function VendorPortal() {
                         padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
                         textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)',
                         textAlign: i >= 3 && i <= 6 ? 'right' : 'left',
-                        fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
+                        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', whiteSpace: 'nowrap',
                       }}>{h}</th>
                     ))}
                   </tr>
@@ -428,7 +428,7 @@ export default function VendorPortal() {
                 <tbody>
                   {hotel.rooms.length === 0 ? (
                     <tr>
-                      <td colSpan={9} style={{ textAlign: 'center', padding: '48px 20px', color: '#717971', fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 500 }}>
+                      <td colSpan={9} style={{ textAlign: 'center', padding: '48px 20px', color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 500 }}>
                         <BedDouble size={28} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 8px' }} />
                         No room types yet. Add your first room type above.
                       </td>
@@ -450,7 +450,7 @@ export default function VendorPortal() {
 
             {showForm && (
               <div id="add-room-form" style={{ marginBottom: 32, scrollMarginTop: 80 }}>
-                <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 20, fontWeight: 700, color: '#00361a', marginBottom: 12 }}>Add New Room Type</div>
+                <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 20, fontWeight: 700, color: '#00361a', marginBottom: 12 }}>Add New Room Type</div>
                 <div className="card-elevated" style={{ padding: 24 }}>
                   <div className="form-grid">
                     {[
@@ -461,7 +461,7 @@ export default function VendorPortal() {
                       { label: 'Rooms', field: 'inventory', type: 'number', placeholder: '10' },
                     ].map(f => (
                       <div key={f.field}>
-                        <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>{f.label}</label>
+                        <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{f.label}</label>
                         <input
                           type={f.type}
                           value={(newRoom as Record<string, string>)[f.field]}
@@ -473,13 +473,13 @@ export default function VendorPortal() {
                       </div>
                     ))}
                     <div>
-                      <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>Category</label>
+                      <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>Category</label>
                       <select value={newRoom.category} onChange={e => setNewRoom(p => ({ ...p, category: e.target.value as RoomCategory }))} className="input-field" style={{ padding: '11px 14px', fontSize: 13 }}>
                         {categoriesFor(hotel.propertyType).map(c => <option key={c}>{c}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>Meal Plan</label>
+                      <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>Meal Plan</label>
                       <select value={newRoom.meal} onChange={e => setNewRoom(p => ({ ...p, meal: e.target.value as MealPlan }))} className="input-field" style={{ padding: '11px 14px', fontSize: 13 }}>
                         <option value="CP">CP, Breakfast</option>
                         <option value="MAP">MAP, B&amp;D</option>
@@ -489,7 +489,7 @@ export default function VendorPortal() {
                     </div>
                   </div>
                   {formError && (
-                    <p style={{ fontSize: 12, color: '#93000a', margin: '4px 0 12px', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+                    <p style={{ fontSize: 12, color: '#93000a', margin: '4px 0 12px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600 }}>
                       <XIcon size={13} strokeWidth={2.5} style={{ marginRight: 6, verticalAlign: 'middle' }} /> {formError}
                     </p>
                   )}
@@ -507,8 +507,8 @@ export default function VendorPortal() {
 
         {tab === 'profile' && profileDraft && (
           <div className="card-elevated" style={{ padding: 28, marginBottom: 32 }}>
-            <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', marginBottom: 6 }}>Hotel Profile</div>
-            <p style={{ fontSize: 13, color: '#717971', margin: '0 0 24px', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+            <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', marginBottom: 6 }}>Hotel Profile</div>
+            <p style={{ fontSize: 13, color: '#717971', margin: '0 0 24px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
               Public information shown on the rates board and Enquire modal.
             </p>
 
@@ -522,7 +522,7 @@ export default function VendorPortal() {
                 { label: 'Description', key: 'description' as const, full: true, multi: true },
               ].map(f => (
                 <div key={f.key} style={{ gridColumn: f.full ? '1 / -1' : undefined }}>
-                  <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>{f.label}</label>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{f.label}</label>
                   {f.multi ? (
                     <textarea
                       value={((profileDraft as unknown) as Record<string, unknown>)[f.key] as string || ''}
@@ -547,9 +547,9 @@ export default function VendorPortal() {
             <div id="tariff-block" style={{ scrollMarginTop: 80, marginTop: 28, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(255,220,196,0.32), rgba(184,240,197,0.28))', border: '1px solid rgba(240,159,94,0.25)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                 <Calendar size={14} strokeWidth={2.5} color="#6f3800" />
-                <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6f3800', fontFamily: 'Inter, sans-serif' }}>Tariff valid period</label>
+                <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6f3800', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>Tariff valid period</label>
               </div>
-              <p style={{ fontSize: 12.5, color: '#414942', margin: '0 0 14px', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>
+              <p style={{ fontSize: 12.5, color: '#414942', margin: '0 0 14px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.55 }}>
                 The window these rates apply for. Shown on the public card as <strong>Tariff Mar 26 → Jun 26</strong>. Update each season.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -571,7 +571,7 @@ export default function VendorPortal() {
             </div>
 
             <div style={{ marginTop: 28 }}>
-              <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 12, fontFamily: 'Inter, sans-serif' }}>Amenities</label>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#414942', marginBottom: 12, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>Amenities</label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {amenitiesFor(hotel.propertyType).map(a => {
                   const active = profileDraft.amenities.includes(a)
@@ -580,7 +580,7 @@ export default function VendorPortal() {
                       padding: '8px 14px', borderRadius: 9999, border: 'none',
                       background: active ? 'linear-gradient(135deg, #00361a, #1a4d2e)' : '#f3f4f5',
                       color: active ? '#ffffff' : '#414942',
-                      fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600,
+                      fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, fontWeight: 600,
                       cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
                     }}>
                       {active ? <CheckCircle2 size={12} strokeWidth={2.5} /> : <Plus size={12} strokeWidth={2.5} />}
@@ -623,7 +623,7 @@ function RoomRow({ room, propertyType, saved, onSave, onDelete, statusClass }: {
     >
       <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
         <input value={merged.type} onChange={e => change('type', e.target.value)} className="editable-cell" style={{ textAlign: 'left', width: 140 }} />
-        <div style={{ fontSize: 11, color: '#717971', fontWeight: 500, marginTop: 3, fontFamily: 'Inter, sans-serif' }}>{MEAL_LABELS[merged.meal]}</div>
+        <div style={{ fontSize: 11, color: '#717971', fontWeight: 500, marginTop: 3, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{MEAL_LABELS[merged.meal]}</div>
       </td>
       <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
         <select className="input-field" value={merged.category} onChange={e => change('category', e.target.value)} style={{ padding: '6px 10px', fontSize: 12, width: 'auto' }}>
@@ -668,7 +668,7 @@ function RoomRow({ room, propertyType, saved, onSave, onDelete, statusClass }: {
             style={{
               padding: '8px 12px', borderRadius: 9999, border: 'none',
               background: '#ba1a1a', color: '#ffffff',
-              fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 800,
+              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11.5, fontWeight: 800,
               cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
               transition: 'all 0.18s', boxShadow: '0 4px 12px rgba(186,26,26,0.25)',
             }}

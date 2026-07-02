@@ -55,7 +55,7 @@ function ToastItem({ toast, onRemove }: { toast: ToastMessage; onRemove: (id: st
         transition: 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)',
         transform: visible ? 'translateX(0)' : 'translateX(120%)',
         opacity: visible ? 1 : 0,
-        fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 600,
+        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 600,
       }}
     >
       <i className={`fi ${palette.icon}`} style={{ fontSize: 16, flexShrink: 0 }} />

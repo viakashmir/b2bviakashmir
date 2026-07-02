@@ -39,7 +39,7 @@ export default function MyListing() {
     return (
       <main>
         <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading your listing…</div>
+          <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading your listing…</div>
         </div>
       </main>
     )
@@ -50,10 +50,10 @@ export default function MyListing() {
       <main>
         <div className="card-elevated" style={{ padding: 48, textAlign: 'center', maxWidth: 560, margin: '0 auto' }}>
           <Building2 size={48} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 16px' }} />
-          <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', margin: '0 0 10px' }}>
+          <h2 style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', margin: '0 0 10px' }}>
             No listing yet
           </h2>
-          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#414942', lineHeight: 1.55, margin: '0 0 24px' }}>
+          <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, color: '#414942', lineHeight: 1.55, margin: '0 0 24px' }}>
             Finish the onboarding to create your listing.
           </p>
           <Link href="/vendor" style={{ textDecoration: 'none' }}>
@@ -77,7 +77,7 @@ export default function MyListing() {
             <Building2 size={11} strokeWidth={2.5} /> My Listing
           </span>
           <h1 className="dash-title">{hotel.name}</h1>
-          <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+          <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
             {STAR_LABELS[hotel.stars]} · {hotel.propertyType === 'houseboat' ? 'Houseboat' : 'Hotel'} · {hotel.locationLabel}
           </p>
         </div>
@@ -109,7 +109,7 @@ export default function MyListing() {
           background: '#fff8ed', border: '1px solid #ffdcc4',
           borderRadius: 14, padding: '14px 18px', marginBottom: 24,
           display: 'flex', alignItems: 'center', gap: 12,
-          fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: '#6f3800',
+          fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13.5, color: '#6f3800',
         }}>
           <AlertTriangle size={18} strokeWidth={2.3} color="#f09f5e" />
           <div>
@@ -141,7 +141,7 @@ export default function MyListing() {
               </div>
             </div>
             <div className={`stat-value${c.small ? ' small' : ''}`} style={{ color: c.accent }}>{c.value}</div>
-            <div style={{ fontSize: 12, color: '#717971', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>{c.sub}</div>
+            <div style={{ fontSize: 12, color: '#717971', marginTop: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>{c.sub}</div>
           </div>
         ))}
       </div>
@@ -169,7 +169,7 @@ export default function MyListing() {
                 </div>
                 <div>
                   <div className="t-overline" style={{ marginBottom: 2 }}>{row.label}</div>
-                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 600, color: '#191c1d', overflowWrap: 'anywhere' }}>
+                  <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 600, color: '#191c1d', overflowWrap: 'anywhere' }}>
                     {row.value}
                   </div>
                 </div>
@@ -180,7 +180,7 @@ export default function MyListing() {
           {hotel.description && (
             <div style={{ marginTop: 20, paddingTop: 18, borderTop: '1px solid #edeeef' }}>
               <div className="t-overline" style={{ marginBottom: 8 }}>About</div>
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: '#414942', lineHeight: 1.6, margin: 0 }}>
+              <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13.5, color: '#414942', lineHeight: 1.6, margin: 0 }}>
                 {hotel.description}
               </p>
             </div>
@@ -223,7 +223,7 @@ export default function MyListing() {
                 position: 'absolute', top: 16, left: 16, right: 16,
                 background: 'rgba(0,54,26,0.92)', color: '#ffdcc4',
                 padding: '10px 14px', borderRadius: 10,
-                fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 700,
+                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12.5, fontWeight: 700,
                 display: 'flex', alignItems: 'center', gap: 8,
                 boxShadow: '0 8px 24px rgba(0,54,26,0.25)',
               }}>

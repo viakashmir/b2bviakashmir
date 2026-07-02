@@ -92,21 +92,21 @@ export default function KashmirLive() {
         overflow: 'hidden',
       }}>
         <Mountain size={110} color="rgba(184,240,197,0.08)" style={{ position: 'absolute', right: -16, top: -10, pointerEvents: 'none' }} />
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#9dd3aa', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#9dd3aa', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
           <Clock size={11} strokeWidth={2.5} />
           Kashmir Time · IST
         </div>
-        <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.05, marginTop: 6 }}>
+        <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.05, marginTop: 6 }}>
           {time}
         </div>
-        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>
+        <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>
           {date}
         </div>
       </div>
 
       {/* Weather strip */}
       <div className="card-elevated" style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#717971', fontFamily: 'Inter, sans-serif', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
           <CloudSun size={12} strokeWidth={2.2} color="#13677b" />
           Live Weather
         </div>
@@ -124,10 +124,10 @@ export default function KashmirLive() {
                 background: '#f3f4f5',
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                 gap: 4,
-                fontFamily: 'Inter, sans-serif',
+                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
               }}>
                 <Icon size={18} strokeWidth={2} color="#00361a" />
-                <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 17, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 17, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em', lineHeight: 1 }}>
                   {c.temp == null || Number.isNaN(c.temp) ? '-' : `${c.temp}°`}
                 </div>
                 <div style={{ fontSize: 9, fontWeight: 700, color: '#414942', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center', whiteSpace: 'nowrap' }}>

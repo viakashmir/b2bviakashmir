@@ -113,7 +113,7 @@ export default function AdminPortal() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading admin…</div>
+        <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading admin…</div>
       </div>
     )
   }
@@ -140,7 +140,7 @@ export default function AdminPortal() {
               <ShieldCheck size={11} strokeWidth={2.5} /> Admin Panel
             </span>
             <h1 className="dash-title">Operations Console</h1>
-            <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+            <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
               Approve hotels, moderate concerns, monitor the portal.
             </p>
           </div>
@@ -153,10 +153,10 @@ export default function AdminPortal() {
 
         {authError && (
           <div className="card-elevated" style={{ padding: 18, marginBottom: 20, borderLeft: '4px solid #ba1a1a', background: '#ffdad6' }}>
-            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, color: '#93000a', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 700, color: '#93000a', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <AlertTriangle size={14} strokeWidth={2.3} /> Admin actions disabled
             </div>
-            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#191c1d', lineHeight: 1.5 }}>{authError}</div>
+            <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#191c1d', lineHeight: 1.5 }}>{authError}</div>
           </div>
         )}
 
@@ -164,7 +164,7 @@ export default function AdminPortal() {
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
               padding: '12px 18px', border: 'none', background: 'transparent',
-              fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700,
+              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 700,
               color: tab === t.key ? '#00361a' : '#717971', cursor: 'pointer',
               borderBottom: tab === t.key ? '3px solid #00361a' : '3px solid transparent',
               marginBottom: -1, display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -192,7 +192,7 @@ export default function AdminPortal() {
                   </div>
                 </div>
                 <div className="stat-value">{c.value}</div>
-                <div style={{ fontSize: 12, color: '#717971', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>{c.sub}</div>
+                <div style={{ fontSize: 12, color: '#717971', marginTop: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>{c.sub}</div>
               </div>
             ))}
           </div>
@@ -204,7 +204,7 @@ export default function AdminPortal() {
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
                   {['', 'Hotel', 'Location', 'Star', 'Inventory', 'Status', 'Created', 'Actions'].map(h => (
-                    <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
+                    <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -227,14 +227,14 @@ export default function AdminPortal() {
                       </button>
                     </td>
                     <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: '#191c1d', fontFamily: 'Inter, sans-serif' }}>{h.name}</div>
-                      <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: 'Inter, sans-serif' }}>{h.email}</div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: '#191c1d', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{h.name}</div>
+                      <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{h.email}</div>
                     </td>
-                    <td style={{ padding: '14px 16px', fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{h.locationLabel}</td>
+                    <td style={{ padding: '14px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{h.locationLabel}</td>
                     <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <span className="badge badge-neutral">{STAR_LABELS[h.stars]}</span>
                     </td>
-                    <td style={{ padding: '14px 16px', fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                    <td style={{ padding: '14px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       {availableInventory(h.rooms)}/{totalInventory(h.rooms)}
                     </td>
                     <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
@@ -243,7 +243,7 @@ export default function AdminPortal() {
                         : <span className="badge badge-tertiary"><Clock size={11} strokeWidth={2.5} /> Pending</span>
                       }
                     </td>
-                    <td style={{ padding: '14px 16px', fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#717971', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{timeAgo(h.createdAt)}</td>
+                    <td style={{ padding: '14px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, color: '#717971', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{timeAgo(h.createdAt)}</td>
                     <td style={{ padding: '14px 16px', whiteSpace: 'nowrap', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                         {h.approved ? (
@@ -252,7 +252,7 @@ export default function AdminPortal() {
                             style={{
                               padding: '8px 14px', borderRadius: 9999, border: 'none',
                               background: '#fef3c7', color: '#6f3800',
-                              fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 800,
+                              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11.5, fontWeight: 800,
                               cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
                               transition: 'all 0.18s',
                             }}
@@ -275,7 +275,7 @@ export default function AdminPortal() {
                           style={{
                             padding: '8px 14px', borderRadius: 9999, border: 'none',
                             background: '#ba1a1a', color: '#ffffff',
-                            fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 800,
+                            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11.5, fontWeight: 800,
                             cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
                             transition: 'all 0.18s', boxShadow: '0 4px 12px rgba(186,26,26,0.25)',
                           }}
@@ -298,7 +298,7 @@ export default function AdminPortal() {
                   </Fragment>
                 ))}
                 {hotels.length === 0 && (
-                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '48px 20px', color: '#717971', fontFamily: 'Inter, sans-serif' }}>No hotels yet.</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '48px 20px', color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>No hotels yet.</td></tr>
                 )}
               </tbody>
             </table>
@@ -314,8 +314,8 @@ export default function AdminPortal() {
             {concerns.length === 0 && (
               <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
                 <MessageSquare size={40} color="#c1c9bf" style={{ marginBottom: 12, display: 'block', margin: '0 auto 12px' }} />
-                <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No Concerns</p>
-                <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Travel agents will raise concerns from their portal.</p>
+                <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No Concerns</p>
+                <p style={{ fontSize: 14, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#717971' }}>Travel agents will raise concerns from their portal.</p>
               </div>
             )}
             {concerns.map(c => (
@@ -327,8 +327,8 @@ export default function AdminPortal() {
                       <span className={`badge ${PRIORITY_BADGE[c.priority]}`}>{c.priority} priority</span>
                       <span className="badge badge-neutral">{c.category}</span>
                     </div>
-                    <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 17, fontWeight: 700, color: '#00361a', margin: 0 }}>{c.subject}</h3>
-                    <div style={{ fontSize: 12, color: '#717971', marginTop: 4, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                    <h3 style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 17, fontWeight: 700, color: '#00361a', margin: 0 }}>{c.subject}</h3>
+                    <div style={{ fontSize: 12, color: '#717971', marginTop: 4, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
                       <strong style={{ color: '#414942' }}>{c.hotelName}</strong> · {c.agentName} ({c.agentCompany}) · {timeAgo(c.createdAt)}
                     </div>
                   </div>
@@ -340,12 +340,12 @@ export default function AdminPortal() {
                   </select>
                 </div>
 
-                <p style={{ fontSize: 14, color: '#414942', fontFamily: 'Inter, sans-serif', lineHeight: 1.6, margin: '0 0 16px' }}>{c.description}</p>
+                <p style={{ fontSize: 14, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.6, margin: '0 0 16px' }}>{c.description}</p>
 
                 {c.adminResponse && (
                   <div className="card-section" style={{ padding: 14, marginBottom: 14 }}>
                     <div className="t-overline" style={{ marginBottom: 6 }}>Admin response · {timeAgo(c.adminResponseAt)}</div>
-                    <div style={{ fontSize: 13, color: '#191c1d', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>{c.adminResponse}</div>
+                    <div style={{ fontSize: 13, color: '#191c1d', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.55 }}>{c.adminResponse}</div>
                   </div>
                 )}
 
@@ -394,7 +394,7 @@ function HotelDetailPanel({ hotel }: { hotel: Hotel }) {
       {hotel.description && (
         <div style={{ padding: 14, borderRadius: 10, background: '#ffffff', border: '1px solid #edeeef', marginBottom: 18 }}>
           <div className="t-overline" style={{ marginBottom: 6 }}>Description</div>
-          <div style={{ fontSize: 13, color: '#414942', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>{hotel.description}</div>
+          <div style={{ fontSize: 13, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.55 }}>{hotel.description}</div>
         </div>
       )}
 
@@ -418,7 +418,7 @@ function HotelDetailPanel({ hotel }: { hotel: Hotel }) {
           </div>
         ) : (
           <div style={{ overflowX: 'auto', borderRadius: 10, border: '1px solid #edeeef', background: '#ffffff' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, fontFamily: 'Inter, sans-serif' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
               <thead>
                 <tr style={{ background: '#f8f9fa' }}>
                   {['Room', 'Category', 'EP', 'CP', 'MAP', 'AP', 'Extra Bed', 'Child WOB', 'GST', 'Inv', 'Status'].map(h => (
@@ -464,7 +464,7 @@ function DetailRow({ Icon, label, value }: { Icon: typeof Phone; label: string; 
       </div>
       <div style={{ minWidth: 0 }}>
         <div className="t-overline" style={{ fontSize: 9 }}>{label}</div>
-        <div style={{ fontSize: 13, color: '#191c1d', fontFamily: 'Inter, sans-serif', fontWeight: 600, wordBreak: 'break-word' }}>{value}</div>
+        <div style={{ fontSize: 13, color: '#191c1d', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600, wordBreak: 'break-word' }}>{value}</div>
       </div>
     </div>
   )
@@ -478,8 +478,8 @@ function EnquiriesPanel({ enquiries }: { enquiries: Enquiry[] }) {
     return (
       <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
         <MessageCircle size={40} color="#c1c9bf" style={{ marginBottom: 12, display: 'block', margin: '0 auto 12px' }} />
-        <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No enquiries yet</p>
-        <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif', color: '#717971' }}>Travellers who hit &quot;Enquire on WhatsApp&quot; on the public board show up here.</p>
+        <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No enquiries yet</p>
+        <p style={{ fontSize: 14, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#717971' }}>Travellers who hit &quot;Enquire on WhatsApp&quot; on the public board show up here.</p>
       </div>
     )
   }
@@ -489,20 +489,20 @@ function EnquiriesPanel({ enquiries }: { enquiries: Enquiry[] }) {
         <thead>
           <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
             {['Sent', 'Traveller', 'Phone', 'Hotel', 'Stay', 'Party', 'Notes', 'WhatsApp'].map(h => (
-              <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
+              <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {enquiries.map(e => (
             <tr key={e.id} style={{ borderTop: '1px solid #edeeef' }}>
-              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#717971', whiteSpace: 'nowrap' }}>{timeAgo(e.createdAt)}</td>
-              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#191c1d', fontWeight: 700 }}>{e.travellerName}</td>
-              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#414942' }}>
+              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, color: '#717971', whiteSpace: 'nowrap' }}>{timeAgo(e.createdAt)}</td>
+              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#191c1d', fontWeight: 700 }}>{e.travellerName}</td>
+              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#414942' }}>
                 <a href={`tel:${e.travellerPhone}`} style={{ color: '#13677b', textDecoration: 'none' }}>{e.travellerPhone}</a>
               </td>
-              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#414942' }}>{e.hotelName}</td>
-              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
+              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#414942' }}>{e.hotelName}</td>
+              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
                 {e.checkIn && e.checkOut ? (
                   <>
                     {e.checkIn} → {e.checkOut}
@@ -510,11 +510,11 @@ function EnquiriesPanel({ enquiries }: { enquiries: Enquiry[] }) {
                   </>
                 ) : <span style={{ color: '#9aa19f' }}>Flexible</span>}
               </td>
-              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
+              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
                 <BedDouble size={11} strokeWidth={2.4} style={{ verticalAlign: 'middle', marginRight: 4 }} />
                 {e.rooms} rm · {e.adults}A{e.children > 0 ? ` + ${e.children}C` : ''}
               </td>
-              <td style={{ padding: '12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#414942', maxWidth: 260 }}>
+              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, color: '#414942', maxWidth: 260 }}>
                 {e.notes || <span style={{ color: '#9aa19f' }}>-</span>}
               </td>
               <td style={{ padding: '12px 16px' }}>
@@ -526,7 +526,7 @@ function EnquiriesPanel({ enquiries }: { enquiries: Enquiry[] }) {
                     display: 'inline-flex', alignItems: 'center', gap: 6,
                     padding: '6px 12px', borderRadius: 9999, textDecoration: 'none',
                     background: 'linear-gradient(135deg, #25d366 0%, #128c7e 100%)',
-                    color: '#ffffff', fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 800,
+                    color: '#ffffff', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11, fontWeight: 800,
                   }}
                 ><MessageCircle size={11} strokeWidth={2.6} /> Open chat</a>
               </td>

@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           colorInputBackground: '#f3f4f5',
           colorInputText: '#191c1d',
           borderRadius: '12px',
-          fontFamily: 'Inter, sans-serif',
+          fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
         },
         elements: {
           formButtonPrimary:

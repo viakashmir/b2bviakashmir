@@ -144,7 +144,7 @@ export default function InventoryCalendar() {
     return (
       <>
         <div style={{ minHeight: '100vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading calendar…</div>
+          <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading calendar…</div>
         </div>
       </>
     )
@@ -155,7 +155,7 @@ export default function InventoryCalendar() {
       <>
         <main>
           <div className="card-elevated" style={{ padding: 28 }}>
-            <p style={{ fontFamily: 'Inter, sans-serif', color: '#414942' }}>
+            <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#414942' }}>
               Couldn&apos;t load the calendar. Try refreshing the page.
             </p>
           </div>
@@ -183,10 +183,10 @@ export default function InventoryCalendar() {
           </div>
           <div className="card-elevated" style={{ padding: 48, textAlign: 'center', maxWidth: 560, margin: '0 auto' }}>
             <BedDouble size={48} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 16px' }} />
-            <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', margin: '0 0 10px' }}>
+            <h2 style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', margin: '0 0 10px' }}>
               No rooms in your listing yet
             </h2>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#414942', lineHeight: 1.55, margin: '0 0 24px' }}>
+            <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, color: '#414942', lineHeight: 1.55, margin: '0 0 24px' }}>
               Add at least one room type with rates from your dashboard, then come back here to block dates for OTA bookings, holds, or maintenance.
             </p>
             <a href="/vendor" style={{ textDecoration: 'none' }}>
@@ -209,7 +209,7 @@ export default function InventoryCalendar() {
               <Calendar size={11} strokeWidth={2.5} /> Inventory Calendar
             </span>
             <h1 className="dash-title">Inventory & Availability</h1>
-            <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+            <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
               Block dates for OTA bookings, maintenance, or holds. Public board availability updates live.
             </p>
           </div>
@@ -236,7 +236,7 @@ export default function InventoryCalendar() {
             <div key={i} className="card-elevated" style={{ padding: '22px 24px' }}>
               <div className="t-overline" style={{ marginBottom: 8 }}>{c.label}</div>
               <div className={`stat-value${c.small ? ' small' : ''}`} style={{ color: c.accent }}>{c.value}</div>
-              <div style={{ fontSize: 12, color: '#717971', marginTop: 8, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>{c.sub}</div>
+              <div style={{ fontSize: 12, color: '#717971', marginTop: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>{c.sub}</div>
             </div>
           ))}
         </div>
@@ -249,13 +249,13 @@ export default function InventoryCalendar() {
             padding: '12px 18px', borderRadius: 14,
             background: 'linear-gradient(135deg, rgba(255,220,196,0.4), rgba(184,240,197,0.4))',
             border: '1px solid rgba(240,159,94,0.35)',
-            fontFamily: 'Inter, sans-serif',
+            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ width: 10, height: 10, borderRadius: 9999, background: '#f09f5e', boxShadow: '0 0 0 4px rgba(240,159,94,0.18)' }} />
               <div>
                 <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6f3800' }}>Current tariff window</div>
-                <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 800, color: '#00361a', marginTop: 2 }}>
+                <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 15, fontWeight: 800, color: '#00361a', marginTop: 2 }}>
                   {fmtDateLabel(data.tariffStart)} → {fmtDateLabel(data.tariffEnd)}
                 </div>
               </div>
@@ -268,7 +268,7 @@ export default function InventoryCalendar() {
 
         {/* Month nav */}
         <div className="card-elevated" style={{ padding: 18, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>
+          <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>
             {MONTH_NAMES[month - 1]} {year}
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
@@ -289,7 +289,7 @@ export default function InventoryCalendar() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6 }}>
             {WEEKDAYS.map(d => (
               <div key={d} style={{
-                fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 800,
+                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 10, fontWeight: 800,
                 letterSpacing: '0.1em', textTransform: 'uppercase', color: '#717971',
                 padding: '6px 8px', textAlign: 'center',
               }}>{d}</div>
@@ -316,7 +316,7 @@ export default function InventoryCalendar() {
                     borderRadius: 10, padding: '8px 6px',
                     minHeight: 64, cursor: 'pointer',
                     display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4,
-                    fontFamily: 'Inter, sans-serif',
+                    fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
                     opacity: d.status === 'past' ? 0.55 : 1,
                     transition: 'transform 0.12s',
                   }}
@@ -350,7 +350,7 @@ export default function InventoryCalendar() {
           </div>
 
           {/* Legend */}
-          <div style={{ marginTop: 16, display: 'flex', flexWrap: 'wrap', gap: 14, fontSize: 11, color: '#414942', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+          <div style={{ marginTop: 16, display: 'flex', flexWrap: 'wrap', gap: 14, fontSize: 11, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600 }}>
             {([
               ['available', 'All rooms open'],
               ['partial', 'Partially blocked'],
@@ -377,10 +377,10 @@ export default function InventoryCalendar() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
               <div>
                 <div className="t-overline" style={{ marginBottom: 4 }}>Selected day</div>
-                <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', margin: 0 }}>
+                <h2 style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 800, color: '#00361a', margin: 0 }}>
                   {new Date(selected.date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                 </h2>
-                <p style={{ fontSize: 13, color: '#717971', margin: '4px 0 0', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                <p style={{ fontSize: 13, color: '#717971', margin: '4px 0 0', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
                   {selected.totalAvailable} of {selected.totalRooms} rooms available · {selected.totalBlocked} blocked
                 </p>
               </div>
@@ -392,10 +392,10 @@ export default function InventoryCalendar() {
             {/* Per-room breakdown */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10, marginBottom: 16 }}>
               {selected.rooms.map(r => (
-                <div key={r.id} style={{ background: '#f3f4f5', padding: 12, borderRadius: 10, fontFamily: 'Inter, sans-serif' }}>
+                <div key={r.id} style={{ background: '#f3f4f5', padding: 12, borderRadius: 10, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#191c1d' }}>{r.type}</div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
-                    <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, color: r.available === 0 ? '#93000a' : r.available <= 2 ? '#6f3800' : '#1d5031' }}>
+                    <span style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 800, color: r.available === 0 ? '#93000a' : r.available <= 2 ? '#6f3800' : '#1d5031' }}>
                       {r.available}
                     </span>
                     <span style={{ fontSize: 11, color: '#717971', fontWeight: 600 }}>/ {r.total} available</span>
@@ -418,7 +418,7 @@ export default function InventoryCalendar() {
                     <div key={b.id} style={{
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                       padding: '12px 14px', background: '#f8f9fa', borderRadius: 10,
-                      fontFamily: 'Inter, sans-serif',
+                      fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
                     }}>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 700, color: '#191c1d' }}>{b.reason}</div>
@@ -433,7 +433,7 @@ export default function InventoryCalendar() {
                         style={{
                           padding: '7px 12px', borderRadius: 9999, border: 'none',
                           background: '#ba1a1a', color: '#ffffff',
-                          fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 800,
+                          fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11, fontWeight: 800,
                           cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
                         }}
                       >
@@ -462,7 +462,7 @@ export default function InventoryCalendar() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
               <div>
                 <div className="t-overline" style={{ marginBottom: 4 }}>Block inventory</div>
-                <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 20, fontWeight: 800, color: '#00361a', margin: 0 }}>
+                <h3 style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 20, fontWeight: 800, color: '#00361a', margin: 0 }}>
                   Block date range
                 </h3>
               </div>
@@ -505,7 +505,7 @@ export default function InventoryCalendar() {
                       padding: '7px 13px', borderRadius: 9999,
                       border: '1px solid rgba(0,54,26,0.12)', background: '#ffffff',
                       color: '#1a4d2e', cursor: 'pointer',
-                      fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 700,
+                      fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11.5, fontWeight: 700,
                       transition: 'all 0.18s',
                     }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f5'; (e.currentTarget as HTMLElement).style.borderColor = '#00361a' }}
@@ -525,7 +525,7 @@ export default function InventoryCalendar() {
                 <div style={{
                   marginBottom: 12, padding: '10px 14px', borderRadius: 10,
                   background: 'linear-gradient(135deg, rgba(184,240,197,0.35), rgba(255,220,196,0.3))',
-                  fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, color: '#00361a',
+                  fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 700, color: '#00361a',
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 }}>
                   <span>
