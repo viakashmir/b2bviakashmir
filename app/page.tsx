@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import {
-  Mountain, Leaf, CheckCircle2, Eye, Clock, Filter,
+  Mountain, Leaf, Filter,
   Search, Grid3x3, Building2, Sailboat,
 } from 'lucide-react'
 import Header from '@/components/Header'
@@ -76,45 +76,24 @@ export default function PublicPage() {
       <Header />
 
       <main className="app-shell">
-        <section className="hero-section">
+        {/* Compact promo banner — keeps hotels above the fold */}
+        <section className="promo-banner">
           <Mountain
-            size={280}
+            size={200}
             color="rgba(184,240,197,0.08)"
-            style={{ position: 'absolute', right: -30, top: -20, pointerEvents: 'none' }}
+            style={{ position: 'absolute', right: -24, top: -40, pointerEvents: 'none' }}
           />
-
-          <div className="hero-live-badge">
-            <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#b8f0c5', display: 'inline-block' }} />
-            {hotels.length} {hotels.length === 1 ? 'hotel' : 'hotels'} live
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-            <Leaf size={18} strokeWidth={2.2} color="#b8f0c5" />
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#9dd3aa', fontFamily: 'Inter, sans-serif' }}>
+          <div className="promo-left">
+            <span className="promo-overline">
+              <Leaf size={13} strokeWidth={2.4} color="#b8f0c5" style={{ verticalAlign: 'middle', marginRight: 8 }} />
               Kashmir B2B Rate Portal
             </span>
+            <h1 className="promo-title">Live hotel &amp; houseboat rates, updated in real-time</h1>
+            <p className="promo-sub">Srinagar · Gulmarg · Pahalgam · Sonamarg · Gurez — book confidently, no calls.</p>
           </div>
-
-          <h1 className="hero-title">
-            No More<br />
-            <span style={{ color: '#9dd3aa' }}>Back-and-Forth.</span>
-          </h1>
-          <p className="hero-subtitle">
-            Hotels publish once. Agents book confidently.<br />
-            Live B2B rates across Srinagar, Gulmarg, Pahalgam, Sonamarg &amp; Gurez.
-          </p>
-
-          <div className="hero-meta-row" style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 28, flexWrap: 'wrap' }}>
-            {[
-              { Icon: CheckCircle2, text: 'Live rates, zero calls' },
-              { Icon: Eye,          text: 'No login for agents' },
-              { Icon: Clock,        text: 'Updated in real-time' },
-            ].map((m, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.88)', fontFamily: 'Inter, sans-serif' }}>
-                <m.Icon size={14} strokeWidth={2.2} color="#b8f0c5" />
-                {m.text}
-              </div>
-            ))}
+          <div className="hero-live-badge promo-badge">
+            <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#b8f0c5', display: 'inline-block' }} />
+            {hotels.length} {hotels.length === 1 ? 'hotel' : 'hotels'} live
           </div>
         </section>
 

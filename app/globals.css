@@ -347,6 +347,24 @@ body {
   letter-spacing: 0.06em; text-transform: uppercase;
 }
 
+/* Compact promo banner (replaces the tall hero so hotels stay above the fold) */
+.promo-banner {
+  background: linear-gradient(135deg, #00361a 0%, #1a4d2e 60%, #004e5f 100%);
+  border-radius: 18px; padding: 22px 28px; margin-bottom: 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap; position: relative; overflow: hidden;
+}
+.promo-left { position: relative; z-index: 1; }
+.promo-overline { font-size: 10.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #9dd3aa; font-family: 'Inter', sans-serif; }
+.promo-title { font-family: 'Manrope', sans-serif; font-size: 25px; font-weight: 800; color: #ffffff; line-height: 1.2; letter-spacing: -0.02em; margin: 8px 0 4px; max-width: 640px; }
+.promo-sub { font-size: 13.5px; color: rgba(255,255,255,0.72); font-family: 'Inter', sans-serif; margin: 0; line-height: 1.5; }
+.promo-badge { position: static; z-index: 1; flex-shrink: 0; }
+@media (max-width: 600px) {
+  .promo-banner { padding: 18px 20px; }
+  .promo-title { font-size: 19px; }
+  .promo-sub { font-size: 12.5px; }
+}
+
 .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
 .filter-row .search-wrap { position: relative; margin-left: auto; }
 .filter-row .search-wrap .input-field { width: 240px; }
