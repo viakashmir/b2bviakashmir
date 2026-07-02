@@ -1,7 +1,7 @@
 export type RoomStatus = 'Available' | 'Limited' | 'Sold Out'
 export type MealPlan = 'CP' | 'MAP' | 'AP' | 'EP'
 export type StarCategory = 1 | 2 | 3 | 4 | 5
-export type Location = 'srinagar' | 'gulmarg' | 'pahalgam' | 'sonamarg' | 'gurez'
+export type Location = 'srinagar' | 'gulmarg' | 'pahalgam' | 'sonamarg' | 'gurez' | 'leh'
 export type PropertyType = 'hotel' | 'houseboat'
 export type RoomCategory =
   | 'Standard' | 'Deluxe' | 'Super Deluxe' | 'Suite' | 'Executive Suite' | 'Presidential Suite'
@@ -121,6 +121,7 @@ export const LOCATIONS: { value: Location | 'all'; label: string }[] = [
   { value: 'pahalgam', label: 'Pahalgam' },
   { value: 'sonamarg', label: 'Sonamarg' },
   { value: 'gurez', label: 'Gurez' },
+  { value: 'leh', label: 'Ladakh' },
 ]
 
 export const LOCATION_LABELS: Record<Location, string> = {
@@ -129,6 +130,7 @@ export const LOCATION_LABELS: Record<Location, string> = {
   pahalgam: 'Pahalgam',
   sonamarg: 'Sonamarg',
   gurez: 'Gurez',
+  leh: 'Ladakh',
 }
 
 // Coordinates for live weather strip (Open-Meteo).
@@ -138,6 +140,7 @@ export const LOCATION_COORDS: Record<Location, { lat: number; lon: number }> = {
   pahalgam: { lat: 34.0151, lon: 75.3260 },
   sonamarg: { lat: 34.3000, lon: 75.2900 },
   gurez:    { lat: 34.6500, lon: 74.8200 },
+  leh:      { lat: 34.1526, lon: 77.5771 },
 }
 
 export const MEAL_LABELS: Record<MealPlan, string> = {
