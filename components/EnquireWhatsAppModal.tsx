@@ -117,21 +117,23 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
           animation: 'fade-up 0.25s ease',
         }}
       >
-        {/* Header */}
+        {/* Header — on-brand Alpine green; WhatsApp identity kept via the green accent badge */}
         <div style={{
-          background: 'linear-gradient(135deg, #25d366 0%, #128c7e 100%)',
+          background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 60%, #004e5f 100%)',
           padding: '20px 24px', color: '#ffffff',
           display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+          position: 'relative', overflow: 'hidden',
         }}>
           <div>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               fontSize: 10, fontWeight: 800, letterSpacing: '0.14em',
-              textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)',
-              background: 'rgba(255,255,255,0.16)',
+              textTransform: 'uppercase', color: '#d7ffe6',
+              background: 'rgba(37,211,102,0.20)',
+              border: '1px solid rgba(37,211,102,0.35)',
               padding: '4px 10px', borderRadius: 9999, marginBottom: 10,
             }}>
-              <MessageCircle size={11} strokeWidth={2.6} /> WhatsApp Enquiry
+              <MessageCircle size={11} strokeWidth={2.6} color="#4ff08a" /> WhatsApp Enquiry
             </div>
             <h3 style={{
               fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 20, fontWeight: 800,

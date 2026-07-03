@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react'
 
 interface Props {
@@ -41,16 +42,29 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
   const [viewMonth, setViewMonth] = useState(initial.getMonth()) // 0..11
   const rootRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const popRef = useRef<HTMLDivElement>(null)
+  const [rect, setRect] = useState<{ top: number; bottom: number; left: number; width: number } | null>(null)
 
-  // Decide whether to open upward or downward based on available viewport space
+  // Measure the trigger and decide up/down. Re-measure on scroll/resize so the
+  // portal-rendered popover stays anchored even inside a scrolling modal.
   useEffect(() => {
     if (!open) return
-    const el = triggerRef.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const POPOVER_HEIGHT = 420 // generous estimate; safer than under-estimating
-    const spaceBelow = window.innerHeight - rect.bottom
-    setOpenUp(spaceBelow < POPOVER_HEIGHT && rect.top > POPOVER_HEIGHT)
+    const measure = () => {
+      const el = triggerRef.current
+      if (!el) return
+      const r = el.getBoundingClientRect()
+      const POPOVER_HEIGHT = 430
+      const spaceBelow = window.innerHeight - r.bottom
+      setOpenUp(spaceBelow < POPOVER_HEIGHT && r.top > POPOVER_HEIGHT)
+      setRect({ top: r.top, bottom: r.bottom, left: r.left, width: r.width })
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    window.addEventListener('scroll', measure, true) // capture: catch modal-body scroll too
+    return () => {
+      window.removeEventListener('resize', measure)
+      window.removeEventListener('scroll', measure, true)
+    }
   }, [open])
 
   // Keep the calendar view aligned with the picked value when opening
@@ -64,7 +78,10 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
   useEffect(() => {
     if (!open) return
     const onDoc = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
+      const t = e.target as Node
+      if (rootRef.current?.contains(t)) return
+      if (popRef.current?.contains(t)) return // clicks inside the portal popover
+      setOpen(false)
     }
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
     document.addEventListener('mousedown', onDoc)
@@ -145,21 +162,23 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
         </span>
       </button>
 
-      {/* Popover calendar */}
-      {open && (
+      {/* Popover calendar — rendered in a portal with fixed positioning so
+          the modal's overflow can never clip it. */}
+      {open && rect && typeof document !== 'undefined' && createPortal(
         <div
+          ref={popRef}
           role="dialog"
           aria-label="Pick a date"
           style={{
-            position: 'absolute', zIndex: 350,
+            position: 'fixed', zIndex: 1000,
+            width: Math.min(320, window.innerWidth - 16),
+            left: Math.max(8, Math.min(rect.left, window.innerWidth - Math.min(320, window.innerWidth - 16) - 8)),
             ...(openUp
-              ? { bottom: 'calc(100% + 8px)' }
-              : { top: 'calc(100% + 8px)' }),
-            left: 0,
-            width: 320, maxWidth: '92vw',
+              ? { top: rect.top - 8, transform: 'translateY(-100%)' }
+              : { top: rect.bottom + 8 }),
             background: '#ffffff',
             borderRadius: 16,
-            boxShadow: '0 20px 60px rgba(0,54,26,0.18), 0 4px 16px rgba(25,28,29,0.08)',
+            boxShadow: '0 20px 60px rgba(0,54,26,0.22), 0 4px 16px rgba(25,28,29,0.10)',
             border: '1px solid rgba(0,54,26,0.08)',
             overflow: 'hidden',
             fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
@@ -303,7 +322,8 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
               Today
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
