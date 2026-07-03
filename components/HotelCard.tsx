@@ -22,17 +22,15 @@ export default function HotelCard({ hotel, index }: Props) {
   const limitTypes = hotel.rooms.filter(r => r.status === 'Limited').length
   const soldTypes = hotel.rooms.filter(r => r.status === 'Sold Out').length
 
-  // Header banner color matches the worst-case status of the property.
-  const headerAvailClass =
-    status === 'Sold Out' ? 'avail-red'
-    : status === 'Limited' || availInv <= 3 ? 'avail-amber'
-    : 'avail-green'
-
-  const statusBadge = {
-    Available: 'badge-success',
-    Limited: 'badge-tertiary',
-    'Sold Out': 'badge-error',
-  }[status] ?? 'badge-neutral'
+  // Status-driven accent + pill colors, tuned for the dark green panel.
+  const accent =
+    status === 'Sold Out' ? '#ffb4ab'
+    : status === 'Limited' || availInv <= 3 ? '#ffc48a'
+    : '#b8f0c5'
+  const pill =
+    status === 'Available' ? { bg: '#b8f0c5', fg: '#00361a' }
+    : status === 'Limited' ? { bg: '#ffdcc4', fg: '#5a2e00' }
+    : { bg: '#ffb4ab', fg: '#5a0a05' }
 
   return (
     <>
@@ -60,7 +58,7 @@ export default function HotelCard({ hotel, index }: Props) {
               <Sparkles size={11} strokeWidth={2.5} />
               {STAR_LABELS[hotel.stars]}
             </span>
-            <span className={`badge ${statusBadge}`} style={{ padding: '3px 10px', fontSize: 10 }}>{status}</span>
+            <span style={{ padding: '4px 11px', borderRadius: 9999, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', background: pill.bg, color: pill.fg }}>{status}</span>
           </div>
 
           <h3 style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 18, fontWeight: 800, color: '#ffffff', lineHeight: 1.18, margin: 0, letterSpacing: '-0.015em' }}>
@@ -71,17 +69,26 @@ export default function HotelCard({ hotel, index }: Props) {
             {hotel.locationLabel}
           </div>
 
-          <div className={headerAvailClass} style={{ marginTop: 12, padding: '8px 12px', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-              <BedDouble size={16} strokeWidth={2.3} />
+          <div style={{
+            marginTop: 12, padding: '11px 13px', borderRadius: 12,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+            background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 34, height: 34, borderRadius: 9999, background: 'rgba(255,255,255,0.09)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: accent, flexShrink: 0 }}>
+                <BedDouble size={17} strokeWidth={2.3} />
+              </div>
               <div>
-                <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 18, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em' }}>{availInv}</div>
-                <div style={{ fontSize: 8.5, fontWeight: 800, marginTop: 2, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Available</div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+                  <span style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em', color: accent }}>{availInv}</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>rooms</span>
+                </div>
+                <div style={{ fontSize: 8.5, fontWeight: 800, marginTop: 3, letterSpacing: '0.14em', textTransform: 'uppercase', color: accent, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>Available now</div>
               </div>
             </div>
-            <div style={{ textAlign: 'right', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 10.5 }}>
-              <div style={{ fontWeight: 800 }}>{availTypes + limitTypes}/{hotel.rooms.length}</div>
-              <div style={{ fontSize: 8.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>types open</div>
+            <div style={{ textAlign: 'right', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#ffffff' }}>
+              <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1 }}>{availTypes + limitTypes}/{hotel.rooms.length}</div>
+              <div style={{ fontSize: 8.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 3, color: 'rgba(255,255,255,0.6)' }}>types open</div>
             </div>
           </div>
 
