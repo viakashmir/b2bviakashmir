@@ -118,8 +118,6 @@ export default function HotelCard({ hotel, index }: Props) {
                   { code: 'MAP', val: r.map },
                   { code: 'AP',  val: r.ap },
                 ].filter(p => p.val > 0)
-                // Headline = the room's declared plan if it has a rate, else the first quoted plan.
-                const primary = offered.find(p => p.code === r.meal) ?? offered[0] ?? { code: r.meal, val: 0 }
                 return (
                   <div key={r.id} className="rate-cell">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -132,25 +130,18 @@ export default function HotelCard({ hotel, index }: Props) {
                       </span>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 6 }}>
-                      <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', color: '#13677b' }}>{primary.code}</span>
-                      <span style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 18, fontWeight: 800, color: '#00361a', letterSpacing: '-0.02em' }}>{primary.val ? fmtINR(primary.val) : '—'}</span>
-                      <span style={{ fontSize: 9.5, color: '#717971', fontWeight: 600 }}>/night</span>
-                    </div>
-
-                    {offered.length > 1 && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
+                    {offered.length > 0 ? (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 6, marginTop: 8 }}>
                         {offered.map(p => (
-                          <span key={p.code} style={{
-                            fontSize: 9.5, fontWeight: 700, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', padding: '2px 7px', borderRadius: 9999,
-                            background: p.code === primary.code ? 'rgba(0,54,26,0.08)' : '#eef0ef',
-                            color: p.code === primary.code ? '#00361a' : '#414942',
-                            border: p.code === primary.code ? '1px solid rgba(0,54,26,0.15)' : '1px solid transparent',
-                          }}>
-                            <strong>{p.code}</strong> {fmtINR(p.val)}
+                          <span key={p.code} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, background: '#eef0ef', borderRadius: 8, padding: '4px 9px' }}>
+                            <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.06em', color: '#13677b' }}>{p.code}</span>
+                            <span style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 800, color: '#00361a', letterSpacing: '-0.01em' }}>{fmtINR(p.val)}</span>
                           </span>
                         ))}
+                        <span style={{ fontSize: 9.5, color: '#717971', fontWeight: 600 }}>/night</span>
                       </div>
+                    ) : (
+                      <div style={{ marginTop: 8, fontSize: 12, color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600 }}>Rate on request</div>
                     )}
 
                     {(r.extraBed > 0 || r.childWob > 0) && (
