@@ -1,10 +1,10 @@
 'use client'
 
-import { Hotel, STAR_LABELS, fmtINR, fmtDate, bestStatus } from '@/lib/data'
+import { Hotel, STAR_LABELS, fmtINR, fmtDate, bestStatus, hotelIsSeasonal, roomHasSeasonalRates } from '@/lib/data'
 import { useState } from 'react'
 import {
   MapPin, Phone, Mail, Globe, Clock, BedDouble, Send, X,
-  Mountain, Sparkles, MessageCircle,
+  Mountain, Sparkles, MessageCircle, CalendarRange,
 } from 'lucide-react'
 import EnquireWhatsAppModal from '@/components/EnquireWhatsAppModal'
 
@@ -17,6 +17,7 @@ export default function HotelCard({ hotel, index }: Props) {
   const [showEnquire, setShowEnquire] = useState(false)
   const [showWa, setShowWa] = useState(false)
   const status = bestStatus(hotel.rooms)
+  const seasonal = hotelIsSeasonal(hotel)
   const availInv = hotel.rooms.filter(r => r.status === 'Available').reduce((a, r) => a + (r.inventory || 0), 0)
   const availTypes = hotel.rooms.filter(r => r.status === 'Available').length
   const limitTypes = hotel.rooms.filter(r => r.status === 'Limited').length
@@ -92,10 +93,20 @@ export default function HotelCard({ hotel, index }: Props) {
             </div>
           </div>
 
-          {hotel.tariffStart && hotel.tariffEnd && (
-            <span style={{ display: 'inline-block', marginTop: 10, fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2f1400', background: 'rgba(255,220,196,0.9)', padding: '4px 10px', borderRadius: 9999 }}>
-              Tariff {shortRange(hotel.tariffStart, hotel.tariffEnd)}
-            </span>
+          {(seasonal || (hotel.tariffStart && hotel.tariffEnd)) && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
+              {hotel.tariffStart && hotel.tariffEnd && (
+                <span style={{ display: 'inline-block', fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2f1400', background: 'rgba(255,220,196,0.9)', padding: '4px 10px', borderRadius: 9999 }}>
+                  Tariff {shortRange(hotel.tariffStart, hotel.tariffEnd)}
+                </span>
+              )}
+              {seasonal && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#04353f', background: 'rgba(160,231,229,0.92)', padding: '4px 10px', borderRadius: 9999 }}>
+                  <CalendarRange size={11} strokeWidth={2.6} />
+                  Seasonal
+                </span>
+              )}
+            </div>
           )}
         </div>
 
@@ -155,6 +166,13 @@ export default function HotelCard({ hotel, index }: Props) {
                       <div style={{ display: 'flex', gap: 10, marginTop: 6, fontSize: 9.5, color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600 }}>
                         {r.extraBed > 0 && <span>Extra Bed <strong style={{ color: '#414942' }}>{fmtINR(r.extraBed)}</strong></span>}
                         {r.childWob > 0 && <span>Child WOB <strong style={{ color: '#414942' }}>{fmtINR(r.childWob)}</strong></span>}
+                      </div>
+                    )}
+
+                    {r.notes && (
+                      <div style={{ display: 'flex', gap: 5, marginTop: 6, fontSize: 9.5, lineHeight: 1.5, color: roomHasSeasonalRates(r) ? '#0b6b73' : '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
+                        {roomHasSeasonalRates(r) && <CalendarRange size={11} strokeWidth={2.4} style={{ flexShrink: 0, marginTop: 1 }} />}
+                        <span style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{r.notes}</span>
                       </div>
                     )}
                   </div>
@@ -326,18 +344,30 @@ export default function HotelCard({ hotel, index }: Props) {
                     {['Room', 'Double', 'CNB', 'X-Bed', 'Avail.'].map((h, i) => (
                       <div key={h} style={{ fontWeight: 800, fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#717971', textAlign: i > 0 ? 'right' : 'left', paddingBottom: 6, borderBottom: '1px solid #edeeef' }}>{h}</div>
                     ))}
-                    {hotel.rooms.map(r => (
+                    {hotel.rooms.map(r => {
+                      const bb = r.notes ? 'none' : '1px solid #f3f4f5'
+                      return (
                       <div key={r.id} style={{ display: 'contents' }}>
-                        <div style={{ padding: '8px 0', fontWeight: 600, color: '#191c1d', borderBottom: '1px solid #f3f4f5' }}>
+                        <div style={{ padding: '8px 0', fontWeight: 600, color: '#191c1d', borderBottom: bb }}>
                           {r.type}
                           <div style={{ fontSize: 10, color: '#717971', fontWeight: 500 }}>{r.category} · {r.meal}</div>
                         </div>
-                        <div style={{ padding: '8px 0', textAlign: 'right', fontWeight: 700, color: '#00361a', borderBottom: '1px solid #f3f4f5' }}>{fmtINR(r.double)}</div>
-                        <div style={{ padding: '8px 0', textAlign: 'right', color: '#414942', borderBottom: '1px solid #f3f4f5' }}>{r.cnb ? fmtINR(r.cnb) : '-'}</div>
-                        <div style={{ padding: '8px 0', textAlign: 'right', color: '#414942', borderBottom: '1px solid #f3f4f5' }}>{r.extraBed ? fmtINR(r.extraBed) : '-'}</div>
-                        <div style={{ padding: '8px 0', textAlign: 'right', fontWeight: 700, color: '#414942', borderBottom: '1px solid #f3f4f5' }}>{r.inventory}</div>
+                        <div style={{ padding: '8px 0', textAlign: 'right', fontWeight: 700, color: '#00361a', borderBottom: bb }}>{fmtINR(r.double)}</div>
+                        <div style={{ padding: '8px 0', textAlign: 'right', color: '#414942', borderBottom: bb }}>{r.cnb ? fmtINR(r.cnb) : '-'}</div>
+                        <div style={{ padding: '8px 0', textAlign: 'right', color: '#414942', borderBottom: bb }}>{r.extraBed ? fmtINR(r.extraBed) : '-'}</div>
+                        <div style={{ padding: '8px 0', textAlign: 'right', fontWeight: 700, color: '#414942', borderBottom: bb }}>{r.inventory}</div>
+                        {r.notes && (
+                          <div style={{ gridColumn: '1 / -1', padding: '0 0 9px', borderBottom: '1px solid #f3f4f5', display: 'flex', gap: 6, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                            {roomHasSeasonalRates(r) && (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#04353f', background: 'rgba(160,231,229,0.7)', padding: '2px 7px', borderRadius: 9999 }}>
+                                <CalendarRange size={9} strokeWidth={2.6} /> Seasonal
+                              </span>
+                            )}
+                            <span style={{ fontSize: 10.5, lineHeight: 1.5, color: '#5a625b', fontWeight: 500, flex: 1, minWidth: 0 }}>{r.notes}</span>
+                          </div>
+                        )}
                       </div>
-                    ))}
+                    )})}
                   </div>
                 </div>
               )}

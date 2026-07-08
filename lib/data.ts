@@ -336,6 +336,26 @@ export function availableInventory(rooms: Room[]): number {
   return rooms.filter(r => r.status === 'Available').reduce((a, r) => a + (r.inventory || 0), 0)
 }
 
+// =============================================================
+// Seasonal rates
+// Vendors that quote more than one season are stored with the CURRENT
+// season in the rate columns and the alternate season(s) written into
+// the room `notes`. These helpers detect that so the UI can flag it and
+// surface the off-season prices.
+// =============================================================
+const SEASONAL_RE =
+  /(off[-\s]?season|\bwinter\b|\blean\b|\bpeak\b|amarnath|\b1[0-9]\s?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)|season\s+\d)/i
+
+/** True when a room's notes carry alternate-season pricing. */
+export function roomHasSeasonalRates(r: { notes?: string }): boolean {
+  return !!r.notes && SEASONAL_RE.test(r.notes)
+}
+
+/** True when any of a hotel's rooms quotes more than one season. */
+export function hotelIsSeasonal(hotel: { rooms: Room[] }): boolean {
+  return hotel.rooms.some(roomHasSeasonalRates)
+}
+
 /** Lowest positive nightly rate (₹) across a hotel's rooms; 0 if none. */
 export function hotelFromPrice(hotel: { rooms: Room[] }): number {
   let min = 0
