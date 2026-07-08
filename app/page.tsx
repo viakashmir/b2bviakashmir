@@ -3,14 +3,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import {
   Mountain, Leaf, SlidersHorizontal,
-  Search, Grid3x3, Building2, Sailboat,
+  Search, Grid3x3, Building2, Sailboat, CalendarRange,
 } from 'lucide-react'
 import Header from '@/components/Header'
 import HotelCard from '@/components/HotelCard'
 import KashmirLive from '@/components/KashmirLive'
 import {
   Hotel, LOCATIONS, Location, PropertyType, rowToHotel,
-  hotelFromPrice, HOTEL_AMENITIES, HOUSEBOAT_AMENITIES,
+  hotelFromPrice, hotelIsSeasonal, HOTEL_AMENITIES, HOUSEBOAT_AMENITIES,
 } from '@/lib/data'
 import { browserSupabase } from '@/lib/supabase'
 
@@ -38,6 +38,7 @@ export default function PublicPage() {
   const [sort, setSort] = useState<SortKey>('recommended')
   const [priceMin, setPriceMin] = useState('')
   const [priceMax, setPriceMax] = useState('')
+  const [seasonalOnly, setSeasonalOnly] = useState(false)
   const [amenitySel, setAmenitySel] = useState<string[]>([])
   const [mounted, setMounted] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -83,7 +84,8 @@ export default function PublicPage() {
     const minOk = !priceMin || (p > 0 && p >= Number(priceMin))
     const maxOk = !priceMax || (p > 0 && p <= Number(priceMax))
     const amenOk = amenitySel.length === 0 || amenitySel.every(a => h.amenities.includes(a))
-    return locMatch && propMatch && searchMatch && minOk && maxOk && amenOk
+    const seasonalOk = !seasonalOnly || hotelIsSeasonal(h)
+    return locMatch && propMatch && searchMatch && minOk && maxOk && amenOk && seasonalOk
   })
 
   const sorted = [...filtered].sort((a, b) => {
@@ -95,7 +97,7 @@ export default function PublicPage() {
 
   const resetAll = () => {
     setFilter('all'); setPropFilter('all'); setSearch('')
-    setPriceMin(''); setPriceMax(''); setAmenitySel([]); setSort('recommended')
+    setPriceMin(''); setPriceMax(''); setSeasonalOnly(false); setAmenitySel([]); setSort('recommended')
   }
   const toggleAmenity = (a: string) =>
     setAmenitySel(prev => prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a])
@@ -182,6 +184,18 @@ export default function PublicPage() {
                     <p.Icon size={11} strokeWidth={2.3} /> {p.label}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            <div className="fp-group">
+              <div className="fp-label">Rates</div>
+              <div className="fp-chips">
+                <button className={seasonalOnly ? 'fp-chip active' : 'fp-chip'}
+                  onClick={() => setSeasonalOnly(v => !v)}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                  aria-pressed={seasonalOnly}>
+                  <CalendarRange size={11} strokeWidth={2.3} /> Seasonal only
+                </button>
               </div>
             </div>
 
