@@ -44,6 +44,8 @@ export async function PATCH(req: Request, ctx: { params: { id: string } }) {
   if (Array.isArray(body.amenities)) update.amenities = body.amenities
   if ('tariffStart' in body) update.tariff_start = body.tariffStart || null
   if ('tariffEnd' in body) update.tariff_end = body.tariffEnd || null
+  if (typeof body.mmtUrl === 'string') update.mmt_url = body.mmtUrl.trim()
+  if (typeof body.goibiboUrl === 'string') update.goibibo_url = body.goibiboUrl.trim()
   if (Object.keys(update).length === 0) return NextResponse.json({ error: 'no fields' }, { status: 400 })
 
   const sb = serverSupabase()

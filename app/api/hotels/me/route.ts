@@ -3,6 +3,7 @@ import { auth, currentUser } from '@clerk/nextjs/server'
 import { serverSupabase } from '@/lib/supabase'
 import { rowToHotel } from '@/lib/data'
 import { emailListingSubmitted } from '@/lib/email'
+import { claimExistingHotelListing } from '@/lib/hotelHandoff'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,8 +20,20 @@ export async function GET() {
 
   const hotelId = vendorHotelId(userId)
   const sb = serverSupabase()
-  const { data: hotel, error: hErr } = await sb.from('hotels').select('*').eq('id', hotelId).maybeSingle()
+  let { data: hotel, error: hErr } = await sb.from('hotels').select('*').eq('id', hotelId).maybeSingle()
   if (hErr) return NextResponse.json({ error: hErr.message }, { status: 500 })
+
+  // Fallback for vendors who signed in before this handoff existed, or
+  // whose admin-managed listing was created/claimed after their account:
+  // check once whether their email now matches an unclaimed listing.
+  if (!hotel) {
+    const email = (await currentUser())?.primaryEmailAddress?.emailAddress
+    if (email) {
+      await claimExistingHotelListing(email, userId)
+      ;({ data: hotel, error: hErr } = await sb.from('hotels').select('*').eq('id', hotelId).maybeSingle())
+      if (hErr) return NextResponse.json({ error: hErr.message }, { status: 500 })
+    }
+  }
   if (!hotel) return NextResponse.json({ hotel: null })
 
   const { data: rooms, error: rErr } = await sb.from('rooms').select('*').eq('hotel_id', hotelId)

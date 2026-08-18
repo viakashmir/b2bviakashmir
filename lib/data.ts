@@ -42,6 +42,13 @@ export interface Room {
   double: number
   /** Legacy alias for childWob, kept on the type for back-compat reads. */
   cnb: number
+
+  /** Admin-entered reference price seen on MakeMyTrip for this room, 0 = not checked. */
+  mmtPrice: number
+  /** Admin-entered reference price seen on Goibibo for this room, 0 = not checked. */
+  goibiboPrice: number
+  /** When either competitor price was last updated, ms epoch or 0. */
+  competitorUpdatedAt: number
 }
 
 export interface Hotel {
@@ -63,6 +70,10 @@ export interface Hotel {
   /** ISO date 'YYYY-MM-DD' or '', tariff validity window. */
   tariffStart: string
   tariffEnd: string
+  /** Direct link to this property's MakeMyTrip listing, for one-click rate comparison. */
+  mmtUrl: string
+  /** Direct link to this property's Goibibo listing, for one-click rate comparison. */
+  goibiboUrl: string
   createdAt: number
   updatedAt: number
   rooms: Room[]
@@ -202,6 +213,7 @@ type HotelRow = {
   amenities: string[]; approved: boolean; created_at: string; updated_at: string
   tariff_start: string | null; tariff_end: string | null
   whatsapp_phone: string | null
+  mmt_url?: string | null; goibibo_url?: string | null
 }
 type RoomRow = {
   id: string; hotel_id: string; type: string; category: string; meal: string
@@ -209,6 +221,7 @@ type RoomRow = {
   ep: number | null; cp: number | null; map_rate: number | null; ap: number | null
   child_wob: number | null; gst: string | null; notes: string | null
   inventory: number; status: string; updated_at: string
+  mmt_price?: number | null; goibibo_price?: number | null; competitor_updated_at?: string | null
 }
 type ConcernRow = {
   id: string; hotel_id: string; hotel_name: string; agent_name: string
@@ -229,6 +242,8 @@ export function rowToHotel(row: HotelRow, rooms: RoomRow[] = []): Hotel {
     approved: row.approved,
     tariffStart: row.tariff_start ?? '',
     tariffEnd:   row.tariff_end   ?? '',
+    mmtUrl:     row.mmt_url     ?? '',
+    goibiboUrl: row.goibibo_url ?? '',
     createdAt: new Date(row.created_at).getTime(),
     updatedAt: new Date(row.updated_at).getTime(),
     rooms: rooms.filter(r => r.hotel_id === row.id).map(rowToRoom),
@@ -253,6 +268,9 @@ export function rowToRoom(row: RoomRow): Room {
     updatedAt: new Date(row.updated_at).getTime(),
     double: cp || fallback,
     cnb: row.child_wob ?? row.cnb ?? 0,
+    mmtPrice:     row.mmt_price     ?? 0,
+    goibiboPrice: row.goibibo_price ?? 0,
+    competitorUpdatedAt: row.competitor_updated_at ? new Date(row.competitor_updated_at).getTime() : 0,
   }
 }
 

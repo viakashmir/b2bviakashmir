@@ -12,7 +12,10 @@ async function assertAdmin() {
   return { ok: true as const }
 }
 
-const NUM_FIELDS = new Set(['ep', 'cp', 'map_rate', 'ap', 'child_wob', 'extra_bed', 'double', 'cnb', 'inventory'])
+const NUM_FIELDS = new Set([
+  'ep', 'cp', 'map_rate', 'ap', 'child_wob', 'extra_bed', 'double', 'cnb', 'inventory',
+  'mmt_price', 'goibibo_price',
+])
 const FIELD_MAP: Record<string, string> = {
   type: 'type', category: 'category', meal: 'meal',
   ep: 'ep', cp: 'cp', map: 'map_rate', ap: 'ap',
@@ -21,6 +24,8 @@ const FIELD_MAP: Record<string, string> = {
   inventory: 'inventory', status: 'status',
   // legacy fields some callers may still send
   double: 'double', cnb: 'cnb',
+  // admin-entered competitor reference prices
+  mmtPrice: 'mmt_price', goibiboPrice: 'goibibo_price',
 }
 
 /** PUT /api/admin/hotels/[id]/rooms/[roomId], update a room on any hotel. */
@@ -39,6 +44,7 @@ export async function PUT(req: Request, ctx: { params: { id: string; roomId: str
   // same convention the public board and 0003 migration backfill rely on.
   if ('cp' in update && !('double' in update)) update.double = update.cp
   if ('child_wob' in update && !('cnb' in update)) update.cnb = update.child_wob
+  if ('mmt_price' in update || 'goibibo_price' in update) update.competitor_updated_at = new Date().toISOString()
 
   const sb = serverSupabase()
   const { error } = await sb.from('rooms').update(update).eq('id', ctx.params.roomId).eq('hotel_id', ctx.params.id)

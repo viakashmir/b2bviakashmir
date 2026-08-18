@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { serverSupabase } from '@/lib/supabase'
 import { rowToHotel } from '@/lib/data'
+import { inviteVendor } from '@/lib/hotelHandoff'
 
 export const dynamic = 'force-dynamic'
 
@@ -81,6 +82,8 @@ export async function POST(req: Request) {
     amenities: Array.isArray(body.amenities) ? body.amenities : [],
     tariff_start: body.tariffStart || null,
     tariff_end: body.tariffEnd || null,
+    mmt_url: String(body.mmtUrl ?? '').trim(),
+    goibibo_url: String(body.goibiboUrl ?? '').trim(),
     // Admin-created listings are live immediately unless explicitly unchecked.
     approved: body.approved !== false,
   }
@@ -117,5 +120,14 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ ok: true, id })
+  // Auto-invite the hotel's own email to a self-service vendor login, if
+  // one was given. Best-effort: a failed/skipped invite never fails hotel
+  // creation — admin can retry from the "Send Login Invite" button.
+  let inviteMessage: string | null = null
+  if (row.email) {
+    const invite = await inviteVendor(row.email)
+    inviteMessage = invite.message
+  }
+
+  return NextResponse.json({ ok: true, id, inviteMessage })
 }

@@ -27,7 +27,7 @@ function fromAddr(): string {
 function adminAddr(): string {
   return process.env.ADMIN_EMAIL || 'admin@viakashmiritinerary.in'
 }
-function appUrl(): string {
+export function appUrl(): string {
   return process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://b2b.viakashmiritinerary.in'
 }
 

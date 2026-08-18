@@ -106,7 +106,10 @@ export default function AdminPortal() {
       addToast('Admin role missing on your Clerk user. See banner above.', 'error'); return false
     }
     if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Create failed', 'error'); return false }
-    addToast('Hotel created · Now live', 'success'); refresh()
+    const json = await res.json().catch(() => ({}))
+    addToast('Hotel created · Now live', 'success')
+    if (json.inviteMessage) addToast(json.inviteMessage, 'info')
+    refresh()
     return true
   }
 
@@ -433,6 +436,7 @@ function AddHotelForm({ onCreate, onCancel }: {
     address: '', phone: '', whatsappSameAsPhone: true, whatsapp: '',
     email: '', website: '', description: '', amenities: [] as string[],
     tariffStart: '', tariffEnd: '', approved: true,
+    mmtUrl: '', goibiboUrl: '',
   })
   const [error, setError] = useState('')
 
@@ -497,7 +501,10 @@ function AddHotelForm({ onCreate, onCancel }: {
         </div>
         <div>
           <label style={fieldLabel}>Email</label>
-          <input type="text" value={draft.email} onChange={e => setDraft({ ...draft, email: e.target.value })} className="input-field" style={inputStyle} />
+          <input type="text" value={draft.email} onChange={e => setDraft({ ...draft, email: e.target.value })} className="input-field" style={inputStyle} placeholder="reservations@hotel.in" />
+          <p style={{ fontSize: 11, color: '#717971', margin: '6px 0 0', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
+            If set, a login invite goes out to this address automatically so the hotel can self-manage rates.
+          </p>
         </div>
         <div>
           <label style={fieldLabel}>Website</label>
@@ -518,6 +525,14 @@ function AddHotelForm({ onCreate, onCancel }: {
         <div style={{ gridColumn: '1 / -1' }}>
           <label style={fieldLabel}>Description</label>
           <textarea value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} className="input-field" rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
+        </div>
+        <div>
+          <label style={fieldLabel}>MakeMyTrip Listing URL</label>
+          <input type="text" value={draft.mmtUrl} onChange={e => setDraft({ ...draft, mmtUrl: e.target.value })} className="input-field" style={inputStyle} placeholder="https://www.makemytrip.com/hotels/..." />
+        </div>
+        <div>
+          <label style={fieldLabel}>Goibibo Listing URL</label>
+          <input type="text" value={draft.goibiboUrl} onChange={e => setDraft({ ...draft, goibiboUrl: e.target.value })} className="input-field" style={inputStyle} placeholder="https://www.goibibo.com/hotels/..." />
         </div>
       </div>
 
@@ -589,6 +604,8 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
   const [showAddRoom, setShowAddRoom] = useState(false)
   const [newRoom, setNewRoom] = useState(emptyRoomDraft)
   const [roomError, setRoomError] = useState('')
+  const [invitePending, setInvitePending] = useState(false)
+  const hasVendorAccount = hotel.id.startsWith('vendor_')
 
   const toggleAmenity = (a: string) => {
     const set = new Set(draft.amenities)
@@ -606,10 +623,19 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
         email: draft.email, website: draft.website, description: draft.description,
         amenities: draft.amenities,
         tariffStart: draft.tariffStart || null, tariffEnd: draft.tariffEnd || null,
+        mmtUrl: draft.mmtUrl, goibiboUrl: draft.goibiboUrl,
       }),
     })
     if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Save failed', 'error'); return }
     addToast('Hotel profile saved', 'success'); onRefresh()
+  }
+
+  const sendInvite = async () => {
+    setInvitePending(true)
+    const res = await fetch(`/api/admin/hotels/${hotel.id}/invite`, { method: 'POST' })
+    const json = await res.json().catch(() => ({}))
+    setInvitePending(false)
+    addToast(json.message || json.error || 'Something went wrong', res.ok ? 'success' : 'error')
   }
 
   const addRoom = async () => {
@@ -698,6 +724,14 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
           <label style={fieldLabel}>Description</label>
           <textarea value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} className="input-field" rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
         </div>
+        <div>
+          <label style={fieldLabel}>MakeMyTrip Listing URL</label>
+          <input type="text" value={draft.mmtUrl} onChange={e => setDraft({ ...draft, mmtUrl: e.target.value })} className="input-field" style={inputStyle} placeholder="https://www.makemytrip.com/hotels/..." />
+        </div>
+        <div>
+          <label style={fieldLabel}>Goibibo Listing URL</label>
+          <input type="text" value={draft.goibiboUrl} onChange={e => setDraft({ ...draft, goibiboUrl: e.target.value })} className="input-field" style={inputStyle} placeholder="https://www.goibibo.com/hotels/..." />
+        </div>
       </div>
 
       <div style={{ marginBottom: 18, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(255,220,196,0.32), rgba(184,240,197,0.28))', border: '1px solid rgba(240,159,94,0.25)' }}>
@@ -709,6 +743,31 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
           <BrandedDatePicker label="Valid from" value={draft.tariffStart} max={draft.tariffEnd || undefined} onChange={v => setDraft({ ...draft, tariffStart: v })} placeholder="Pick start date" />
           <BrandedDatePicker label="Valid till" value={draft.tariffEnd} min={draft.tariffStart || undefined} onChange={v => setDraft({ ...draft, tariffEnd: v })} placeholder="Pick end date" />
         </div>
+      </div>
+
+      <div style={{
+        marginBottom: 18, padding: 16, borderRadius: 14,
+        background: hasVendorAccount ? '#f0f9f2' : '#f3f4f5',
+        border: `1px solid ${hasVendorAccount ? '#b8f0c5' : '#edeeef'}`,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
+      }}>
+        <div>
+          <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 800, color: '#00361a', marginBottom: 3 }}>
+            Hotel Login Access
+          </div>
+          <div style={{ fontSize: 12, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
+            {hasVendorAccount
+              ? 'This hotel has its own vendor login and manages its rates directly.'
+              : 'No vendor login yet — invite one so the hotel can manage its own rates and inventory.'}
+          </div>
+        </div>
+        {hasVendorAccount ? (
+          <span className="badge badge-success"><CheckCircle2 size={11} strokeWidth={2.5} /> Vendor account linked</span>
+        ) : (
+          <button onClick={sendInvite} disabled={invitePending || !draft.email} className="btn-primary" style={{ padding: '10px 18px', fontSize: 12.5, opacity: invitePending || !draft.email ? 0.6 : 1 }}>
+            <Send size={12} strokeWidth={2.3} /> {invitePending ? 'Sending…' : 'Send Login Invite'}
+          </button>
+        )}
       </div>
 
       <div style={{ marginBottom: 18 }}>
@@ -736,11 +795,23 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
         <Save size={13} strokeWidth={2.3} /> Save Profile
       </button>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 10 }}>
         <div className="t-overline">Rooms ({hotel.rooms.length})</div>
-        <button onClick={() => setShowAddRoom(f => !f)} className="btn-secondary" style={{ padding: '8px 16px', fontSize: 12 }}>
-          {showAddRoom ? (<><XIcon size={12} strokeWidth={2.5} /> Cancel</>) : (<><Plus size={12} strokeWidth={2.5} /> Add Room Type</>)}
-        </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <a
+            href={draft.mmtUrl || `https://www.makemytrip.com/hotels/hotel-listing/?searchText=${encodeURIComponent(`${draft.name} ${draft.locationLabel}`)}`}
+            target="_blank" rel="noreferrer"
+            style={{ fontSize: 11.5, fontWeight: 700, color: '#bf3100', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+          >MakeMyTrip ↗</a>
+          <a
+            href={draft.goibiboUrl || `https://www.goibibo.com/hotels/find-hotels/?locusValue=${encodeURIComponent(`${draft.name} ${draft.locationLabel}`)}`}
+            target="_blank" rel="noreferrer"
+            style={{ fontSize: 11.5, fontWeight: 700, color: '#bf3100', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+          >Goibibo ↗</a>
+          <button onClick={() => setShowAddRoom(f => !f)} className="btn-secondary" style={{ padding: '8px 16px', fontSize: 12 }}>
+            {showAddRoom ? (<><XIcon size={12} strokeWidth={2.5} /> Cancel</>) : (<><Plus size={12} strokeWidth={2.5} /> Add Room Type</>)}
+          </button>
+        </div>
       </div>
 
       {hotel.rooms.length === 0 && !showAddRoom && (
@@ -755,7 +826,7 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
             <thead>
               <tr style={{ background: '#f8f9fa' }}>
-                {['Room', 'Category', 'Meal', 'EP', 'CP', 'MAP', 'AP', 'Extra Bed', 'Child WOB', 'GST', 'Inv', 'Status', ''].map(h => (
+                {['Room', 'Category', 'Meal', 'EP', 'CP', 'MAP', 'AP', 'Extra Bed', 'Child WOB', 'GST', 'MMT ₹', 'Goibibo ₹', 'Inv', 'Status', ''].map(h => (
                   <th key={h} style={{ padding: '10px 12px', fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#717971', textAlign: 'left', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
@@ -843,6 +914,15 @@ function AdminRoomRow({ room, propertyType, onSave, onDelete }: {
   const change = (k: keyof Room, v: string | number) => setDraft(d => ({ ...d, [k]: v }))
   const cellStyle: React.CSSProperties = { padding: '8px 10px', borderTop: '1px solid #edeeef' }
   const numInput: React.CSSProperties = { width: 76, padding: '6px 8px', fontSize: 12 }
+  const ourRate = merged.cp || merged.map || merged.ap || merged.ep
+  const delta = (competitor: number) => {
+    if (!ourRate || !competitor) return null
+    const diff = ourRate - competitor
+    if (diff === 0) return <span style={{ color: '#717971' }}>Matched</span>
+    return diff < 0
+      ? <span style={{ color: '#146c2e' }}>▼ {fmtINR(-diff)} lower</span>
+      : <span style={{ color: '#93000a' }}>▲ {fmtINR(diff)} higher</span>
+  }
 
   return (
     <tr>
@@ -866,6 +946,14 @@ function AdminRoomRow({ room, propertyType, onSave, onDelete }: {
         <select className="input-field" value={merged.gst} onChange={e => change('gst', e.target.value)} style={{ padding: '6px 8px', fontSize: 11, width: 'auto' }}>
           {(Object.keys(GST_LABELS) as GstStatus[]).map(g => <option key={g} value={g}>{GST_LABELS[g]}</option>)}
         </select>
+      </td>
+      <td style={cellStyle}>
+        <input type="number" min={0} className="input-field" style={numInput} value={merged.mmtPrice || ''} onChange={e => change('mmtPrice', parseInt(e.target.value) || 0)} placeholder="—" />
+        {delta(merged.mmtPrice) && <div style={{ fontSize: 10, fontWeight: 700, marginTop: 3, whiteSpace: 'nowrap' }}>{delta(merged.mmtPrice)}</div>}
+      </td>
+      <td style={cellStyle}>
+        <input type="number" min={0} className="input-field" style={numInput} value={merged.goibiboPrice || ''} onChange={e => change('goibiboPrice', parseInt(e.target.value) || 0)} placeholder="—" />
+        {delta(merged.goibiboPrice) && <div style={{ fontSize: 10, fontWeight: 700, marginTop: 3, whiteSpace: 'nowrap' }}>{delta(merged.goibiboPrice)}</div>}
       </td>
       <td style={cellStyle}>
         <input type="number" min={0} className="input-field" style={{ ...numInput, width: 60 }} value={merged.inventory} onChange={e => change('inventory', parseInt(e.target.value) || 0)} />
