@@ -4,12 +4,16 @@ import { useState, useEffect, useCallback, Fragment } from 'react'
 import {
   ShieldCheck, RefreshCw, Building2, Clock, MessageSquare, TrendingUp,
   Trash2, Pause, CheckCircle2, AlertTriangle, Send, BarChart3, LayoutDashboard,
-  ChevronDown, ChevronUp, MessageCircle, Phone, Mail, MapPin, BedDouble,
+  ChevronDown, ChevronUp, MessageCircle, BedDouble,
+  Plus, Save, X as XIcon, Calendar,
 } from 'lucide-react'
 import Header from '@/components/Header'
 import Toast, { ToastMessage } from '@/components/Toast'
+import BrandedDatePicker from '@/components/BrandedDatePicker'
 import {
-  Concern, ConcernStatus, Enquiry, Hotel, STAR_LABELS, GST_LABELS,
+  Concern, ConcernStatus, Enquiry, Hotel, Room, MealPlan, RoomCategory, GstStatus,
+  STAR_LABELS, GST_LABELS, LOCATIONS, MEAL_LABELS,
+  categoriesFor, amenitiesFor,
   timeAgo, totalInventory, availableInventory, fmtINR,
 } from '@/lib/data'
 import { browserSupabase } from '@/lib/supabase'
@@ -34,6 +38,7 @@ export default function AdminPortal() {
   const [replyId, setReplyId] = useState<string | null>(null)
   const [replyText, setReplyText] = useState('')
   const [expandedHotelId, setExpandedHotelId] = useState<string | null>(null)
+  const [showAddHotel, setShowAddHotel] = useState(false)
 
   const [authError, setAuthError] = useState<string | null>(null)
 
@@ -90,6 +95,19 @@ export default function AdminPortal() {
     }
     if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Delete failed', 'error'); return }
     addToast(`"${name}" deleted`, 'success'); refresh()
+  }
+
+  const createHotel = async (body: object) => {
+    const res = await fetch('/api/admin/hotels', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    if (res.status === 401 || res.status === 403) {
+      addToast('Admin role missing on your Clerk user. See banner above.', 'error'); return false
+    }
+    if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Create failed', 'error'); return false }
+    addToast('Hotel created · Now live', 'success'); refresh()
+    return true
   }
 
   const patchConcern = async (id: string, body: object, success: string) => {
@@ -199,6 +217,20 @@ export default function AdminPortal() {
         )}
 
         {tab === 'hotels' && (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+              <button onClick={() => setShowAddHotel(f => !f)} className="btn-primary" style={{ padding: '11px 20px', fontSize: 13 }}>
+                {showAddHotel ? (<><XIcon size={13} strokeWidth={2.5} /> Cancel</>) : (<><Plus size={13} strokeWidth={2.5} /> Add Hotel</>)}
+              </button>
+            </div>
+
+            {showAddHotel && (
+              <AddHotelForm
+                onCreate={async body => { const ok = await createHotel(body); if (ok) setShowAddHotel(false) }}
+                onCancel={() => setShowAddHotel(false)}
+              />
+            )}
+
           <div className="card-elevated table-scroll" style={{ overflow: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -291,7 +323,7 @@ export default function AdminPortal() {
                   {expandedHotelId === h.id && (
                     <tr>
                       <td colSpan={8} style={{ padding: 0, background: '#fafbfa', borderBottom: '1px solid #edeeef' }}>
-                        <HotelDetailPanel hotel={h} />
+                        <HotelDetailPanel key={`${h.id}:${h.updatedAt}`} hotel={h} addToast={addToast} onRefresh={refresh} />
                       </td>
                     </tr>
                   )}
@@ -303,6 +335,7 @@ export default function AdminPortal() {
               </tbody>
             </table>
           </div>
+          </>
         )}
 
         {tab === 'enquiries' && (
@@ -374,99 +407,494 @@ export default function AdminPortal() {
   )
 }
 
+const fieldLabel: React.CSSProperties = {
+  display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase',
+  color: '#414942', marginBottom: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
+}
+const inputStyle: React.CSSProperties = { padding: '11px 14px', fontSize: 13 }
+
+const emptyRoomDraft = {
+  type: '', category: 'Deluxe' as RoomCategory, meal: 'CP' as MealPlan,
+  ep: '', cp: '', map: '', ap: '', childWob: '', extraBed: '',
+  gst: 'as_applicable' as GstStatus, notes: '', inventory: '', status: 'Available' as Room['status'],
+}
+
 // =====================================================================
-// Detail panel, shown when an admin expands a hotel row. Renders the
-// full submission so admin can decide approve/reject without leaving the
-// table.
+// Add Hotel, a standalone form for creating a listing directly (no
+// vendor signup needed). Rendered above the hotels table.
 // =====================================================================
-function HotelDetailPanel({ hotel }: { hotel: Hotel }) {
+function AddHotelForm({ onCreate, onCancel }: {
+  onCreate: (body: Record<string, unknown>) => void
+  onCancel: () => void
+}) {
+  const [draft, setDraft] = useState({
+    name: '', stars: 3, location: 'srinagar', locationLabel: 'Srinagar',
+    propertyType: 'hotel' as Hotel['propertyType'],
+    address: '', phone: '', whatsappSameAsPhone: true, whatsapp: '',
+    email: '', website: '', description: '', amenities: [] as string[],
+    tariffStart: '', tariffEnd: '', approved: true,
+  })
+  const [error, setError] = useState('')
+
+  const toggleAmenity = (a: string) => {
+    const set = new Set(draft.amenities)
+    if (set.has(a)) set.delete(a); else set.add(a)
+    setDraft({ ...draft, amenities: Array.from(set) })
+  }
+
+  const submit = () => {
+    if (!draft.name.trim()) { setError('Hotel name is required.'); return }
+    if (!draft.location) { setError('Location is required.'); return }
+    setError('')
+    onCreate(draft)
+  }
+
   return (
-    <div style={{ padding: '20px 24px', borderTop: '1px solid #edeeef' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 18 }}>
-        <DetailRow Icon={Phone}   label="Phone"        value={hotel.phone || '-'} />
-        <DetailRow Icon={MessageCircle} label="WhatsApp" value={hotel.whatsapp || '-'} />
-        <DetailRow Icon={Mail}    label="Email"        value={hotel.email || '-'} />
-        <DetailRow Icon={MapPin}  label="Address"      value={hotel.address || '-'} />
-        <DetailRow Icon={Building2} label="Type"       value={hotel.propertyType === 'houseboat' ? 'Houseboat' : 'Hotel'} />
-        <DetailRow Icon={Clock}   label="Tariff window" value={hotel.tariffStart && hotel.tariffEnd ? `${hotel.tariffStart} → ${hotel.tariffEnd}` : 'Not set'} />
-      </div>
+    <div className="card-elevated" style={{ padding: 28, marginBottom: 20 }}>
+      <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 20, fontWeight: 700, color: '#00361a', marginBottom: 6 }}>New Hotel Listing</div>
+      <p style={{ fontSize: 13, color: '#717971', margin: '0 0 22px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
+        Created directly, no vendor account needed. Add room rates after saving.
+      </p>
 
-      {hotel.description && (
-        <div style={{ padding: 14, borderRadius: 10, background: '#ffffff', border: '1px solid #edeeef', marginBottom: 18 }}>
-          <div className="t-overline" style={{ marginBottom: 6 }}>Description</div>
-          <div style={{ fontSize: 13, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.55 }}>{hotel.description}</div>
+      <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr', alignItems: 'start' }}>
+        <div>
+          <label style={fieldLabel}>Hotel Name *</label>
+          <input type="text" value={draft.name} onChange={e => setDraft({ ...draft, name: e.target.value })} className="input-field" style={inputStyle} placeholder="Hotel Marina Gulmarg" />
         </div>
-      )}
-
-      {hotel.amenities && hotel.amenities.length > 0 && (
-        <div style={{ marginBottom: 18 }}>
-          <div className="t-overline" style={{ marginBottom: 8 }}>Amenities ({hotel.amenities.length})</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {hotel.amenities.map(a => (
-              <span key={a} className="badge badge-neutral" style={{ fontSize: 11 }}>{a}</span>
-            ))}
-          </div>
+        <div>
+          <label style={fieldLabel}>Star Category</label>
+          <select value={draft.stars} onChange={e => setDraft({ ...draft, stars: parseInt(e.target.value) })} className="input-field" style={inputStyle}>
+            {[1, 2, 3, 4, 5].map(s => <option key={s} value={s}>{STAR_LABELS[s]}</option>)}
+          </select>
         </div>
-      )}
-
-      <div>
-        <div className="t-overline" style={{ marginBottom: 8 }}>Rooms ({hotel.rooms.length})</div>
-        {hotel.rooms.length === 0 ? (
-          <div style={{ padding: 14, borderRadius: 10, background: '#fff4f4', color: '#93000a', fontSize: 12.5, fontWeight: 600, border: '1px dashed #ba1a1a' }}>
-            <AlertTriangle size={13} strokeWidth={2.4} style={{ verticalAlign: 'middle', marginRight: 6 }} />
-            No rooms submitted, nothing for agents to see. Consider rejecting until vendor adds rates.
-          </div>
-        ) : (
-          <div style={{ overflowX: 'auto', borderRadius: 10, border: '1px solid #edeeef', background: '#ffffff' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
-              <thead>
-                <tr style={{ background: '#f8f9fa' }}>
-                  {['Room', 'Category', 'EP', 'CP', 'MAP', 'AP', 'Extra Bed', 'Child WOB', 'GST', 'Inv', 'Status'].map(h => (
-                    <th key={h} style={{ padding: '10px 12px', fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#717971', textAlign: 'left', whiteSpace: 'nowrap' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {hotel.rooms.map(r => (
-                  <tr key={r.id} style={{ borderTop: '1px solid #edeeef' }}>
-                    <td style={{ padding: '10px 12px', fontWeight: 700, color: '#191c1d' }}>{r.type}</td>
-                    <td style={{ padding: '10px 12px', color: '#414942' }}>{r.category}</td>
-                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.ep ? fmtINR(r.ep) : '-'}</td>
-                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.cp ? fmtINR(r.cp) : '-'}</td>
-                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.map ? fmtINR(r.map) : '-'}</td>
-                    <td style={{ padding: '10px 12px', color: '#00361a', fontWeight: 700 }}>{r.ap ? fmtINR(r.ap) : '-'}</td>
-                    <td style={{ padding: '10px 12px', color: '#414942' }}>{r.extraBed ? fmtINR(r.extraBed) : '-'}</td>
-                    <td style={{ padding: '10px 12px', color: '#414942' }}>{r.childWob ? fmtINR(r.childWob) : '-'}</td>
-                    <td style={{ padding: '10px 12px', color: '#717971', fontSize: 11 }}>{GST_LABELS[r.gst] || r.gst}</td>
-                    <td style={{ padding: '10px 12px', color: '#414942', fontWeight: 700 }}>{r.inventory}</td>
-                    <td style={{ padding: '10px 12px' }}>
-                      <span className={`badge ${r.status === 'Available' ? 'badge-success' : r.status === 'Limited' ? 'badge-tertiary' : 'badge-error'}`} style={{ fontSize: 10 }}>{r.status}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div>
+          <label style={fieldLabel}>Location *</label>
+          <select
+            value={draft.location}
+            onChange={e => {
+              const loc = LOCATIONS.find(l => l.value === e.target.value)
+              setDraft({ ...draft, location: e.target.value, locationLabel: loc?.label || e.target.value })
+            }}
+            className="input-field" style={inputStyle}
+          >
+            {LOCATIONS.filter(l => l.value !== 'all').map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={fieldLabel}>Property Type</label>
+          <select value={draft.propertyType} onChange={e => setDraft({ ...draft, propertyType: e.target.value as Hotel['propertyType'] })} className="input-field" style={inputStyle}>
+            <option value="hotel">Hotel</option>
+            <option value="houseboat">Houseboat</option>
+          </select>
+        </div>
+        <div style={{ gridColumn: '1 / -1' }}>
+          <label style={fieldLabel}>Address</label>
+          <input type="text" value={draft.address} onChange={e => setDraft({ ...draft, address: e.target.value })} className="input-field" style={inputStyle} />
+        </div>
+        <div>
+          <label style={fieldLabel}>Phone</label>
+          <input type="text" value={draft.phone} onChange={e => setDraft({ ...draft, phone: e.target.value })} className="input-field" style={inputStyle} placeholder="+919906993545" />
+        </div>
+        <div>
+          <label style={fieldLabel}>Email</label>
+          <input type="text" value={draft.email} onChange={e => setDraft({ ...draft, email: e.target.value })} className="input-field" style={inputStyle} />
+        </div>
+        <div>
+          <label style={fieldLabel}>Website</label>
+          <input type="text" value={draft.website} onChange={e => setDraft({ ...draft, website: e.target.value })} className="input-field" style={inputStyle} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 11 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, fontWeight: 600, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', cursor: 'pointer' }}>
+            <input type="checkbox" checked={draft.whatsappSameAsPhone} onChange={e => setDraft({ ...draft, whatsappSameAsPhone: e.target.checked })} />
+            WhatsApp same as phone
+          </label>
+        </div>
+        {!draft.whatsappSameAsPhone && (
+          <div>
+            <label style={fieldLabel}>WhatsApp</label>
+            <input type="text" value={draft.whatsapp} onChange={e => setDraft({ ...draft, whatsapp: e.target.value })} className="input-field" style={inputStyle} />
           </div>
         )}
+        <div style={{ gridColumn: '1 / -1' }}>
+          <label style={fieldLabel}>Description</label>
+          <textarea value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} className="input-field" rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
+        </div>
+      </div>
+
+      <div style={{ marginTop: 22, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(255,220,196,0.32), rgba(184,240,197,0.28))', border: '1px solid rgba(240,159,94,0.25)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <Calendar size={14} strokeWidth={2.5} color="#6f3800" />
+          <label style={{ ...fieldLabel, marginBottom: 0, color: '#6f3800' }}>Tariff valid period</label>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+          <BrandedDatePicker label="Valid from" value={draft.tariffStart} max={draft.tariffEnd || undefined} onChange={v => setDraft({ ...draft, tariffStart: v })} placeholder="Pick start date" />
+          <BrandedDatePicker label="Valid till" value={draft.tariffEnd} min={draft.tariffStart || undefined} onChange={v => setDraft({ ...draft, tariffEnd: v })} placeholder="Pick end date" />
+        </div>
+      </div>
+
+      <div style={{ marginTop: 22 }}>
+        <label style={{ ...fieldLabel, marginBottom: 12 }}>Amenities</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {amenitiesFor(draft.propertyType).map(a => {
+            const active = draft.amenities.includes(a)
+            return (
+              <button key={a} onClick={() => toggleAmenity(a)} type="button" style={{
+                padding: '8px 14px', borderRadius: 9999, border: 'none',
+                background: active ? 'linear-gradient(135deg, #00361a, #1a4d2e)' : '#f3f4f5',
+                color: active ? '#ffffff' : '#414942',
+                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, fontWeight: 600,
+                cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+              }}>
+                {active ? <CheckCircle2 size={12} strokeWidth={2.5} /> : <Plus size={12} strokeWidth={2.5} />}
+                {a}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      <div style={{ marginTop: 22 }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, fontWeight: 600, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', cursor: 'pointer' }}>
+          <input type="checkbox" checked={draft.approved} onChange={e => setDraft({ ...draft, approved: e.target.checked })} />
+          Live on public board immediately (uncheck to save as a draft awaiting approval)
+        </label>
+      </div>
+
+      {error && (
+        <p style={{ fontSize: 12, color: '#93000a', margin: '16px 0 0', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600 }}>
+          <XIcon size={13} strokeWidth={2.5} style={{ marginRight: 6, verticalAlign: 'middle' }} /> {error}
+        </p>
+      )}
+
+      <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
+        <button onClick={submit} className="btn-primary" style={{ padding: '12px 24px', fontSize: 13 }}>
+          <Plus size={13} strokeWidth={2.5} /> Create Hotel
+        </button>
+        <button onClick={onCancel} className="btn-secondary" style={{ padding: '12px 22px', fontSize: 13 }}>Cancel</button>
       </div>
     </div>
   )
 }
 
-function DetailRow({ Icon, label, value }: { Icon: typeof Phone; label: string; value: string }) {
+// =====================================================================
+// Detail panel, shown when an admin expands a hotel row. Full profile
+// editor + room rate management, all changes go live immediately.
+// =====================================================================
+function HotelDetailPanel({ hotel, addToast, onRefresh }: {
+  hotel: Hotel
+  addToast: (msg: string, type?: ToastMessage['type']) => void
+  onRefresh: () => void
+}) {
+  const [draft, setDraft] = useState<Hotel>(hotel)
+  const [showAddRoom, setShowAddRoom] = useState(false)
+  const [newRoom, setNewRoom] = useState(emptyRoomDraft)
+  const [roomError, setRoomError] = useState('')
+
+  const toggleAmenity = (a: string) => {
+    const set = new Set(draft.amenities)
+    if (set.has(a)) set.delete(a); else set.add(a)
+    setDraft({ ...draft, amenities: Array.from(set) })
+  }
+
+  const saveProfile = async () => {
+    const res = await fetch(`/api/admin/hotels/${hotel.id}`, {
+      method: 'PATCH', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: draft.name, stars: draft.stars, location: draft.location, locationLabel: draft.locationLabel,
+        propertyType: draft.propertyType, address: draft.address, phone: draft.phone,
+        whatsapp: draft.whatsapp || draft.phone,
+        email: draft.email, website: draft.website, description: draft.description,
+        amenities: draft.amenities,
+        tariffStart: draft.tariffStart || null, tariffEnd: draft.tariffEnd || null,
+      }),
+    })
+    if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Save failed', 'error'); return }
+    addToast('Hotel profile saved', 'success'); onRefresh()
+  }
+
+  const addRoom = async () => {
+    setRoomError('')
+    if (!newRoom.type.trim()) { setRoomError('Room type name is required.'); return }
+    const res = await fetch(`/api/admin/hotels/${hotel.id}/rooms`, {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(newRoom),
+    })
+    if (!res.ok) { setRoomError((await res.json().catch(() => ({}))).error || 'Add failed'); return }
+    setNewRoom(emptyRoomDraft); setShowAddRoom(false)
+    addToast(`"${newRoom.type.trim()}" added · Now live`, 'success'); onRefresh()
+  }
+
+  const saveRoom = async (roomId: string, patch: Partial<Room>) => {
+    const res = await fetch(`/api/admin/hotels/${hotel.id}/rooms/${roomId}`, {
+      method: 'PUT', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(patch),
+    })
+    if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Save failed', 'error'); return }
+    addToast('Room saved', 'success'); onRefresh()
+  }
+
+  const deleteRoom = async (roomId: string, name: string) => {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
+    const res = await fetch(`/api/admin/hotels/${hotel.id}/rooms/${roomId}`, { method: 'DELETE' })
+    if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Delete failed', 'error'); return }
+    addToast(`"${name}" removed`, 'info'); onRefresh()
+  }
+
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-      <div style={{
-        width: 32, height: 32, borderRadius: 9999, background: '#f3f4f5',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-      }}>
-        <Icon size={14} strokeWidth={2.2} color="#00361a" />
+    <div style={{ padding: '20px 24px', borderTop: '1px solid #edeeef' }}>
+      <div className="t-overline" style={{ marginBottom: 12 }}>Hotel Profile</div>
+      <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr', alignItems: 'start', marginBottom: 18 }}>
+        <div>
+          <label style={fieldLabel}>Hotel Name</label>
+          <input type="text" value={draft.name} onChange={e => setDraft({ ...draft, name: e.target.value })} className="input-field" style={inputStyle} />
+        </div>
+        <div>
+          <label style={fieldLabel}>Star Category</label>
+          <select value={draft.stars} onChange={e => setDraft({ ...draft, stars: parseInt(e.target.value) as Hotel['stars'] })} className="input-field" style={inputStyle}>
+            {[1, 2, 3, 4, 5].map(s => <option key={s} value={s}>{STAR_LABELS[s]}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={fieldLabel}>Location</label>
+          <select
+            value={draft.location}
+            onChange={e => {
+              const loc = LOCATIONS.find(l => l.value === e.target.value)
+              setDraft({ ...draft, location: e.target.value as Hotel['location'], locationLabel: loc?.label || e.target.value })
+            }}
+            className="input-field" style={inputStyle}
+          >
+            {LOCATIONS.filter(l => l.value !== 'all').map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={fieldLabel}>Property Type</label>
+          <select value={draft.propertyType} onChange={e => setDraft({ ...draft, propertyType: e.target.value as Hotel['propertyType'] })} className="input-field" style={inputStyle}>
+            <option value="hotel">Hotel</option>
+            <option value="houseboat">Houseboat</option>
+          </select>
+        </div>
+        <div style={{ gridColumn: '1 / -1' }}>
+          <label style={fieldLabel}>Address</label>
+          <input type="text" value={draft.address} onChange={e => setDraft({ ...draft, address: e.target.value })} className="input-field" style={inputStyle} />
+        </div>
+        <div>
+          <label style={fieldLabel}>Phone</label>
+          <input type="text" value={draft.phone} onChange={e => setDraft({ ...draft, phone: e.target.value })} className="input-field" style={inputStyle} />
+        </div>
+        <div>
+          <label style={fieldLabel}>WhatsApp</label>
+          <input type="text" value={draft.whatsapp} onChange={e => setDraft({ ...draft, whatsapp: e.target.value })} className="input-field" style={inputStyle} />
+        </div>
+        <div>
+          <label style={fieldLabel}>Email</label>
+          <input type="text" value={draft.email} onChange={e => setDraft({ ...draft, email: e.target.value })} className="input-field" style={inputStyle} />
+        </div>
+        <div>
+          <label style={fieldLabel}>Website</label>
+          <input type="text" value={draft.website} onChange={e => setDraft({ ...draft, website: e.target.value })} className="input-field" style={inputStyle} />
+        </div>
+        <div style={{ gridColumn: '1 / -1' }}>
+          <label style={fieldLabel}>Description</label>
+          <textarea value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} className="input-field" rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
+        </div>
       </div>
-      <div style={{ minWidth: 0 }}>
-        <div className="t-overline" style={{ fontSize: 9 }}>{label}</div>
-        <div style={{ fontSize: 13, color: '#191c1d', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600, wordBreak: 'break-word' }}>{value}</div>
+
+      <div style={{ marginBottom: 18, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(255,220,196,0.32), rgba(184,240,197,0.28))', border: '1px solid rgba(240,159,94,0.25)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <Calendar size={14} strokeWidth={2.5} color="#6f3800" />
+          <label style={{ ...fieldLabel, marginBottom: 0, color: '#6f3800' }}>Tariff valid period</label>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+          <BrandedDatePicker label="Valid from" value={draft.tariffStart} max={draft.tariffEnd || undefined} onChange={v => setDraft({ ...draft, tariffStart: v })} placeholder="Pick start date" />
+          <BrandedDatePicker label="Valid till" value={draft.tariffEnd} min={draft.tariffStart || undefined} onChange={v => setDraft({ ...draft, tariffEnd: v })} placeholder="Pick end date" />
+        </div>
       </div>
+
+      <div style={{ marginBottom: 18 }}>
+        <label style={{ ...fieldLabel, marginBottom: 12 }}>Amenities</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {amenitiesFor(draft.propertyType).map(a => {
+            const active = draft.amenities.includes(a)
+            return (
+              <button key={a} onClick={() => toggleAmenity(a)} type="button" style={{
+                padding: '8px 14px', borderRadius: 9999, border: 'none',
+                background: active ? 'linear-gradient(135deg, #00361a, #1a4d2e)' : '#f3f4f5',
+                color: active ? '#ffffff' : '#414942',
+                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, fontWeight: 600,
+                cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+              }}>
+                {active ? <CheckCircle2 size={12} strokeWidth={2.5} /> : <Plus size={12} strokeWidth={2.5} />}
+                {a}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      <button onClick={saveProfile} className="btn-primary" style={{ padding: '12px 24px', fontSize: 13, marginBottom: 28 }}>
+        <Save size={13} strokeWidth={2.3} /> Save Profile
+      </button>
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <div className="t-overline">Rooms ({hotel.rooms.length})</div>
+        <button onClick={() => setShowAddRoom(f => !f)} className="btn-secondary" style={{ padding: '8px 16px', fontSize: 12 }}>
+          {showAddRoom ? (<><XIcon size={12} strokeWidth={2.5} /> Cancel</>) : (<><Plus size={12} strokeWidth={2.5} /> Add Room Type</>)}
+        </button>
+      </div>
+
+      {hotel.rooms.length === 0 && !showAddRoom && (
+        <div style={{ padding: 14, borderRadius: 10, background: '#fff4f4', color: '#93000a', fontSize: 12.5, fontWeight: 600, border: '1px dashed #ba1a1a', marginBottom: 14 }}>
+          <AlertTriangle size={13} strokeWidth={2.4} style={{ verticalAlign: 'middle', marginRight: 6 }} />
+          No rooms yet, nothing for agents to see. Add at least one room type below.
+        </div>
+      )}
+
+      {hotel.rooms.length > 0 && (
+        <div style={{ overflowX: 'auto', borderRadius: 10, border: '1px solid #edeeef', background: '#ffffff', marginBottom: 14 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
+            <thead>
+              <tr style={{ background: '#f8f9fa' }}>
+                {['Room', 'Category', 'Meal', 'EP', 'CP', 'MAP', 'AP', 'Extra Bed', 'Child WOB', 'GST', 'Inv', 'Status', ''].map(h => (
+                  <th key={h} style={{ padding: '10px 12px', fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#717971', textAlign: 'left', whiteSpace: 'nowrap' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {hotel.rooms.map(r => (
+                <AdminRoomRow key={r.id} room={r} propertyType={draft.propertyType} onSave={patch => saveRoom(r.id, patch)} onDelete={() => deleteRoom(r.id, r.type)} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {showAddRoom && (
+        <div className="card-elevated" style={{ padding: 20 }}>
+          <div className="form-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+            <div style={{ gridColumn: 'span 2' }}>
+              <label style={fieldLabel}>Room Type *</label>
+              <input type="text" value={newRoom.type} onChange={e => setNewRoom({ ...newRoom, type: e.target.value })} className="input-field" style={inputStyle} placeholder="Deluxe Room" />
+            </div>
+            <div>
+              <label style={fieldLabel}>Category</label>
+              <select value={newRoom.category} onChange={e => setNewRoom({ ...newRoom, category: e.target.value as RoomCategory })} className="input-field" style={inputStyle}>
+                {categoriesFor(draft.propertyType).map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={fieldLabel}>Meal Plan</label>
+              <select value={newRoom.meal} onChange={e => setNewRoom({ ...newRoom, meal: e.target.value as MealPlan })} className="input-field" style={inputStyle}>
+                {(Object.keys(MEAL_LABELS) as MealPlan[]).map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </div>
+            {(['ep', 'cp', 'map', 'ap', 'extraBed', 'childWob'] as const).map(f => (
+              <div key={f}>
+                <label style={fieldLabel}>{f === 'map' ? 'MAP ₹' : f === 'extraBed' ? 'Extra Bed ₹' : f === 'childWob' ? 'Child WOB ₹' : `${f.toUpperCase()} ₹`}</label>
+                <input type="number" value={(newRoom as Record<string, string>)[f]} onChange={e => setNewRoom({ ...newRoom, [f]: e.target.value })} className="input-field" style={inputStyle} placeholder="0" />
+              </div>
+            ))}
+            <div>
+              <label style={fieldLabel}>GST</label>
+              <select value={newRoom.gst} onChange={e => setNewRoom({ ...newRoom, gst: e.target.value as GstStatus })} className="input-field" style={inputStyle}>
+                {(Object.keys(GST_LABELS) as GstStatus[]).map(g => <option key={g} value={g}>{GST_LABELS[g]}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={fieldLabel}>Rooms Available</label>
+              <input type="number" value={newRoom.inventory} onChange={e => setNewRoom({ ...newRoom, inventory: e.target.value })} className="input-field" style={inputStyle} placeholder="5" />
+            </div>
+            <div>
+              <label style={fieldLabel}>Status</label>
+              <select value={newRoom.status} onChange={e => setNewRoom({ ...newRoom, status: e.target.value as Room['status'] })} className="input-field" style={inputStyle}>
+                <option>Available</option><option>Limited</option><option>Sold Out</option>
+              </select>
+            </div>
+            <div style={{ gridColumn: 'span 2' }}>
+              <label style={fieldLabel}>Notes</label>
+              <input type="text" value={newRoom.notes} onChange={e => setNewRoom({ ...newRoom, notes: e.target.value })} className="input-field" style={inputStyle} placeholder="Extra bed Rs 800/1000/1200, GST as applicable…" />
+            </div>
+          </div>
+          {roomError && (
+            <p style={{ fontSize: 12, color: '#93000a', margin: '14px 0 0', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600 }}>
+              <XIcon size={13} strokeWidth={2.5} style={{ marginRight: 6, verticalAlign: 'middle' }} /> {roomError}
+            </p>
+          )}
+          <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+            <button onClick={addRoom} className="btn-primary" style={{ padding: '11px 22px', fontSize: 13 }}>
+              <Plus size={13} strokeWidth={2.5} /> Add Room Type
+            </button>
+            <button onClick={() => { setShowAddRoom(false); setRoomError('') }} className="btn-secondary" style={{ padding: '11px 20px', fontSize: 13 }}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
+  )
+}
+
+function AdminRoomRow({ room, propertyType, onSave, onDelete }: {
+  room: Room
+  propertyType: Hotel['propertyType']
+  onSave: (patch: Partial<Room>) => void
+  onDelete: () => void
+}) {
+  const [draft, setDraft] = useState<Partial<Room>>({})
+  const merged = { ...room, ...draft }
+  const change = (k: keyof Room, v: string | number) => setDraft(d => ({ ...d, [k]: v }))
+  const cellStyle: React.CSSProperties = { padding: '8px 10px', borderTop: '1px solid #edeeef' }
+  const numInput: React.CSSProperties = { width: 76, padding: '6px 8px', fontSize: 12 }
+
+  return (
+    <tr>
+      <td style={cellStyle}><input value={merged.type} onChange={e => change('type', e.target.value)} className="input-field" style={{ width: 130, padding: '6px 8px', fontSize: 12 }} /></td>
+      <td style={cellStyle}>
+        <select className="input-field" value={merged.category} onChange={e => change('category', e.target.value)} style={{ padding: '6px 8px', fontSize: 12, width: 'auto' }}>
+          {categoriesFor(propertyType).map(c => <option key={c}>{c}</option>)}
+        </select>
+      </td>
+      <td style={cellStyle}>
+        <select className="input-field" value={merged.meal} onChange={e => change('meal', e.target.value)} style={{ padding: '6px 8px', fontSize: 12, width: 'auto' }}>
+          <option value="CP">CP</option><option value="MAP">MAP</option><option value="AP">AP</option><option value="EP">EP</option>
+        </select>
+      </td>
+      {(['ep', 'cp', 'map', 'ap', 'extraBed', 'childWob'] as const).map(f => (
+        <td key={f} style={cellStyle}>
+          <input type="number" min={0} className="input-field" style={numInput} value={(merged as Record<string, unknown>)[f] as number} onChange={e => change(f, parseInt(e.target.value) || 0)} />
+        </td>
+      ))}
+      <td style={cellStyle}>
+        <select className="input-field" value={merged.gst} onChange={e => change('gst', e.target.value)} style={{ padding: '6px 8px', fontSize: 11, width: 'auto' }}>
+          {(Object.keys(GST_LABELS) as GstStatus[]).map(g => <option key={g} value={g}>{GST_LABELS[g]}</option>)}
+        </select>
+      </td>
+      <td style={cellStyle}>
+        <input type="number" min={0} className="input-field" style={{ ...numInput, width: 60 }} value={merged.inventory} onChange={e => change('inventory', parseInt(e.target.value) || 0)} />
+      </td>
+      <td style={cellStyle}>
+        <select className="input-field" value={merged.status} onChange={e => change('status', e.target.value)} style={{ padding: '6px 8px', fontSize: 11, width: 'auto' }}>
+          <option>Available</option><option>Limited</option><option>Sold Out</option>
+        </select>
+      </td>
+      <td style={{ ...cellStyle, whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button onClick={() => { onSave(draft); setDraft({}) }} className="btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>
+            <Save size={11} strokeWidth={2.3} /> Save
+          </button>
+          <button
+            onClick={onDelete}
+            style={{
+              padding: '6px 10px', borderRadius: 9999, border: 'none',
+              background: '#ba1a1a', color: '#ffffff',
+              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11, fontWeight: 800,
+              cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4,
+            }}
+            aria-label="Delete room"
+          >
+            <Trash2 size={11} strokeWidth={2.3} />
+          </button>
+        </div>
+      </td>
+    </tr>
   )
 }
 

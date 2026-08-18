@@ -13,12 +13,37 @@ async function assertAdmin() {
   return { ok: true as const }
 }
 
-/** PATCH /api/admin/hotels/[id]  body: { approved?: boolean } */
+// Strip non-digits from phone for storage consistency, preserve leading +
+function normPhone(raw: unknown) {
+  const s = String(raw ?? '').trim()
+  if (!s) return ''
+  return s.startsWith('+') ? '+' + s.slice(1).replace(/\D/g, '') : s.replace(/\D/g, '')
+}
+
+/**
+ * PATCH /api/admin/hotels/[id]
+ * body: { approved?: boolean } for the approve/suspend buttons, or any subset
+ * of the full profile fields below for the edit form.
+ */
 export async function PATCH(req: Request, ctx: { params: { id: string } }) {
   const a = await assertAdmin(); if (!a.ok) return NextResponse.json({ error: 'forbidden' }, { status: a.code })
   const body = await req.json()
   const update: Record<string, unknown> = {}
   if (typeof body.approved === 'boolean') update.approved = body.approved
+  if (typeof body.name === 'string') update.name = body.name.trim()
+  if (body.stars !== undefined) update.stars = Math.max(1, Math.min(5, parseInt(body.stars) || 3))
+  if (typeof body.location === 'string') update.location = body.location.trim()
+  if (typeof body.locationLabel === 'string') update.location_label = body.locationLabel.trim()
+  if (body.propertyType === 'hotel' || body.propertyType === 'houseboat') update.property_type = body.propertyType
+  if (typeof body.address === 'string') update.address = body.address.trim()
+  if (typeof body.phone === 'string') update.phone = normPhone(body.phone)
+  if (typeof body.whatsapp === 'string') update.whatsapp_phone = normPhone(body.whatsapp)
+  if (typeof body.email === 'string') update.email = body.email.trim()
+  if (typeof body.website === 'string') update.website = body.website.trim()
+  if (typeof body.description === 'string') update.description = body.description.trim()
+  if (Array.isArray(body.amenities)) update.amenities = body.amenities
+  if ('tariffStart' in body) update.tariff_start = body.tariffStart || null
+  if ('tariffEnd' in body) update.tariff_end = body.tariffEnd || null
   if (Object.keys(update).length === 0) return NextResponse.json({ error: 'no fields' }, { status: 400 })
 
   const sb = serverSupabase()
