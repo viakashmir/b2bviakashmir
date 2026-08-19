@@ -421,6 +421,12 @@ const emptyRoomDraft = {
   ep: '', cp: '', map: '', ap: '', childWob: '', extraBed: '',
   gst: 'as_applicable' as GstStatus, notes: '', inventory: '', status: 'Available' as Room['status'],
 }
+// emptyRoomDraft.category ('Deluxe') is only valid for hotels — houseboats use
+// a disjoint category list, so always seed the draft's category from the
+// hotel's actual property type rather than the hardcoded default.
+function defaultRoomDraft(propertyType: Hotel['propertyType']) {
+  return { ...emptyRoomDraft, category: categoriesFor(propertyType)[0] }
+}
 
 // =====================================================================
 // Add Hotel, a standalone form for creating a listing directly (no
@@ -602,7 +608,7 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
 }) {
   const [draft, setDraft] = useState<Hotel>(hotel)
   const [showAddRoom, setShowAddRoom] = useState(false)
-  const [newRoom, setNewRoom] = useState(emptyRoomDraft)
+  const [newRoom, setNewRoom] = useState(() => defaultRoomDraft(hotel.propertyType))
   const [roomError, setRoomError] = useState('')
   const [invitePending, setInvitePending] = useState(false)
   const hasVendorAccount = hotel.id.startsWith('vendor_')
@@ -646,7 +652,7 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
       body: JSON.stringify(newRoom),
     })
     if (!res.ok) { setRoomError((await res.json().catch(() => ({}))).error || 'Add failed'); return }
-    setNewRoom(emptyRoomDraft); setShowAddRoom(false)
+    setNewRoom(defaultRoomDraft(draft.propertyType)); setShowAddRoom(false)
     addToast(`"${newRoom.type.trim()}" added · Now live`, 'success'); onRefresh()
   }
 
@@ -655,8 +661,9 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
       method: 'PUT', headers: { 'content-type': 'application/json' },
       body: JSON.stringify(patch),
     })
-    if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Save failed', 'error'); return }
+    if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Save failed', 'error'); return false }
     addToast('Room saved', 'success'); onRefresh()
+    return true
   }
 
   const deleteRoom = async (roomId: string, name: string) => {
@@ -758,13 +765,17 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
           <div style={{ fontSize: 12, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
             {hasVendorAccount
               ? 'This hotel has its own vendor login and manages its rates directly.'
-              : 'No vendor login yet — invite one so the hotel can manage its own rates and inventory.'}
+              : hotel.email
+                ? (draft.email !== hotel.email
+                    ? 'Save the profile first — the invite goes to the saved email, not what\'s typed above yet.'
+                    : 'No vendor login yet — invite one so the hotel can manage its own rates and inventory.')
+                : 'No email on file yet — add one above and save before inviting a login.'}
           </div>
         </div>
         {hasVendorAccount ? (
           <span className="badge badge-success"><CheckCircle2 size={11} strokeWidth={2.5} /> Vendor account linked</span>
         ) : (
-          <button onClick={sendInvite} disabled={invitePending || !draft.email} className="btn-primary" style={{ padding: '10px 18px', fontSize: 12.5, opacity: invitePending || !draft.email ? 0.6 : 1 }}>
+          <button onClick={sendInvite} disabled={invitePending || !hotel.email || draft.email !== hotel.email} className="btn-primary" style={{ padding: '10px 18px', fontSize: 12.5, opacity: invitePending || !hotel.email || draft.email !== hotel.email ? 0.6 : 1 }}>
             <Send size={12} strokeWidth={2.3} /> {invitePending ? 'Sending…' : 'Send Login Invite'}
           </button>
         )}
@@ -906,10 +917,11 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
 function AdminRoomRow({ room, propertyType, onSave, onDelete }: {
   room: Room
   propertyType: Hotel['propertyType']
-  onSave: (patch: Partial<Room>) => void
+  onSave: (patch: Partial<Room>) => Promise<boolean>
   onDelete: () => void
 }) {
   const [draft, setDraft] = useState<Partial<Room>>({})
+  const [saving, setSaving] = useState(false)
   const merged = { ...room, ...draft }
   const change = (k: keyof Room, v: string | number) => setDraft(d => ({ ...d, [k]: v }))
   const cellStyle: React.CSSProperties = { padding: '8px 10px', borderTop: '1px solid #edeeef' }
@@ -965,8 +977,17 @@ function AdminRoomRow({ room, propertyType, onSave, onDelete }: {
       </td>
       <td style={{ ...cellStyle, whiteSpace: 'nowrap' }}>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button onClick={() => { onSave(draft); setDraft({}) }} className="btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>
-            <Save size={11} strokeWidth={2.3} /> Save
+          <button
+            onClick={async () => {
+              setSaving(true)
+              const ok = await onSave(draft)
+              setSaving(false)
+              if (ok) setDraft({})
+            }}
+            disabled={saving}
+            className="btn-primary" style={{ padding: '6px 12px', fontSize: 11, opacity: saving ? 0.6 : 1 }}
+          >
+            <Save size={11} strokeWidth={2.3} /> {saving ? 'Saving…' : 'Save'}
           </button>
           <button
             onClick={onDelete}

@@ -2,6 +2,13 @@ import { clerkClient } from '@clerk/nextjs/server'
 import { serverSupabase } from '@/lib/supabase'
 import { appUrl } from '@/lib/email'
 
+// Postgres LIKE/ILIKE treats '%' and '_' as wildcards ('_' matches any
+// single character) — escape them so an ilike() match on a user-supplied
+// email behaves as an exact case-insensitive match, not a pattern.
+function escapeLike(s: string) {
+  return s.replace(/[\\%_]/g, '\\$&')
+}
+
 /**
  * Server-only. When a Clerk vendor account's email matches an existing
  * admin-managed hotel listing (bulk-imported via seed SQL, or created
@@ -28,7 +35,7 @@ export async function claimExistingHotelListing(email: string, userId: string): 
 
   const { data: candidate } = await sb.from('hotels')
     .select('*')
-    .ilike('email', email)
+    .ilike('email', escapeLike(email))
     .not('id', 'like', 'vendor_%')
     .order('created_at', { ascending: true })
     .limit(1)
