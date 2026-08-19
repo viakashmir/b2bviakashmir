@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@clerk/nextjs'
 import {
   Trash2, Save, Plus, Eye, Clock, BedDouble, TrendingUp,
-  Coins, Building2, Contact, CheckCircle2, X as XIcon, Calendar,
+  Coins, Building2, Contact, CheckCircle2, X as XIcon, Calendar, AlertTriangle,
 } from 'lucide-react'
 import BrandedDatePicker from '@/components/BrandedDatePicker'
 import Toast, { ToastMessage } from '@/components/Toast'
@@ -13,7 +13,7 @@ import {
   Hotel, Room, MealPlan, RoomCategory,
   MEAL_LABELS, STAR_LABELS,
   categoriesFor, amenitiesFor,
-  fmtDate, timeAgo, fmtINR, availableInventory, totalInventory,
+  fmtDate, timeAgo, fmtINR, availableInventory, totalInventory, isExpired,
 } from '@/lib/data'
 import { browserSupabase } from '@/lib/supabase'
 
@@ -199,6 +199,22 @@ export default function VendorPortal() {
           </div>
         </div>
 
+        {hotel.approved && isExpired(hotel) && (
+          <div className="card-elevated" style={{ padding: 18, marginBottom: 20, borderLeft: '4px solid #ba1a1a', background: '#ffdad6' }}>
+            <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 700, color: '#93000a', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <AlertTriangle size={14} strokeWidth={2.3} /> Your rates have expired
+            </div>
+            <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#191c1d', lineHeight: 1.5 }}>
+              Your tariff was valid through {hotel.tariffEnd}. Your listing is hidden from the public board until you set a new period below, it goes live again automatically, no approval needed.
+              {' '}
+              <button
+                onClick={() => { setTab('profile'); setTimeout(() => document.getElementById('tariff-block')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80) }}
+                style={{ background: 'none', border: 'none', padding: 0, color: '#93000a', fontWeight: 800, textDecoration: 'underline', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}
+              >Update tariff period →</button>
+            </div>
+          </div>
+        )}
+
         {/* === MY LISTING, the data the vendor entered during onboarding === */}
         <div className="card-elevated" style={{ overflow: 'hidden', marginBottom: 24 }}>
           <div style={{
@@ -214,15 +230,17 @@ export default function VendorPortal() {
             }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,
-                background: hotel.approved ? 'rgba(184,240,197,0.18)' : 'rgba(255,220,196,0.22)',
-                color: hotel.approved ? '#b8f0c5' : '#ffdcc4',
+                background: !hotel.approved ? 'rgba(255,220,196,0.22)' : isExpired(hotel) ? 'rgba(255,180,164,0.28)' : 'rgba(184,240,197,0.18)',
+                color: !hotel.approved ? '#ffdcc4' : isExpired(hotel) ? '#ffb4a4' : '#b8f0c5',
                 fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 10, fontWeight: 800,
                 letterSpacing: '0.12em', textTransform: 'uppercase',
                 padding: '5px 12px', borderRadius: 9999,
               }}>
-                {hotel.approved
-                  ? (<><CheckCircle2 size={11} strokeWidth={2.5} /> Live</>)
-                  : (<><Clock size={11} strokeWidth={2.5} /> Pending</>)}
+                {!hotel.approved
+                  ? (<><Clock size={11} strokeWidth={2.5} /> Pending</>)
+                  : isExpired(hotel)
+                    ? (<><AlertTriangle size={11} strokeWidth={2.5} /> Rates Expired</>)
+                    : (<><CheckCircle2 size={11} strokeWidth={2.5} /> Live</>)}
               </span>
             </div>
 
@@ -243,11 +261,12 @@ export default function VendorPortal() {
               {hotel.tariffStart && hotel.tariffEnd ? (
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 4,
-                  background: 'rgba(255,220,196,0.18)', color: '#ffdcc4',
+                  background: isExpired(hotel) ? 'rgba(255,180,164,0.28)' : 'rgba(255,220,196,0.18)',
+                  color: isExpired(hotel) ? '#ffb4a4' : '#ffdcc4',
                   padding: '2px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
                 }}>
                   <Calendar size={11} strokeWidth={2.4} />
-                  Tariff {hotel.tariffStart.slice(5)} → {hotel.tariffEnd.slice(5)}
+                  Tariff {hotel.tariffStart.slice(5)} → {hotel.tariffEnd.slice(5)}{isExpired(hotel) ? ' · Expired' : ''}
                 </span>
               ) : (
                 <button

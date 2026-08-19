@@ -355,6 +355,24 @@ export function availableInventory(rooms: Room[]): number {
 }
 
 // =============================================================
+// Tariff expiry
+// A hotel's rates are only valid through tariffEnd. Past that date the
+// listing is treated as expired: hidden from the public board even
+// though `approved` stays true, until the vendor or admin saves a new
+// (or cleared) tariff period.
+// =============================================================
+export function isExpired(hotel: { tariffEnd: string }): boolean {
+  return !!hotel.tariffEnd && hotel.tariffEnd < new Date().toISOString().slice(0, 10)
+}
+
+/** Whole days since tariffEnd passed, 0 if not expired. */
+export function daysExpired(hotel: { tariffEnd: string }): number {
+  if (!isExpired(hotel)) return 0
+  const diff = Date.now() - new Date(hotel.tariffEnd + 'T00:00:00Z').getTime()
+  return Math.max(0, Math.floor(diff / 86400000))
+}
+
+// =============================================================
 // Seasonal rates
 // Vendors that quote more than one season are stored with the CURRENT
 // season in the rate columns and the alternate season(s) written into

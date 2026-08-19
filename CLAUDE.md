@@ -43,7 +43,7 @@ Hotels can also originate outside that flow — bulk-imported via `supabase/seed
 
 | Route | Method | Auth | Purpose |
 |---|---|---|---|
-| `/api/hotels` | GET | public | Approved hotels + rooms for the public board |
+| `/api/hotels` | GET | public | Approved hotels + rooms for the public board, excludes hotels whose tariff period has expired |
 | `/api/hotels/me` | GET, POST | vendor | Fetch / upsert vendor's own hotel (used by onboarding + Profile tab); GET falls back to `claimExistingHotelListing` before returning null |
 | `/api/hotels/me/rooms` | POST | vendor | Add a room |
 | `/api/hotels/me/rooms/[roomId]` | PUT, DELETE | vendor | Update / delete a room |
@@ -55,9 +55,11 @@ Hotels can also originate outside that flow — bulk-imported via `supabase/seed
 | `/api/admin/hotels/[id]/rooms` | POST | admin | Add a room to any hotel (full EP/CP/MAP/AP/GST field set, unlike the vendor route) |
 | `/api/admin/hotels/[id]/rooms/[roomId]` | PUT, DELETE | admin | Update / delete a room on any hotel, including admin-entered `mmtPrice`/`goibiboPrice` |
 | `/api/admin/hotels/[id]/invite` | POST | admin | Send/resend a Clerk vendor-login invite to the hotel's own email (manual trigger, for pre-existing hotels or a failed auto-invite) |
+| `/api/admin/hotels/[id]/request-rates` | POST | admin | Email the hotel that its tariff period expired and its listing is hidden, from the admin panel's Expired Rates tab |
 | `/api/concerns` | GET, POST | admin / customer | List (filtered by role) / raise |
 | `/api/concerns/[id]` | PATCH | admin | Update status, send response |
 | `/api/enquiries` | GET, POST | admin / **public** | Admin lists enquiries; POST is public — logs the row, fires emails, returns a `wa.me` deep-link the client opens |
+| `/api/enquiries/[id]` | DELETE | admin | Remove a logged enquiry |
 
 Routes that mutate transactional state fire **best-effort emails** via [lib/email.ts](lib/email.ts) (Resend). Email sends never block or fail the request — a missing `RESEND_API_KEY` just logs and skips. All branded HTML is built in `lib/email.ts`; API routes only call the exported `email*` trigger functions.
 
@@ -69,11 +71,20 @@ Admin never sets or knows a hotel's password — [lib/hotelHandoff.ts](lib/hotel
 
 `rooms.mmt_price` / `rooms.goibibo_price` and `hotels.mmt_url` / `hotels.goibibo_url` (migration `0005`) are **admin-entered reference data, not scraped** — MakeMyTrip and Goibibo have no public rate API and actively block automated scraping. The admin panel gives one-click "MakeMyTrip ↗ / Goibibo ↗" links (the hotel's own listing URL if set, else a name+location search) so admin can check the live price and key it into the room row; the UI then shows a same-row delta against the B2B rate.
 
+### Tariff expiry
+
+Every hotel has a required `tariffStart`/`tariffEnd` validity window (set at onboarding, editable from the vendor Profile tab or the admin Hotel Profile editor). There's no stored "expired" flag — [lib/data.ts](lib/data.ts)'s `isExpired(hotel)` / `daysExpired(hotel)` derive it purely from `tariffEnd < today`, so the state can never drift out of sync with the date:
+
+- `GET /api/hotels` filters out `approved && isExpired` hotels, so a listing drops off the public board automatically the day after `tariffEnd`, no cron job needed.
+- The admin panel's **Expired Rates** tab (`AdminPortal.tsx`) lists exactly those hotels, separate from the main Hotels tab. Each row has a **Request New Rates** button (`POST /api/admin/hotels/[id]/request-rates`, fires `emailRateExpired`) and expands into the same `HotelDetailPanel` used elsewhere, so admin can update the tariff dates and room rates inline.
+- The vendor dashboard shows a matching red "Rates Expired" banner/badge when their own hotel is expired, linking straight to the tariff date pickers.
+- Reactivation is automatic: saving a new `tariffEnd` (today or later) through either the vendor or admin PATCH routes makes `isExpired` false on the next fetch, so the listing reappears on the public board and drops out of the Expired Rates tab with no separate "reactivate" step.
+
 ### Client data layer
 
 - [lib/supabase.ts](lib/supabase.ts) — `browserSupabase()` (anon key, for real-time subscriptions) and `serverSupabase()` (service role; **never import server-side from client code**).
-- [lib/data.ts](lib/data.ts) — types, constants, snake_case ↔ camelCase mappers (`rowToHotel`, `rowToRoom`, `rowToConcern`, `rowToEnquiry`), and pure formatters (`fmtINR`, `fmtDate`, `timeAgo`, `bestStatus`, `availableInventory`, etc.). No business logic, no I/O.
-- [lib/email.ts](lib/email.ts) — server-only Resend layer: branded HTML shell plus `emailListingSubmitted`, `emailHotelApproved`, `emailHotelSuspended`, `emailEnquirySent`, `emailConcernRaised`, `emailConcernResponded`, and `appUrl()`. Never import from client code.
+- [lib/data.ts](lib/data.ts) — types, constants, snake_case ↔ camelCase mappers (`rowToHotel`, `rowToRoom`, `rowToConcern`, `rowToEnquiry`), and pure formatters (`fmtINR`, `fmtDate`, `timeAgo`, `bestStatus`, `availableInventory`, `isExpired`, `daysExpired`, etc.). No business logic, no I/O.
+- [lib/email.ts](lib/email.ts) — server-only Resend layer: branded HTML shell plus `emailListingSubmitted`, `emailHotelApproved`, `emailHotelSuspended`, `emailRateExpired`, `emailEnquirySent`, `emailConcernRaised`, `emailConcernResponded`, and `appUrl()`. Never import from client code.
 - [lib/hotelHandoff.ts](lib/hotelHandoff.ts) — server-only: `claimExistingHotelListing` (admin-managed → vendor id handoff) and `inviteVendor` (Clerk login invitation). Never import from client code.
 
 Pages **never** call Supabase directly for writes — they always go through `/api/*`. They DO call `browserSupabase()` to subscribe to `postgres_changes` channels for real-time refresh.

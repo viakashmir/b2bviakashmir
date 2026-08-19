@@ -261,6 +261,34 @@ export async function emailHotelSuspended(args: {
   await send({ to: args.vendorEmail, subject: `${args.hotelName} suspended on Via Kashmir`, html })
 }
 
+/** Admin requested updated rates for a hotel whose tariff period expired. */
+export async function emailRateExpired(args: {
+  vendorEmail: string
+  hotelName: string
+  locationLabel: string
+  tariffEnd: string
+}) {
+  const html = layout({
+    preheader: `Your rates for "${args.hotelName}" expired on ${args.tariffEnd} and are hidden from travel agents.`,
+    heading: `Your tariff period has expired`,
+    intro: `<strong>${escapeHtml(args.hotelName)}</strong>'s quoted rates were valid through <strong>${escapeHtml(args.tariffEnd)}</strong> and have now expired. Your listing is temporarily hidden from the public rate board until you update it.`,
+    bodyHtml: `
+      ${infoTable([
+        ['Property',   args.hotelName],
+        ['Location',   args.locationLabel],
+        ['Expired on', args.tariffEnd],
+      ])}
+      <p style="margin:14px 0 0; font-size:14px; line-height:1.65;">
+        Update your room rates and tariff validity period from your dashboard, your listing goes live again automatically the moment you save a new valid period, no admin approval needed.
+      </p>
+    `,
+    ctaLabel: 'Update my rates',
+    ctaHref: `${appUrl()}/vendor`,
+    footnote: `Need help updating your rates? Reply to this email and we'll assist.`,
+  })
+  await send({ to: args.vendorEmail, subject: `Action needed, ${args.hotelName}'s rates have expired`, html })
+}
+
 /** Traveller hit "Enquire on WhatsApp" on a hotel card. */
 export async function emailEnquirySent(args: {
   vendorEmail?: string

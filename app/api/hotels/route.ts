@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
 import { serverSupabase } from '@/lib/supabase'
-import { rowToHotel } from '@/lib/data'
+import { rowToHotel, isExpired } from '@/lib/data'
 
 export const dynamic = 'force-dynamic'
 
-/** GET /api/hotels, public listing of approved hotels with rooms. */
+/**
+ * GET /api/hotels, public listing of approved hotels with rooms.
+ * Hotels whose tariff period has expired are approved but excluded here,
+ * so a listing automatically drops off the public board the day after
+ * its tariffEnd and reappears the moment tariffEnd is updated.
+ */
 export async function GET() {
   const sb = serverSupabase()
   const [{ data: hotels, error: hErr }, { data: rooms, error: rErr }] = await Promise.all([
@@ -12,6 +17,8 @@ export async function GET() {
     sb.from('rooms').select('*'),
   ])
   if (hErr || rErr) return NextResponse.json({ error: hErr?.message || rErr?.message }, { status: 500 })
-  const mapped = (hotels ?? []).map((h: any) => rowToHotel(h, rooms ?? []))
+  const mapped = (hotels ?? [])
+    .map((h: any) => rowToHotel(h, rooms ?? []))
+    .filter(h => !isExpired(h))
   return NextResponse.json({ hotels: mapped })
 }

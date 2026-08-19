@@ -15,10 +15,11 @@ import {
   STAR_LABELS, GST_LABELS, LOCATIONS, MEAL_LABELS,
   categoriesFor, amenitiesFor,
   timeAgo, totalInventory, availableInventory, fmtINR,
+  isExpired, daysExpired,
 } from '@/lib/data'
 import { browserSupabase } from '@/lib/supabase'
 
-type Tab = 'overview' | 'hotels' | 'enquiries' | 'concerns'
+type Tab = 'overview' | 'hotels' | 'expired' | 'enquiries' | 'concerns'
 
 const STATUS_BADGE: Record<ConcernStatus, string> = {
   open: 'badge-error', 'in-progress': 'badge-tertiary',
@@ -97,6 +98,22 @@ export default function AdminPortal() {
     addToast(`"${name}" deleted`, 'success'); refresh()
   }
 
+  const requestRates = async (id: string) => {
+    const res = await fetch(`/api/admin/hotels/${id}/request-rates`, { method: 'POST' })
+    const json = await res.json().catch(() => ({}))
+    addToast(json.message || json.error || 'Something went wrong', res.ok ? 'success' : 'error')
+  }
+
+  const deleteEnquiry = async (id: string, travellerName: string) => {
+    if (!confirm(`Delete the enquiry from "${travellerName}"? This cannot be undone.`)) return
+    const res = await fetch(`/api/enquiries/${id}`, { method: 'DELETE' })
+    if (res.status === 401 || res.status === 403) {
+      addToast('Admin role missing on your Clerk user. See banner above.', 'error'); return
+    }
+    if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Delete failed', 'error'); return }
+    addToast('Enquiry deleted', 'success'); refresh()
+  }
+
   const createHotel = async (body: object) => {
     const res = await fetch('/api/admin/hotels', {
       method: 'POST', headers: { 'content-type': 'application/json' },
@@ -142,11 +159,16 @@ export default function AdminPortal() {
   const approved = hotels.filter(h => h.approved)
   const pending = hotels.filter(h => !h.approved)
   const openConcerns = concerns.filter(c => c.status === 'open' || c.status === 'in-progress')
+  // Rates past tariffEnd are auto-hidden from the public board (see /api/hotels)
+  // and get moved out of the main Hotels list into their own tab here.
+  const expiredHotels = hotels.filter(h => h.approved && isExpired(h))
+  const hotelsTabList = hotels.filter(h => !(h.approved && isExpired(h)))
 
   type Lucide = typeof Building2
   const TABS: { key: Tab; label: string; Icon: Lucide; badge?: number }[] = [
     { key: 'overview', label: 'Overview', Icon: LayoutDashboard },
     { key: 'hotels', label: 'Hotels', Icon: Building2, badge: pending.length },
+    { key: 'expired', label: 'Expired Rates', Icon: AlertTriangle, badge: expiredHotels.length },
     { key: 'enquiries', label: 'Enquiries', Icon: MessageCircle, badge: enquiries.length },
     { key: 'concerns', label: 'Concerns', Icon: MessageSquare, badge: openConcerns.length },
   ]
@@ -244,7 +266,7 @@ export default function AdminPortal() {
                 </tr>
               </thead>
               <tbody>
-                {hotels.map(h => (
+                {hotelsTabList.map(h => (
                   <Fragment key={h.id}>
                   <tr>
                     <td style={{ padding: '14px 8px', width: 36, background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
@@ -332,7 +354,7 @@ export default function AdminPortal() {
                   )}
                   </Fragment>
                 ))}
-                {hotels.length === 0 && (
+                {hotelsTabList.length === 0 && (
                   <tr><td colSpan={8} style={{ textAlign: 'center', padding: '48px 20px', color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>No hotels yet.</td></tr>
                 )}
               </tbody>
@@ -341,8 +363,92 @@ export default function AdminPortal() {
           </>
         )}
 
+        {tab === 'expired' && (
+          <div className="card-elevated table-scroll" style={{ overflow: 'auto' }}>
+            {expiredHotels.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '56px 24px' }}>
+                <CheckCircle2 size={36} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 12px' }} />
+                <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 18, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No Expired Rates</p>
+                <p style={{ fontSize: 13, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#717971' }}>Every live listing has a valid tariff period.</p>
+              </div>
+            ) : (
+            <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: 'linear-gradient(135deg, #ba1a1a 0%, #93000a 100%)' }}>
+                  {['', 'Hotel', 'Location', 'Tariff Expired', 'Actions'].map(h => (
+                    <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {expiredHotels.map(h => (
+                  <Fragment key={h.id}>
+                  <tr>
+                    <td style={{ padding: '14px 8px', width: 36, background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                      <button
+                        onClick={() => setExpandedHotelId(prev => prev === h.id ? null : h.id)}
+                        title="Update tariff dates & rates"
+                        style={{
+                          width: 28, height: 28, borderRadius: 9999, border: 'none',
+                          background: expandedHotelId === h.id ? '#00361a' : '#f3f4f5',
+                          color: expandedHotelId === h.id ? '#ffffff' : '#414942',
+                          cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        }}
+                      >
+                        {expandedHotelId === h.id ? <ChevronUp size={14} strokeWidth={2.4} /> : <ChevronDown size={14} strokeWidth={2.4} />}
+                      </button>
+                    </td>
+                    <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: '#191c1d', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{h.name}</div>
+                      <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{h.email || 'No email on file'}</div>
+                    </td>
+                    <td style={{ padding: '14px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{h.locationLabel}</td>
+                    <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                      <span className="badge badge-error"><AlertTriangle size={11} strokeWidth={2.5} /> {h.tariffEnd} · {daysExpired(h)}d ago</span>
+                    </td>
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <button
+                          onClick={() => requestRates(h.id)}
+                          disabled={!h.email}
+                          className="btn-primary"
+                          style={{ padding: '9px 16px', fontSize: 12, opacity: h.email ? 1 : 0.5 }}
+                          title={h.email ? 'Email the hotel asking for updated rates' : 'No email on file for this hotel'}
+                        >
+                          <Send size={12} strokeWidth={2.3} /> Request New Rates
+                        </button>
+                        <button
+                          onClick={() => deleteHotel(h.id, h.name)}
+                          style={{
+                            padding: '8px 14px', borderRadius: 9999, border: 'none',
+                            background: '#ba1a1a', color: '#ffffff',
+                            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11.5, fontWeight: 800,
+                            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
+                          }}
+                          aria-label={`Delete ${h.name}`}
+                        >
+                          <Trash2 size={12} strokeWidth={2.3} /> Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {expandedHotelId === h.id && (
+                    <tr>
+                      <td colSpan={5} style={{ padding: 0, background: '#fafbfa', borderBottom: '1px solid #edeeef' }}>
+                        <HotelDetailPanel key={`${h.id}:${h.updatedAt}`} hotel={h} addToast={addToast} onRefresh={refresh} />
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
+                ))}
+              </tbody>
+            </table>
+            )}
+          </div>
+        )}
+
         {tab === 'enquiries' && (
-          <EnquiriesPanel enquiries={enquiries} />
+          <EnquiriesPanel enquiries={enquiries} onDelete={deleteEnquiry} />
         )}
 
         {tab === 'concerns' && (
@@ -992,7 +1098,7 @@ function AdminRoomRow({ room, propertyType, onSave, onDelete }: {
 // =====================================================================
 // Enquiries log, every WhatsApp enquiry that travellers submit.
 // =====================================================================
-function EnquiriesPanel({ enquiries }: { enquiries: Enquiry[] }) {
+function EnquiriesPanel({ enquiries, onDelete }: { enquiries: Enquiry[]; onDelete: (id: string, travellerName: string) => void }) {
   if (enquiries.length === 0) {
     return (
       <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
@@ -1007,7 +1113,7 @@ function EnquiriesPanel({ enquiries }: { enquiries: Enquiry[] }) {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
-            {['Sent', 'Traveller', 'Phone', 'Hotel', 'Stay', 'Party', 'Notes', 'WhatsApp'].map(h => (
+            {['Sent', 'Traveller', 'Phone', 'Hotel', 'Stay', 'Party', 'Notes', 'WhatsApp', ''].map(h => (
               <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
             ))}
           </tr>
@@ -1048,6 +1154,19 @@ function EnquiriesPanel({ enquiries }: { enquiries: Enquiry[] }) {
                     color: '#ffffff', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11, fontWeight: 800,
                   }}
                 ><MessageCircle size={11} strokeWidth={2.6} /> Open chat</a>
+              </td>
+              <td style={{ padding: '12px 16px' }}>
+                <button
+                  onClick={() => onDelete(e.id, e.travellerName)}
+                  style={{
+                    padding: '6px 10px', borderRadius: 9999, border: 'none',
+                    background: '#ba1a1a', color: '#ffffff',
+                    cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4,
+                  }}
+                  aria-label={`Delete enquiry from ${e.travellerName}`}
+                >
+                  <Trash2 size={11} strokeWidth={2.3} />
+                </button>
               </td>
             </tr>
           ))}
