@@ -235,7 +235,7 @@ export default function AdminPortal() {
             )}
 
           <div className="card-elevated table-scroll" style={{ overflow: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
                   {['', 'Hotel', 'Location', 'Star', 'Inventory', 'Status', 'Created', 'Actions'].map(h => (
@@ -442,7 +442,6 @@ function AddHotelForm({ onCreate, onCancel }: {
     address: '', phone: '', whatsappSameAsPhone: true, whatsapp: '',
     email: '', website: '', description: '', amenities: [] as string[],
     tariffStart: '', tariffEnd: '', approved: true,
-    mmtUrl: '', goibiboUrl: '',
   })
   const [error, setError] = useState('')
 
@@ -531,14 +530,6 @@ function AddHotelForm({ onCreate, onCancel }: {
         <div style={{ gridColumn: '1 / -1' }}>
           <label style={fieldLabel}>Description</label>
           <textarea value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} className="input-field" rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
-        </div>
-        <div>
-          <label style={fieldLabel}>MakeMyTrip Listing URL</label>
-          <input type="text" value={draft.mmtUrl} onChange={e => setDraft({ ...draft, mmtUrl: e.target.value })} className="input-field" style={inputStyle} placeholder="https://www.makemytrip.com/hotels/..." />
-        </div>
-        <div>
-          <label style={fieldLabel}>Goibibo Listing URL</label>
-          <input type="text" value={draft.goibiboUrl} onChange={e => setDraft({ ...draft, goibiboUrl: e.target.value })} className="input-field" style={inputStyle} placeholder="https://www.goibibo.com/hotels/..." />
         </div>
       </div>
 
@@ -629,7 +620,6 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
         email: draft.email, website: draft.website, description: draft.description,
         amenities: draft.amenities,
         tariffStart: draft.tariffStart || null, tariffEnd: draft.tariffEnd || null,
-        mmtUrl: draft.mmtUrl, goibiboUrl: draft.goibiboUrl,
       }),
     })
     if (!res.ok) { addToast((await res.json().catch(() => ({}))).error || 'Save failed', 'error'); return }
@@ -731,14 +721,6 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
           <label style={fieldLabel}>Description</label>
           <textarea value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} className="input-field" rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
         </div>
-        <div>
-          <label style={fieldLabel}>MakeMyTrip Listing URL</label>
-          <input type="text" value={draft.mmtUrl} onChange={e => setDraft({ ...draft, mmtUrl: e.target.value })} className="input-field" style={inputStyle} placeholder="https://www.makemytrip.com/hotels/..." />
-        </div>
-        <div>
-          <label style={fieldLabel}>Goibibo Listing URL</label>
-          <input type="text" value={draft.goibiboUrl} onChange={e => setDraft({ ...draft, goibiboUrl: e.target.value })} className="input-field" style={inputStyle} placeholder="https://www.goibibo.com/hotels/..." />
-        </div>
       </div>
 
       <div style={{ marginBottom: 18, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(255,220,196,0.32), rgba(184,240,197,0.28))', border: '1px solid rgba(240,159,94,0.25)' }}>
@@ -810,12 +792,12 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
         <div className="t-overline">Rooms ({hotel.rooms.length})</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <a
-            href={draft.mmtUrl || `https://www.makemytrip.com/hotels/hotel-listing/?searchText=${encodeURIComponent(`${draft.name} ${draft.locationLabel}`)}`}
+            href={`https://www.makemytrip.com/hotels/hotel-listing/?searchText=${encodeURIComponent(`${draft.name} ${draft.locationLabel}`)}`}
             target="_blank" rel="noreferrer"
             style={{ fontSize: 11.5, fontWeight: 700, color: '#bf3100', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
           >MakeMyTrip ↗</a>
           <a
-            href={draft.goibiboUrl || `https://www.goibibo.com/hotels/find-hotels/?locusValue=${encodeURIComponent(`${draft.name} ${draft.locationLabel}`)}`}
+            href={`https://www.goibibo.com/hotels/find-hotels/?locusValue=${encodeURIComponent(`${draft.name} ${draft.locationLabel}`)}`}
             target="_blank" rel="noreferrer"
             style={{ fontSize: 11.5, fontWeight: 700, color: '#bf3100', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
           >Goibibo ↗</a>
