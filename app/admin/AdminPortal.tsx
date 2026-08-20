@@ -257,7 +257,17 @@ export default function AdminPortal() {
             )}
 
           <div className="card-elevated table-scroll" style={{ overflow: 'auto' }}>
-            <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
+            <table style={{ width: '100%', minWidth: 1040, tableLayout: 'fixed', borderCollapse: 'collapse' }}>
+              <colgroup>
+                <col style={{ width: 44 }} />
+                <col style={{ width: 230 }} />
+                <col style={{ width: 130 }} />
+                <col style={{ width: 90 }} />
+                <col style={{ width: 100 }} />
+                <col style={{ width: 120 }} />
+                <col style={{ width: 100 }} />
+                <col style={{ width: 240 }} />
+              </colgroup>
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
                   {['', 'Hotel', 'Location', 'Star', 'Inventory', 'Status', 'Created', 'Actions'].map(h => (
@@ -372,7 +382,14 @@ export default function AdminPortal() {
                 <p style={{ fontSize: 13, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#717971' }}>Every live listing has a valid tariff period.</p>
               </div>
             ) : (
-            <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
+            <table style={{ width: '100%', minWidth: 960, tableLayout: 'fixed', borderCollapse: 'collapse' }}>
+              <colgroup>
+                <col style={{ width: 44 }} />
+                <col style={{ width: 250 }} />
+                <col style={{ width: 140 }} />
+                <col style={{ width: 210 }} />
+                <col style={{ width: 316 }} />
+              </colgroup>
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg, #ba1a1a 0%, #93000a 100%)' }}>
                   {['', 'Hotel', 'Location', 'Tariff Expired', 'Actions'].map(h => (
