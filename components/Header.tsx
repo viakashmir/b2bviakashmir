@@ -47,8 +47,8 @@ export default function Header() {
               className="btn-ghost nav-button"
               style={{
                 padding: '10px 16px', fontSize: 13,
-                color: path === '/' ? '#b8f0c5' : 'rgba(255,255,255,0.78)',
-                background: path === '/' ? 'rgba(184,240,197,0.12)' : 'transparent',
+                color: path === '/' ? '#a9d9b8' : 'rgba(255,255,255,0.78)',
+                background: path === '/' ? 'rgba(169,217,184,0.12)' : 'transparent',
               }}
             >
               <Eye size={14} strokeWidth={2.2} />
@@ -62,8 +62,8 @@ export default function Header() {
                 className="btn-ghost nav-button"
                 style={{
                   padding: '10px 16px', fontSize: 13,
-                  color: path === portalHref ? '#b8f0c5' : 'rgba(255,255,255,0.78)',
-                  background: path === portalHref ? 'rgba(184,240,197,0.12)' : 'transparent',
+                  color: path === portalHref ? '#a9d9b8' : 'rgba(255,255,255,0.78)',
+                  background: path === portalHref ? 'rgba(169,217,184,0.12)' : 'transparent',
                 }}
               >
                 <PortalIcon size={14} strokeWidth={2.2} />

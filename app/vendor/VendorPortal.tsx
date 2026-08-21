@@ -158,7 +158,7 @@ export default function VendorPortal() {
   const statCards = [
     { label: 'Rooms Available Today', value: String(availInv), sub: `${availTypes} types open`, Icon: BedDouble, accent: '#13677b' },
     { label: 'Total Inventory', value: String(totalInv), sub: `${soldTypes} sold out`, Icon: TrendingUp, accent: '#00361a' },
-    { label: 'Avg Double Rate', value: fmtINR(avgDbl), sub: 'Per night · net B2B', Icon: Coins, accent: '#f09f5e' },
+    { label: 'Avg Double Rate', value: fmtINR(avgDbl), sub: 'Per night · net B2B', Icon: Coins, accent: '#dc9257' },
     { label: 'Last Updated', value: timeAgo(hotel.updatedAt), sub: fmtDate(hotel.updatedAt), Icon: Clock, accent: '#00361a', small: true },
   ]
 
@@ -230,8 +230,8 @@ export default function VendorPortal() {
             }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,
-                background: !hotel.approved ? 'rgba(255,220,196,0.22)' : isExpired(hotel) ? 'rgba(255,180,164,0.28)' : 'rgba(184,240,197,0.18)',
-                color: !hotel.approved ? '#ffdcc4' : isExpired(hotel) ? '#ffb4a4' : '#b8f0c5',
+                background: !hotel.approved ? 'rgba(243,215,191,0.22)' : isExpired(hotel) ? 'rgba(255,180,164,0.28)' : 'rgba(169,217,184,0.18)',
+                color: !hotel.approved ? '#f3d7bf' : isExpired(hotel) ? '#ffb4a4' : '#a9d9b8',
                 fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 10, fontWeight: 800,
                 letterSpacing: '0.12em', textTransform: 'uppercase',
                 padding: '5px 12px', borderRadius: 9999,
@@ -244,7 +244,7 @@ export default function VendorPortal() {
               </span>
             </div>
 
-            <div className="t-overline" style={{ color: '#9dd3aa', marginBottom: 8 }}>
+            <div className="t-overline" style={{ color: '#8ec29e', marginBottom: 8 }}>
               <Eye size={10} strokeWidth={2.5} style={{ verticalAlign: 'middle', marginRight: 6 }} />
               Your Listing
             </div>
@@ -261,8 +261,8 @@ export default function VendorPortal() {
               {hotel.tariffStart && hotel.tariffEnd ? (
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 4,
-                  background: isExpired(hotel) ? 'rgba(255,180,164,0.28)' : 'rgba(255,220,196,0.18)',
-                  color: isExpired(hotel) ? '#ffb4a4' : '#ffdcc4',
+                  background: isExpired(hotel) ? 'rgba(255,180,164,0.28)' : 'rgba(243,215,191,0.18)',
+                  color: isExpired(hotel) ? '#ffb4a4' : '#f3d7bf',
                   padding: '2px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
                 }}>
                   <Calendar size={11} strokeWidth={2.4} />
@@ -272,7 +272,7 @@ export default function VendorPortal() {
                 <button
                   onClick={() => { setTab('profile'); setTimeout(() => document.getElementById('tariff-block')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80) }}
                   style={{
-                    background: 'rgba(255,220,196,0.18)', color: '#ffdcc4', border: 'none', cursor: 'pointer',
+                    background: 'rgba(243,215,191,0.18)', color: '#f3d7bf', border: 'none', cursor: 'pointer',
                     padding: '2px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
                     fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', display: 'inline-flex', alignItems: 'center', gap: 4,
                   }}
@@ -322,7 +322,7 @@ export default function VendorPortal() {
             <div style={{
               padding: '14px 24px',
               background: '#fff8ed',
-              borderTop: '1px solid #ffdcc4',
+              borderTop: '1px solid #f3d7bf',
               fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#6f3800',
               display: 'flex', alignItems: 'center', gap: 8,
             }}>
@@ -339,22 +339,22 @@ export default function VendorPortal() {
             width: '100%',
             padding: '18px 22px',
             borderRadius: 16, border: 'none',
-            background: 'linear-gradient(135deg, rgba(255,220,196,0.45), rgba(184,240,197,0.45))',
+            background: 'linear-gradient(135deg, rgba(243,215,191,0.45), rgba(169,217,184,0.45))',
             cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14,
             fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
             marginBottom: 24,
             transition: 'transform 0.18s, box-shadow 0.18s',
-            boxShadow: '0 4px 20px rgba(240,159,94,0.18)',
+            boxShadow: '0 4px 20px rgba(220,146,87,0.18)',
           } as React.CSSProperties}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 28px rgba(240,159,94,0.28)' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(240,159,94,0.18)' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 28px rgba(220,146,87,0.28)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(220,146,87,0.18)' }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left' }}>
             <div style={{
               width: 44, height: 44, borderRadius: 12,
               background: 'linear-gradient(135deg, #00361a, #1a4d2e)',
-              color: '#ffdcc4',
+              color: '#f3d7bf',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0,
               boxShadow: '0 6px 14px rgba(0,54,26,0.22)',
@@ -563,7 +563,7 @@ export default function VendorPortal() {
             </div>
 
             {/* Tariff window */}
-            <div id="tariff-block" style={{ scrollMarginTop: 80, marginTop: 28, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(255,220,196,0.32), rgba(184,240,197,0.28))', border: '1px solid rgba(240,159,94,0.25)' }}>
+            <div id="tariff-block" style={{ scrollMarginTop: 80, marginTop: 28, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(243,215,191,0.32), rgba(169,217,184,0.28))', border: '1px solid rgba(220,146,87,0.25)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                 <Calendar size={14} strokeWidth={2.5} color="#6f3800" />
                 <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6f3800', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>Tariff valid period</label>

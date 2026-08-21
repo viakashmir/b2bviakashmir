@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@clerk/nextjs'
+import {
+  User, Search, AlertTriangle, Send, MessageSquare, Eye, MessageSquarePlus,
+} from 'lucide-react'
 import Header from '@/components/Header'
 import HotelCard from '@/components/HotelCard'
 import Toast, { ToastMessage } from '@/components/Toast'
@@ -112,10 +115,11 @@ export default function CustomerPortal() {
 
   const openCount = myConcerns.filter(c => c.status === 'open' || c.status === 'in-progress').length
 
-  const TABS: { key: Tab; label: string; icon: string; badge?: number }[] = [
-    { key: 'rates', label: 'Browse Rates', icon: 'fi-rr-eye' },
-    { key: 'raise', label: 'Raise a Concern', icon: 'fi-rr-comment-alt-edit' },
-    { key: 'mine', label: 'My Concerns', icon: 'fi-rr-comment-alt-middle', badge: openCount || undefined },
+  type Lucide = typeof Eye
+  const TABS: { key: Tab; label: string; Icon: Lucide; badge?: number }[] = [
+    { key: 'rates', label: 'Browse Rates', Icon: Eye },
+    { key: 'raise', label: 'Raise a Concern', Icon: MessageSquarePlus },
+    { key: 'mine', label: 'My Concerns', Icon: MessageSquare, badge: openCount || undefined },
   ]
 
   return (
@@ -125,7 +129,7 @@ export default function CustomerPortal() {
         <div className="dash-header">
           <div>
             <span className="badge badge-primary" style={{ marginBottom: 12 }}>
-              <i className="fi fi-rr-user" style={{ fontSize: 11 }} /> Travel Agent
+              <User size={11} strokeWidth={2.5} /> Travel Agent
             </span>
             <h1 className="dash-title">Welcome, {agentName.split(' ')[0]}</h1>
             <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 500 }}>
@@ -143,7 +147,7 @@ export default function CustomerPortal() {
               borderBottom: tab === t.key ? '3px solid #00361a' : '3px solid transparent',
               marginBottom: -1, display: 'inline-flex', alignItems: 'center', gap: 8,
             }}>
-              <i className={`fi ${t.icon}`} style={{ fontSize: 13 }} />
+              <t.Icon size={13} strokeWidth={2.2} />
               {t.label}
               {t.badge ? <span className="badge badge-error" style={{ padding: '2px 8px', fontSize: 9 }}>{t.badge}</span> : null}
             </button>
@@ -153,12 +157,12 @@ export default function CustomerPortal() {
         {tab === 'rates' && (
           <>
             <div style={{ position: 'relative', marginBottom: 20, maxWidth: 360 }}>
-              <i className="fi fi-rr-search" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: '#717971', pointerEvents: 'none', zIndex: 1 }} />
+              <Search size={14} strokeWidth={2.2} color="#717971" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', zIndex: 1 }} />
               <input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search hotel or location…" className="input-field" style={{ padding: '12px 14px 12px 42px', fontSize: 13 }} />
             </div>
             {filteredHotels.length === 0 ? (
               <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-                <i className="fi fi-rr-search" style={{ fontSize: 36, color: '#c1c9bf', display: 'block', marginBottom: 10 }} />
+                <Search size={36} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 10px' }} />
                 <p style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 18, fontWeight: 700, color: '#414942' }}>No hotels available</p>
               </div>
             ) : (
@@ -214,13 +218,13 @@ export default function CustomerPortal() {
 
             {formError && (
               <p style={{ fontSize: 12, color: '#93000a', margin: '14px 0', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 600 }}>
-                <i className="fi fi-rs-exclamation" style={{ fontSize: 13, marginRight: 6 }} /> {formError}
+                <AlertTriangle size={13} strokeWidth={2.4} style={{ marginRight: 6, verticalAlign: 'middle' }} /> {formError}
               </p>
             )}
 
             <div style={{ marginTop: 20 }}>
               <button onClick={submitConcern} className="btn-primary" style={{ padding: '12px 24px', fontSize: 13 }}>
-                <i className="fi fi-rr-paper-plane" style={{ fontSize: 13 }} /> Submit Concern
+                <Send size={13} strokeWidth={2.5} /> Submit Concern
               </button>
             </div>
           </div>
@@ -230,7 +234,7 @@ export default function CustomerPortal() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {myConcerns.length === 0 ? (
               <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-                <i className="fi fi-rr-comment-alt-middle" style={{ fontSize: 40, color: '#c1c9bf', marginBottom: 12, display: 'block' }} />
+                <MessageSquare size={40} color="#c1c9bf" style={{ marginBottom: 12, display: 'block', margin: '0 auto 12px' }} />
                 <p style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No concerns yet</p>
                 <p style={{ fontSize: 14, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', color: '#717971' }}>When you raise one, it will appear here with admin responses.</p>
               </div>

@@ -192,7 +192,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
             color: '#ffffff',
           }}>
             <div>
-              <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#9dd3aa' }}>
+              <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#8ec29e' }}>
                 Pick a date
               </div>
               <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 17, fontWeight: 800, marginTop: 2, letterSpacing: '-0.01em' }}>
@@ -252,7 +252,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
                     background: isSelected
                       ? 'linear-gradient(135deg, #00361a, #1a4d2e)'
                       : isToday
-                        ? 'rgba(255,220,196,0.45)'
+                        ? 'rgba(243,215,191,0.45)'
                         : 'transparent',
                     color: isSelected
                       ? '#ffffff'
@@ -274,7 +274,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
                   }}
                   onMouseLeave={e => {
                     if (disabled || isSelected) return
-                    ;(e.currentTarget as HTMLElement).style.background = isToday ? 'rgba(255,220,196,0.45)' : 'transparent'
+                    ;(e.currentTarget as HTMLElement).style.background = isToday ? 'rgba(243,215,191,0.45)' : 'transparent'
                   }}
                 >
                   {c.d}

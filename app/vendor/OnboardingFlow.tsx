@@ -280,7 +280,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
           </span>
         </div>
         <div style={{ fontSize: 13, fontWeight: 700, color: '#414942' }}>
-          {stepNum} <span style={{ color: '#9dd3aa' }}>of</span> {totalSteps}
+          {stepNum} <span style={{ color: '#8ec29e' }}>of</span> {totalSteps}
         </div>
       </div>
 
@@ -319,7 +319,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
             }}>
               {stepNum}
             </span>
-            <ArrowRight size={11} strokeWidth={2.5} color="#9dd3aa" />
+            <ArrowRight size={11} strokeWidth={2.5} color="#8ec29e" />
             Step {stepNum}
           </div>
 
@@ -386,7 +386,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                       onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.transform = 'translateY(0)' }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
-                        <Sparkles size={16} strokeWidth={2.5} color={active ? '#ffdcc4' : '#f09f5e'} />
+                        <Sparkles size={16} strokeWidth={2.5} color={active ? '#f3d7bf' : '#dc9257'} />
                       </div>
                       <div style={{ fontSize: 26, lineHeight: 1, letterSpacing: '-0.02em' }}>{n}</div>
                       <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 6, opacity: active ? 0.9 : 0.6 }}>
@@ -434,7 +434,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                           style={{
                             padding: '12px 14px', borderRadius: 12,
                             border: `1.5px solid ${active ? '#1a5128' : 'rgba(0,54,26,0.14)'}`,
-                            background: active ? 'linear-gradient(135deg, rgba(184,240,197,0.36), rgba(255,220,196,0.28))' : '#ffffff',
+                            background: active ? 'linear-gradient(135deg, rgba(169,217,184,0.36), rgba(243,215,191,0.28))' : '#ffffff',
                             color: active ? '#00361a' : '#414942',
                             fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 14, fontWeight: 800,
                             cursor: 'pointer',
@@ -493,8 +493,8 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
               {/* Tariff window, context for the rates */}
               <div style={{
                 padding: 18, borderRadius: 14,
-                background: 'linear-gradient(135deg, rgba(255,220,196,0.30), rgba(184,240,197,0.26))',
-                border: '1px solid rgba(240,159,94,0.22)',
+                background: 'linear-gradient(135deg, rgba(243,215,191,0.30), rgba(169,217,184,0.26))',
+                border: '1px solid rgba(220,146,87,0.22)',
                 marginBottom: 22,
               }}>
                 <div style={{
@@ -566,26 +566,26 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                       padding: '16px 20px', borderRadius: 16,
                       border: 'none',
                       background: data.rooms.length === 0
-                        ? 'linear-gradient(135deg, #f09f5e 0%, #d2691e 100%)'
-                        : 'linear-gradient(135deg, rgba(0,54,26,0.04), rgba(184,240,197,0.30))',
+                        ? 'linear-gradient(135deg, #dc9257 0%, #d2691e 100%)'
+                        : 'linear-gradient(135deg, rgba(0,54,26,0.04), rgba(169,217,184,0.30))',
                       color: data.rooms.length === 0 ? '#ffffff' : '#00361a',
                       fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 14.5, fontWeight: 800, cursor: 'pointer',
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                      boxShadow: data.rooms.length === 0 ? '0 8px 24px rgba(240,159,94,0.32)' : 'none',
+                      boxShadow: data.rooms.length === 0 ? '0 8px 24px rgba(220,146,87,0.32)' : 'none',
                       transition: 'all 0.18s',
                     }}
                     onMouseEnter={e => {
                       const el = e.currentTarget as HTMLElement
                       el.style.transform = 'translateY(-1px)'
                       el.style.boxShadow = data.rooms.length === 0
-                        ? '0 12px 28px rgba(240,159,94,0.40)'
+                        ? '0 12px 28px rgba(220,146,87,0.40)'
                         : '0 6px 18px rgba(0,54,26,0.10)'
                     }}
                     onMouseLeave={e => {
                       const el = e.currentTarget as HTMLElement
                       el.style.transform = 'translateY(0)'
                       el.style.boxShadow = data.rooms.length === 0
-                        ? '0 8px 24px rgba(240,159,94,0.32)'
+                        ? '0 8px 24px rgba(220,146,87,0.32)'
                         : 'none'
                     }}
                   >
@@ -608,7 +608,7 @@ export default function OnboardingFlow({ defaultEmail, onComplete }: Props) {
                 {data.rooms.length >= 3 && (
                   <div style={{
                     padding: '14px 18px', borderRadius: 14,
-                    background: 'linear-gradient(135deg, rgba(184,240,197,0.40), rgba(0,54,26,0.06))',
+                    background: 'linear-gradient(135deg, rgba(169,217,184,0.40), rgba(0,54,26,0.06))',
                     color: '#00361a', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, fontWeight: 700,
                     textAlign: 'center', border: '1px solid rgba(0,54,26,0.10)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -941,7 +941,7 @@ function ChoiceGrid({ options, value, onChange, cols = 0, big = false }: {
             onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)' }}
             onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.transform = 'translateY(0)' }}
           >
-            {o.Icon && <o.Icon size={big ? 22 : 16} strokeWidth={2.3} color={active ? '#b8f0c5' : '#00361a'} />}
+            {o.Icon && <o.Icon size={big ? 22 : 16} strokeWidth={2.3} color={active ? '#a9d9b8' : '#00361a'} />}
             <div>
               <div style={{ fontFamily: big ? '"Manrope", -apple-system, "Segoe UI", sans-serif' : '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: big ? 17 : 14, fontWeight: big ? 800 : 700 }}>
                 {o.label}
@@ -1008,14 +1008,14 @@ function ListingPowerPanel({ tariffSet, rooms }: { tariffSet: boolean; rooms: Ro
       {/* sparkles motif */}
       <span style={{
         position: 'absolute', right: -20, top: -28, width: 140, height: 140, borderRadius: 9999,
-        background: 'radial-gradient(circle, rgba(240,159,94,0.30) 0%, rgba(0,0,0,0) 70%)',
+        background: 'radial-gradient(circle, rgba(220,146,87,0.30) 0%, rgba(0,0,0,0) 70%)',
       }} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
         <div>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 7,
             fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase',
-            color: '#ffdcc4', background: 'rgba(255,220,196,0.10)',
+            color: '#f3d7bf', background: 'rgba(243,215,191,0.10)',
             padding: '4px 10px', borderRadius: 9999,
           }}>
             <Sparkles size={11} strokeWidth={2.6} /> Listing Power
@@ -1028,7 +1028,7 @@ function ListingPowerPanel({ tariffSet, rooms }: { tariffSet: boolean; rooms: Ro
           <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 32, fontWeight: 900, lineHeight: 1, color: '#ffffff' }}>
             {pct}%
           </div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#9dd3aa', letterSpacing: '0.06em' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#8ec29e', letterSpacing: '0.06em' }}>
             {hits}/{milestones.length} milestones · {ratesFilled} rate{ratesFilled === 1 ? '' : 's'} live
           </div>
         </div>
@@ -1040,9 +1040,9 @@ function ListingPowerPanel({ tariffSet, rooms }: { tariffSet: boolean; rooms: Ro
       }}>
         <div style={{
           height: '100%', width: `${pct}%`,
-          background: 'linear-gradient(90deg, #f09f5e 0%, #ffdcc4 60%, #b8f0c5 100%)',
+          background: 'linear-gradient(90deg, #dc9257 0%, #f3d7bf 60%, #a9d9b8 100%)',
           borderRadius: 9999, transition: 'width 0.45s cubic-bezier(.4,.0,.2,1)',
-          boxShadow: pct > 0 ? '0 0 20px rgba(255,220,196,0.55)' : 'none',
+          boxShadow: pct > 0 ? '0 0 20px rgba(243,215,191,0.55)' : 'none',
         }} />
       </div>
 
@@ -1056,15 +1056,15 @@ function ListingPowerPanel({ tariffSet, rooms }: { tariffSet: boolean; rooms: Ro
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '6px 12px', borderRadius: 9999,
               fontSize: 11.5, fontWeight: 700, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
-              background: m.hit ? 'rgba(184,240,197,0.18)' : 'rgba(255,255,255,0.06)',
-              color: m.hit ? '#b8f0c5' : 'rgba(255,255,255,0.50)',
-              border: `1px solid ${m.hit ? 'rgba(184,240,197,0.40)' : 'rgba(255,255,255,0.08)'}`,
+              background: m.hit ? 'rgba(169,217,184,0.18)' : 'rgba(255,255,255,0.06)',
+              color: m.hit ? '#a9d9b8' : 'rgba(255,255,255,0.50)',
+              border: `1px solid ${m.hit ? 'rgba(169,217,184,0.40)' : 'rgba(255,255,255,0.08)'}`,
               transition: 'all 0.22s',
             }}
           >
             <span style={{
               width: 14, height: 14, borderRadius: 9999,
-              background: m.hit ? '#b8f0c5' : 'transparent',
+              background: m.hit ? '#a9d9b8' : 'transparent',
               border: m.hit ? 'none' : '1.5px dashed rgba(255,255,255,0.30)',
               color: '#00361a', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 9, fontWeight: 900,
@@ -1147,7 +1147,7 @@ function RoomDraftCard({
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '14px 22px',
-        background: 'linear-gradient(135deg, rgba(0,54,26,0.05), rgba(184,240,197,0.18))',
+        background: 'linear-gradient(135deg, rgba(0,54,26,0.05), rgba(169,217,184,0.18))',
         borderBottom: '1px solid rgba(0,54,26,0.06)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1163,7 +1163,7 @@ function RoomDraftCard({
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: 5,
             padding: '3px 9px', borderRadius: 9999,
-            background: rateCount > 0 ? 'rgba(0,54,26,0.10)' : 'rgba(240,159,94,0.16)',
+            background: rateCount > 0 ? 'rgba(0,54,26,0.10)' : 'rgba(220,146,87,0.16)',
             color: rateCount > 0 ? '#00361a' : '#6f3800',
             fontSize: 10, fontWeight: 800, letterSpacing: '0.04em',
           }}>
@@ -1237,7 +1237,7 @@ function RoomDraftCard({
             border: 'none',
             background: showMore
               ? 'rgba(0,54,26,0.06)'
-              : 'linear-gradient(135deg, rgba(255,220,196,0.55) 0%, rgba(184,240,197,0.40) 100%)',
+              : 'linear-gradient(135deg, rgba(243,215,191,0.55) 0%, rgba(169,217,184,0.40) 100%)',
             color: '#00361a', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13.5, fontWeight: 800,
             cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
@@ -1248,7 +1248,7 @@ function RoomDraftCard({
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
             <span style={{
               width: 28, height: 28, borderRadius: 9999,
-              background: '#00361a', color: '#ffdcc4',
+              background: '#00361a', color: '#f3d7bf',
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 14, fontWeight: 900,
             }}>★</span>
@@ -1353,7 +1353,7 @@ function RatePill({ code, label, hint, value, onChange }: {
       <div style={{
         width: 52, height: 52, borderRadius: 12,
         background: 'linear-gradient(135deg, #00361a, #1a4d2e)',
-        color: '#ffdcc4',
+        color: '#f3d7bf',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
       }}>
@@ -1462,7 +1462,7 @@ function TariffWindow({ start, end, onStart, onEnd }: {
         padding: '14px 18px',
         borderRadius: 12,
         background: nights > 0
-          ? 'linear-gradient(135deg, rgba(184,240,197,0.35), rgba(255,220,196,0.35))'
+          ? 'linear-gradient(135deg, rgba(169,217,184,0.35), rgba(243,215,191,0.35))'
           : 'rgba(0,54,26,0.04)',
         border: '1px solid rgba(0,54,26,0.08)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,

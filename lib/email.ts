@@ -91,9 +91,9 @@ function layout(opts: {
                 <tr>
                   <td>
                     <div style="font-family:'Manrope',Arial,sans-serif; font-weight:900; font-size:18px; letter-spacing:-0.01em;">Via Kashmir</div>
-                    <div style="font-family:'Inter',Arial,sans-serif; font-size:10px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:#9dd3aa; margin-top:4px;">B2B Rate Portal</div>
+                    <div style="font-family:'Inter',Arial,sans-serif; font-size:10px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:#8ec29e; margin-top:4px;">B2B Rate Portal</div>
                   </td>
-                  <td align="right" style="font-family:'Inter',Arial,sans-serif; font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#ffdcc4;">
+                  <td align="right" style="font-family:'Inter',Arial,sans-serif; font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#f3d7bf;">
                     Hello from Kashmir
                   </td>
                 </tr>

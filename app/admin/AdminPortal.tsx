@@ -223,7 +223,7 @@ export default function AdminPortal() {
           <div className="stat-grid">
             {[
               { label: 'Total Hotels', value: String(hotels.length), sub: `${approved.length} approved · ${pending.length} pending`, Icon: Building2, accent: '#00361a' },
-              { label: 'Pending Approval', value: String(pending.length), sub: pending.length ? 'Action required' : 'All clear', Icon: Clock, accent: '#f09f5e' },
+              { label: 'Pending Approval', value: String(pending.length), sub: pending.length ? 'Action required' : 'All clear', Icon: Clock, accent: '#dc9257' },
               { label: 'Open Concerns', value: String(openConcerns.length), sub: 'Requires response', Icon: MessageSquare, accent: '#ba1a1a' },
               { label: 'Total Concerns', value: String(concerns.length), sub: 'All time', Icon: BarChart3, accent: '#13677b' },
             ].map((c, i) => (
@@ -323,7 +323,7 @@ export default function AdminPortal() {
                               cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
                               transition: 'all 0.18s',
                             }}
-                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ffdcc4' }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f3d7bf' }}
                             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fef3c7' }}
                           >
                             <Pause size={12} strokeWidth={2.3} /> Suspend
@@ -656,7 +656,7 @@ function AddHotelForm({ onCreate, onCancel }: {
         </div>
       </div>
 
-      <div style={{ marginTop: 22, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(255,220,196,0.32), rgba(184,240,197,0.28))', border: '1px solid rgba(240,159,94,0.25)' }}>
+      <div style={{ marginTop: 22, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(243,215,191,0.32), rgba(169,217,184,0.28))', border: '1px solid rgba(220,146,87,0.25)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <Calendar size={14} strokeWidth={2.5} color="#6f3800" />
           <label style={{ ...fieldLabel, marginBottom: 0, color: '#6f3800' }}>Tariff valid period</label>
@@ -846,7 +846,7 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
         </div>
       </div>
 
-      <div style={{ marginBottom: 18, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(255,220,196,0.32), rgba(184,240,197,0.28))', border: '1px solid rgba(240,159,94,0.25)' }}>
+      <div style={{ marginBottom: 18, padding: 18, borderRadius: 14, background: 'linear-gradient(135deg, rgba(243,215,191,0.32), rgba(169,217,184,0.28))', border: '1px solid rgba(220,146,87,0.25)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <Calendar size={14} strokeWidth={2.5} color="#6f3800" />
           <label style={{ ...fieldLabel, marginBottom: 0, color: '#6f3800' }}>Tariff valid period</label>
@@ -860,7 +860,7 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
       <div style={{
         marginBottom: 18, padding: 16, borderRadius: 14,
         background: hasVendorAccount ? '#f0f9f2' : '#f3f4f5',
-        border: `1px solid ${hasVendorAccount ? '#b8f0c5' : '#edeeef'}`,
+        border: `1px solid ${hasVendorAccount ? '#a9d9b8' : '#edeeef'}`,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
       }}>
         <div>

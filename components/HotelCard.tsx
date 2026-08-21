@@ -27,10 +27,10 @@ export default function HotelCard({ hotel, index }: Props) {
   const accent =
     status === 'Sold Out' ? '#ffb4ab'
     : status === 'Limited' || availInv <= 3 ? '#ffc48a'
-    : '#b8f0c5'
+    : '#a9d9b8'
   const pill =
-    status === 'Available' ? { bg: '#b8f0c5', fg: '#00361a' }
-    : status === 'Limited' ? { bg: '#ffdcc4', fg: '#5a2e00' }
+    status === 'Available' ? { bg: '#a9d9b8', fg: '#00361a' }
+    : status === 'Limited' ? { bg: '#f3d7bf', fg: '#5a2e00' }
     : { bg: '#ffb4ab', fg: '#5a0a05' }
 
   return (
@@ -52,10 +52,10 @@ export default function HotelCard({ hotel, index }: Props) {
       >
         {/* LEFT — identity panel */}
         <div className="hcard-side">
-          <Mountain size={140} color="rgba(184,240,197,0.08)" style={{ position: 'absolute', right: -18, top: -18, pointerEvents: 'none' }} />
+          <Mountain size={140} color="rgba(169,217,184,0.08)" style={{ position: 'absolute', right: -18, top: -18, pointerEvents: 'none' }} />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#b8f0c5' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a9d9b8' }}>
               <Sparkles size={11} strokeWidth={2.5} />
               {STAR_LABELS[hotel.stars]}
             </span>
@@ -96,7 +96,7 @@ export default function HotelCard({ hotel, index }: Props) {
           {(seasonal || (hotel.tariffStart && hotel.tariffEnd)) && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
               {hotel.tariffStart && hotel.tariffEnd && (
-                <span style={{ display: 'inline-block', fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2f1400', background: 'rgba(255,220,196,0.9)', padding: '4px 10px', borderRadius: 9999 }}>
+                <span style={{ display: 'inline-block', fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2f1400', background: 'rgba(243,215,191,0.9)', padding: '4px 10px', borderRadius: 9999 }}>
                   Tariff {shortRange(hotel.tariffStart, hotel.tariffEnd)}
                 </span>
               )}
@@ -217,8 +217,8 @@ export default function HotelCard({ hotel, index }: Props) {
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                   fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 10, fontWeight: 800,
                   letterSpacing: '0.14em', textTransform: 'uppercase',
-                  color: '#b8f0c5',
-                  background: 'rgba(184,240,197,0.12)',
+                  color: '#a9d9b8',
+                  background: 'rgba(169,217,184,0.12)',
                   padding: '5px 12px', borderRadius: 9999, marginBottom: 10,
                 }}>
                   <Sparkles size={11} strokeWidth={2.5} />

@@ -6,6 +6,7 @@ import ViaKashmirLogo from '@/components/ViaKashmirLogo'
 import { useAuth } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { Mountain, ChevronLeft } from 'lucide-react'
 
 export default function LoginPage() {
   const { isSignedIn, isLoaded } = useAuth()
@@ -22,17 +23,15 @@ export default function LoginPage() {
       <main className="login-shell">
         <div style={{ width: '100%', maxWidth: 460 }}>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <i className="fi fi-rr-mountains" style={{ fontSize: 56, color: '#00361a' }} />
+            <Mountain size={56} color="#00361a" style={{ display: 'inline-block' }} />
           </div>
 
           <div className="card-elevated" style={{ overflow: 'hidden' }}>
             <div className="login-card-head">
-              <i
-                className="fi fi-rr-mountains"
-                style={{
-                  position: 'absolute', right: -24, bottom: -28,
-                  fontSize: 180, color: 'rgba(184,240,197,0.08)', pointerEvents: 'none',
-                }}
+              <Mountain
+                size={180}
+                color="rgba(169,217,184,0.08)"
+                style={{ position: 'absolute', right: -24, bottom: -28, pointerEvents: 'none' }}
               />
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <ViaKashmirLogo variant="light" size="lg" />
@@ -58,7 +57,7 @@ export default function LoginPage() {
 
           <div style={{ textAlign: 'center', marginTop: 20, fontSize: 13, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 500 }}>
             <a href="/" style={{ color: '#00361a', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <i className="fi fi-rr-angle-small-left" style={{ fontSize: 14 }} /> Back to Live Rates
+              <ChevronLeft size={14} strokeWidth={2.4} /> Back to Live Rates
             </a>
           </div>
         </div>

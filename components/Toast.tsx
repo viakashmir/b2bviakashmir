@@ -39,7 +39,7 @@ function ToastItem({ toast, onRemove }: { toast: ToastMessage; onRemove: (id: st
   }, [toast.id, onRemove])
 
   const palette = {
-    success: { bg: '#00361a', color: '#b8f0c5', icon: 'fi-rs-check-circle' },
+    success: { bg: '#00361a', color: '#a9d9b8', icon: 'fi-rs-check-circle' },
     error:   { bg: '#ffdad6', color: '#93000a', icon: 'fi-rs-exclamation' },
     info:    { bg: '#ffffff', color: '#191c1d', icon: 'fi-rs-info' },
   }[toast.type]

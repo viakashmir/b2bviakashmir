@@ -194,7 +194,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
               {nights > 0 && (
                 <div style={{
                   marginTop: 12, padding: '8px 14px', borderRadius: 9999,
-                  background: 'rgba(184,240,197,0.30)', color: '#00361a',
+                  background: 'rgba(169,217,184,0.30)', color: '#00361a',
                   fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, fontWeight: 700,
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                 }}>
@@ -275,7 +275,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
               </div>
               <div style={{
                 marginTop: 16, padding: 14, borderRadius: 12,
-                background: 'linear-gradient(135deg, rgba(184,240,197,0.30), rgba(255,220,196,0.18))',
+                background: 'linear-gradient(135deg, rgba(169,217,184,0.30), rgba(243,215,191,0.18))',
                 fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#414942', lineHeight: 1.5,
               }}>
                 Hitting <strong>Send via WhatsApp</strong> opens WhatsApp with a pre-filled message, you just tap send. We log this enquiry so the Via Kashmir team can follow up if the hotel doesn't reply within 24h.

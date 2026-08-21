@@ -103,7 +103,7 @@ Pages **never** call Supabase directly for writes — they always go through `/a
 Visual reference: Via Kashmir "Alpine Editorial" theme (HTML at `/Users/aribanigar/Downloads/via-kashmir-theme-factory.html`, not in this repo).
 
 - **Manrope** display, **Inter** body — loaded via Google Fonts `@import` in [app/globals.css](app/globals.css), not `next/font`.
-- Icons: **Flaticon UIcons** via CDN (`fi fi-rr-*` regular, `fi fi-rs-*` solid, also `fi fi-br-*` bold) for class-based markup, plus **`lucide-react`** components used across the portals. No emojis.
+- Icons: **`lucide-react`** components exclusively across every portal and the public site (the earlier mixed Flaticon UIcons class-based set was removed for visual consistency — one icon system, one stroke weight). No emojis.
 - Color tokens are CSS variables in `globals.css`, mirrored in [tailwind.config.ts](tailwind.config.ts).
 - Class-based primitives: `.btn-primary` (gradient CTA), `.btn-secondary`, `.btn-tertiary`, `.btn-danger`, `.btn-ghost`, `.card-elevated`, `.input-field`, `.badge-*`.
 - **No 1px sectioning borders** — separate regions with surface-color shifts.

@@ -106,12 +106,12 @@ export default function MyListing() {
       {/* Banner if not approved or no rooms */}
       {(!hotel.approved || hotel.rooms.length === 0) && (
         <div style={{
-          background: '#fff8ed', border: '1px solid #ffdcc4',
+          background: '#fff8ed', border: '1px solid #f3d7bf',
           borderRadius: 14, padding: '14px 18px', marginBottom: 24,
           display: 'flex', alignItems: 'center', gap: 12,
           fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13.5, color: '#6f3800',
         }}>
-          <AlertTriangle size={18} strokeWidth={2.3} color="#f09f5e" />
+          <AlertTriangle size={18} strokeWidth={2.3} color="#dc9257" />
           <div>
             {!hotel.approved && (
               <div><strong>Waiting for admin approval.</strong> Your listing won&apos;t appear on the public rate board until an admin approves it.</div>
@@ -131,7 +131,7 @@ export default function MyListing() {
           { label: 'Room types',     value: String(hotel.rooms.length),    sub: hotel.rooms.length ? 'Configured' : 'Add some below', Icon: BedDouble,     accent: '#13677b' },
           { label: 'Total inventory',value: String(totalInv),               sub: 'Across all room types',                              Icon: Building2,     accent: '#00361a' },
           { label: 'Available now',  value: String(availInv),               sub: 'Marked Available',                                   Icon: CheckCircle2,  accent: '#1d5031' },
-          { label: 'Status',         value: hotel.approved ? 'Live' : 'Pending', sub: hotel.approved ? 'On public board' : 'Awaiting approval', Icon: Eye, accent: hotel.approved ? '#1d5031' : '#f09f5e', small: true },
+          { label: 'Status',         value: hotel.approved ? 'Live' : 'Pending', sub: hotel.approved ? 'On public board' : 'Awaiting approval', Icon: Eye, accent: hotel.approved ? '#1d5031' : '#dc9257', small: true },
         ].map((c, i) => (
           <div key={i} className="card-elevated" style={{ padding: '22px 24px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -221,7 +221,7 @@ export default function MyListing() {
               </div>
               <div style={{
                 position: 'absolute', top: 16, left: 16, right: 16,
-                background: 'rgba(0,54,26,0.92)', color: '#ffdcc4',
+                background: 'rgba(0,54,26,0.92)', color: '#f3d7bf',
                 padding: '10px 14px', borderRadius: 10,
                 fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12.5, fontWeight: 700,
                 display: 'flex', alignItems: 'center', gap: 8,

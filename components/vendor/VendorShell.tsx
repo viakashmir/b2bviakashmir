@@ -48,7 +48,7 @@ export default function VendorShell({ children }: Props) {
           <Link href="/" style={{ textDecoration: 'none', color: '#ffffff', display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{
               width: 38, height: 38, borderRadius: 10,
-              background: 'linear-gradient(135deg, #b8f0c5, #9dd3aa)',
+              background: 'linear-gradient(135deg, #a9d9b8, #8ec29e)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#00361a', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 900, fontSize: 18,
             }}>
@@ -58,7 +58,7 @@ export default function VendorShell({ children }: Props) {
               <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 800, fontSize: 17, letterSpacing: '-0.01em', lineHeight: 1 }}>
                 Via Kashmir
               </div>
-              <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(184,240,197,0.7)', marginTop: 4 }}>
+              <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(169,217,184,0.7)', marginTop: 4 }}>
                 Vendor Portal
               </div>
             </div>
@@ -79,7 +79,7 @@ export default function VendorShell({ children }: Props) {
 
         {/* Nav */}
         <nav style={{ flex: 1, padding: '8px 14px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={{ padding: '12px 8px 6px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(184,240,197,0.55)' }}>
+          <div style={{ padding: '12px 8px 6px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(169,217,184,0.55)' }}>
             Main
           </div>
           {NAV.map(item => {
@@ -89,8 +89,8 @@ export default function VendorShell({ children }: Props) {
                 <div style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '11px 14px', borderRadius: 10,
-                  background: active ? 'rgba(184,240,197,0.12)' : 'transparent',
-                  color: active ? '#b8f0c5' : 'rgba(255,255,255,0.78)',
+                  background: active ? 'rgba(169,217,184,0.12)' : 'transparent',
+                  color: active ? '#a9d9b8' : 'rgba(255,255,255,0.78)',
                   transition: 'background 0.15s, color 0.15s',
                   cursor: 'pointer',
                   fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13.5, fontWeight: active ? 700 : 500,
@@ -105,7 +105,7 @@ export default function VendorShell({ children }: Props) {
             )
           })}
 
-          <div style={{ padding: '20px 8px 6px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(184,240,197,0.55)' }}>
+          <div style={{ padding: '20px 8px 6px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(169,217,184,0.55)' }}>
             Quick links
           </div>
           <Link href="/" onClick={() => setOpen(false)} style={{ textDecoration: 'none' }}>
@@ -129,7 +129,7 @@ export default function VendorShell({ children }: Props) {
         }}>
           <div style={{
             width: 38, height: 38, borderRadius: 9999,
-            background: 'linear-gradient(135deg, #b8f0c5, #9dd3aa)',
+            background: 'linear-gradient(135deg, #a9d9b8, #8ec29e)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: '#00361a', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 800, fontSize: 14,
             flexShrink: 0,

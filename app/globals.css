@@ -3,30 +3,27 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
-@import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css');
-@import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css');
-@import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css');
 
 :root {
   /* Brand */
   --vk-primary: #00361a;
   --vk-primary-container: #1a4d2e;
-  --vk-primary-fixed: #b8f0c5;
-  --vk-primary-fixed-dim: #9dd3aa;
+  --vk-primary-fixed: #a9d9b8;
+  --vk-primary-fixed-dim: #8ec29e;
   --vk-on-primary: #ffffff;
   --vk-on-primary-container: #88bd95;
   --vk-on-primary-fixed-variant: #1d5031;
 
   --vk-secondary: #13677b;
-  --vk-secondary-container: #a1e7ff;
-  --vk-secondary-fixed: #b2ebff;
+  --vk-secondary-container: #b9e2ea;
+  --vk-secondary-fixed: #c3e6ec;
   --vk-on-secondary-container: #18697e;
 
   --vk-tertiary: #4a2400;
   --vk-tertiary-container: #6b3600;
-  --vk-tertiary-fixed: #ffdcc4;
-  --vk-tertiary-fixed-dim: #ffb780;
-  --vk-on-tertiary-container: #f09f5e;
+  --vk-tertiary-fixed: #f3d7bf;
+  --vk-tertiary-fixed-dim: #e2a672;
+  --vk-on-tertiary-container: #dc9257;
   --vk-on-tertiary-fixed: #2f1400;
 
   /* Surfaces */
@@ -295,12 +292,12 @@ body {
 /* Availability indicator - Kashmiri saffron palette so it pops on
    dark green card headers. Blinking amber when low, red when sold out. */
 @keyframes blink-amber {
-  0%, 100% { background: rgba(255,220,196,0.18); color: #ffdcc4; box-shadow: 0 0 0 0 rgba(240,159,94,0.45); }
-  50%      { background: rgba(240,159,94,0.40); color: #ffffff;  box-shadow: 0 0 0 6px rgba(240,159,94,0.20); }
+  0%, 100% { background: rgba(243,215,191,0.18); color: #f3d7bf; box-shadow: 0 0 0 0 rgba(220,146,87,0.45); }
+  50%      { background: rgba(220,146,87,0.40); color: #ffffff;  box-shadow: 0 0 0 6px rgba(220,146,87,0.20); }
 }
 .avail-green {
-  background: rgba(255,220,196,0.18);
-  color: #ffdcc4;
+  background: rgba(243,215,191,0.18);
+  color: #f3d7bf;
 }
 .avail-amber {
   animation: blink-amber 1.2s ease-in-out infinite;
@@ -312,7 +309,7 @@ body {
 /* When the same indicators appear on light backgrounds (the per-row
    inventory pill in the rate table), use the deeper saffron variants. */
 .card-elevated > div:not(.hotel-card-header) .avail-green {
-  background: rgba(255,220,196,0.55);
+  background: rgba(243,215,191,0.55);
   color: #6f3800;
 }
 .card-elevated > div:not(.hotel-card-header) .avail-red {
@@ -358,7 +355,7 @@ body {
   gap: 20px; flex-wrap: wrap; position: relative; overflow: hidden;
 }
 .promo-left { position: relative; z-index: 1; }
-.promo-overline { font-size: 10.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #9dd3aa; font-family: 'Manrope', -apple-system, 'Segoe UI', sans-serif; }
+.promo-overline { font-size: 10.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #8ec29e; font-family: 'Manrope', -apple-system, 'Segoe UI', sans-serif; }
 .promo-title { font-family: 'Manrope', -apple-system, 'Segoe UI', sans-serif; font-size: 25px; font-weight: 800; color: #ffffff; line-height: 1.2; letter-spacing: -0.02em; margin: 8px 0 4px; max-width: 640px; }
 .promo-sub { font-size: 13.5px; color: rgba(255,255,255,0.72); font-family: 'Manrope', -apple-system, 'Segoe UI', sans-serif; margin: 0; line-height: 1.5; }
 .promo-badge { position: static; z-index: 1; flex-shrink: 0; }

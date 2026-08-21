@@ -119,19 +119,19 @@ export default function PublicPage() {
         <section className="promo-banner">
           <Mountain
             size={200}
-            color="rgba(184,240,197,0.08)"
+            color="rgba(169,217,184,0.08)"
             style={{ position: 'absolute', right: -24, top: -40, pointerEvents: 'none' }}
           />
           <div className="promo-left">
             <span className="promo-overline">
-              <Leaf size={13} strokeWidth={2.4} color="#b8f0c5" style={{ verticalAlign: 'middle', marginRight: 8 }} />
+              <Leaf size={13} strokeWidth={2.4} color="#a9d9b8" style={{ verticalAlign: 'middle', marginRight: 8 }} />
               Kashmir B2B Rate Portal
             </span>
             <h1 className="promo-title">Live hotel &amp; houseboat rates, updated in real-time</h1>
             <p className="promo-sub">Srinagar · Gulmarg · Pahalgam · Sonamarg · Gurez — book confidently, no calls.</p>
           </div>
           <div className="hero-live-badge promo-badge">
-            <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#b8f0c5', display: 'inline-block' }} />
+            <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#a9d9b8', display: 'inline-block' }} />
             {hotels.length} {hotels.length === 1 ? 'hotel' : 'hotels'} live
           </div>
         </section>

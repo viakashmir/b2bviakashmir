@@ -18,15 +18,15 @@ const CITY_ORDER: Location[] = ['srinagar', 'gulmarg', 'pahalgam', 'sonamarg', '
 
 /** Map WMO weather code (open-meteo) → lucide icon + label */
 function wmoIcon(code: number | null) {
-  if (code == null) return { Icon: Cloud,           label: '-',         color: '#9dd3aa' }
-  if (code === 0)   return { Icon: Sun,             label: 'Clear',     color: '#ffdcc4' }
-  if (code <= 3)    return { Icon: CloudSun,        label: 'Cloudy',    color: '#b8f0c5' }
+  if (code == null) return { Icon: Cloud,           label: '-',         color: '#8ec29e' }
+  if (code === 0)   return { Icon: Sun,             label: 'Clear',     color: '#f3d7bf' }
+  if (code <= 3)    return { Icon: CloudSun,        label: 'Cloudy',    color: '#a9d9b8' }
   if (code <= 48)   return { Icon: CloudFog,        label: 'Foggy',     color: '#c1c9bf' }
-  if (code <= 67)   return { Icon: CloudRain,       label: 'Rain',      color: '#a1e7ff' }
+  if (code <= 67)   return { Icon: CloudRain,       label: 'Rain',      color: '#b9e2ea' }
   if (code <= 77)   return { Icon: CloudSnow,       label: 'Snow',      color: '#ffffff' }
-  if (code <= 82)   return { Icon: CloudRain,       label: 'Showers',   color: '#a1e7ff' }
-  if (code >= 95)   return { Icon: CloudLightning,  label: 'Thunder',   color: '#b8f0c5' }
-  return              { Icon: Cloud,                label: 'Cloudy',    color: '#b8f0c5' }
+  if (code <= 82)   return { Icon: CloudRain,       label: 'Showers',   color: '#b9e2ea' }
+  if (code >= 95)   return { Icon: CloudLightning,  label: 'Thunder',   color: '#a9d9b8' }
+  return              { Icon: Cloud,                label: 'Cloudy',    color: '#a9d9b8' }
 }
 
 export default function KashmirLive() {
@@ -91,8 +91,8 @@ export default function KashmirLive() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        <Mountain size={110} color="rgba(184,240,197,0.08)" style={{ position: 'absolute', right: -16, top: -10, pointerEvents: 'none' }} />
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#9dd3aa', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <Mountain size={110} color="rgba(169,217,184,0.08)" style={{ position: 'absolute', right: -16, top: -10, pointerEvents: 'none' }} />
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#8ec29e', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
           <Clock size={11} strokeWidth={2.5} />
           Kashmir Time · IST
         </div>

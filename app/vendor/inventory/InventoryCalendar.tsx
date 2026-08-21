@@ -230,7 +230,7 @@ export default function InventoryCalendar() {
           {[
             { label: 'Available Today', value: String(availableToday), sub: `${data.rooms.length} room types`, accent: '#13677b' },
             { label: 'Total Inventory', value: String(totalRoomsToday), sub: 'Rooms in your hotel', accent: '#00361a' },
-            { label: 'Blocked Today', value: String((totalRoomsToday - availableToday)), sub: 'OTA / Manual / Hold', accent: '#f09f5e' },
+            { label: 'Blocked Today', value: String((totalRoomsToday - availableToday)), sub: 'OTA / Manual / Hold', accent: '#dc9257' },
             { label: 'Month', value: `${MONTH_NAMES[month - 1].slice(0, 3)} ${year}`, sub: 'Calendar view', accent: '#00361a', small: true },
           ].map((c, i) => (
             <div key={i} className="card-elevated" style={{ padding: '22px 24px' }}>
@@ -247,12 +247,12 @@ export default function InventoryCalendar() {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             gap: 12, flexWrap: 'wrap', marginBottom: 12,
             padding: '12px 18px', borderRadius: 14,
-            background: 'linear-gradient(135deg, rgba(255,220,196,0.4), rgba(184,240,197,0.4))',
-            border: '1px solid rgba(240,159,94,0.35)',
+            background: 'linear-gradient(135deg, rgba(243,215,191,0.4), rgba(169,217,184,0.4))',
+            border: '1px solid rgba(220,146,87,0.35)',
             fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 10, height: 10, borderRadius: 9999, background: '#f09f5e', boxShadow: '0 0 0 4px rgba(240,159,94,0.18)' }} />
+              <span style={{ width: 10, height: 10, borderRadius: 9999, background: '#dc9257', boxShadow: '0 0 0 4px rgba(220,146,87,0.18)' }} />
               <div>
                 <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6f3800' }}>Current tariff window</div>
                 <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 15, fontWeight: 800, color: '#00361a', marginTop: 2 }}>
@@ -306,12 +306,12 @@ export default function InventoryCalendar() {
                   style={{
                     position: 'relative',
                     background: d.inTariff && d.status === 'available'
-                      ? 'linear-gradient(135deg, rgba(255,220,196,0.55), rgba(184,240,197,0.45))'
+                      ? 'linear-gradient(135deg, rgba(243,215,191,0.55), rgba(169,217,184,0.45))'
                       : s.bg,
                     border:
                       isSelected ? '2px solid #00361a'
                       : isToday ? '2px solid #13677b'
-                      : d.inTariff ? '2px solid #ffb780'
+                      : d.inTariff ? '2px solid #e2a672'
                       : '1px solid transparent',
                     borderRadius: 10, padding: '8px 6px',
                     minHeight: 64, cursor: 'pointer',
@@ -327,8 +327,8 @@ export default function InventoryCalendar() {
                     <span title="In tariff window" style={{
                       position: 'absolute', top: 4, right: 4,
                       width: 8, height: 8, borderRadius: 9999,
-                      background: '#f09f5e',
-                      boxShadow: '0 0 0 3px rgba(240,159,94,0.18)',
+                      background: '#dc9257',
+                      boxShadow: '0 0 0 3px rgba(220,146,87,0.18)',
                     }} />
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
@@ -364,7 +364,7 @@ export default function InventoryCalendar() {
             ))}
             {data.tariffStart && data.tariffEnd && (
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ width: 12, height: 12, borderRadius: 4, background: 'linear-gradient(135deg, rgba(255,220,196,0.55), rgba(184,240,197,0.45))', border: '2px solid #ffb780' }} />
+                <span style={{ width: 12, height: 12, borderRadius: 4, background: 'linear-gradient(135deg, rgba(243,215,191,0.55), rgba(169,217,184,0.45))', border: '2px solid #e2a672' }} />
                 Tariff window
               </span>
             )}
@@ -524,7 +524,7 @@ export default function InventoryCalendar() {
               return (
                 <div style={{
                   marginBottom: 12, padding: '10px 14px', borderRadius: 10,
-                  background: 'linear-gradient(135deg, rgba(184,240,197,0.35), rgba(255,220,196,0.3))',
+                  background: 'linear-gradient(135deg, rgba(169,217,184,0.35), rgba(243,215,191,0.3))',
                   fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, fontWeight: 700, color: '#00361a',
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 }}>
