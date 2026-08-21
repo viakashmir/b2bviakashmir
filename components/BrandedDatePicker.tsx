@@ -123,7 +123,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
       {label && (
         <label style={{
           display: 'block', fontSize: 11, fontWeight: 700, color: '#414942',
-          marginBottom: 7, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
+          marginBottom: 7, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
         }}>{label}</label>
       )}
       {/* Trigger */}
@@ -138,7 +138,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
           background: '#ffffff',
           border: `1px solid ${open ? '#00361a' : 'rgba(0,54,26,0.14)'}`,
           borderRadius: 12,
-          fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 700,
+          fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 14, fontWeight: 700,
           color: value ? '#00361a' : '#9aa19f',
           cursor: 'pointer',
           boxShadow: open ? '0 0 0 4px rgba(0,54,26,0.08)' : 'none',
@@ -181,7 +181,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
             boxShadow: '0 20px 60px rgba(0,54,26,0.22), 0 4px 16px rgba(25,28,29,0.10)',
             border: '1px solid rgba(0,54,26,0.08)',
             overflow: 'hidden',
-            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
+            fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
           }}
         >
           {/* Header */}
@@ -195,7 +195,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
               <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#9dd3aa' }}>
                 Pick a date
               </div>
-              <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 17, fontWeight: 800, marginTop: 2, letterSpacing: '-0.01em' }}>
+              <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 17, fontWeight: 800, marginTop: 2, letterSpacing: '-0.01em' }}>
                 {MONTHS[viewMonth]} {viewYear}
               </div>
             </div>
@@ -261,7 +261,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
                         : isToday
                           ? '#6f3800'
                           : '#191c1d',
-                    fontFamily: isSelected || isToday ? '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' : '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
+                    fontFamily: isSelected || isToday ? '"Manrope", -apple-system, "Segoe UI", sans-serif' : '"Manrope", -apple-system, "Segoe UI", sans-serif',
                     fontWeight: isSelected ? 800 : isToday ? 800 : 600,
                     fontSize: 13,
                     cursor: disabled ? 'not-allowed' : 'pointer',
@@ -293,7 +293,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
               onClick={() => { onChange(''); setOpen(false) }}
               style={{
                 background: 'transparent', border: 'none', cursor: 'pointer',
-                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 700, fontSize: 12, color: '#717971',
+                fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 700, fontSize: 12, color: '#717971',
                 padding: '6px 10px', borderRadius: 8,
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f5' }}
@@ -314,7 +314,7 @@ export default function BrandedDatePicker({ value, onChange, min, max, placehold
                 padding: '8px 14px', borderRadius: 9999,
                 background: 'linear-gradient(135deg, #00361a, #1a4d2e)',
                 color: '#ffffff', border: 'none', cursor: 'pointer',
-                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 800, fontSize: 12,
+                fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 800, fontSize: 12,
                 display: 'inline-flex', alignItems: 'center', gap: 5,
                 boxShadow: '0 4px 12px rgba(0,54,26,0.22)',
               }}

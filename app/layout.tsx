@@ -28,11 +28,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           colorInputBackground: '#f3f4f5',
           colorInputText: '#191c1d',
           borderRadius: '12px',
-          fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
+          fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
         },
         elements: {
           formButtonPrimary:
-            'bg-gradient-to-br from-[#00361a] to-[#1a4d2e] hover:shadow-lg rounded-full font-display font-bold',
+            'bg-gradient-to-br from-[#00361a] to-[#1a4d2e] hover:shadow-lg rounded-xl font-display font-bold',
           card: 'shadow-none',
           headerTitle: 'font-display',
           headerSubtitle: 'font-body',

@@ -151,7 +151,7 @@ export default function AdminPortal() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading admin…</div>
+        <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 22, fontWeight: 700, color: '#00361a', opacity: 0.5 }}>Loading admin…</div>
       </div>
     )
   }
@@ -183,7 +183,7 @@ export default function AdminPortal() {
               <ShieldCheck size={11} strokeWidth={2.5} /> Admin Panel
             </span>
             <h1 className="dash-title">Operations Console</h1>
-            <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
+            <p style={{ fontSize: 14, color: '#414942', marginTop: 8, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 500 }}>
               Approve hotels, moderate concerns, monitor the portal.
             </p>
           </div>
@@ -196,10 +196,10 @@ export default function AdminPortal() {
 
         {authError && (
           <div className="card-elevated" style={{ padding: 18, marginBottom: 20, borderLeft: '4px solid #ba1a1a', background: '#ffdad6' }}>
-            <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 700, color: '#93000a', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, fontWeight: 700, color: '#93000a', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <AlertTriangle size={14} strokeWidth={2.3} /> Admin actions disabled
             </div>
-            <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#191c1d', lineHeight: 1.5 }}>{authError}</div>
+            <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#191c1d', lineHeight: 1.5 }}>{authError}</div>
           </div>
         )}
 
@@ -207,7 +207,7 @@ export default function AdminPortal() {
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
               padding: '12px 18px', border: 'none', background: 'transparent',
-              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 700,
+              fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, fontWeight: 700,
               color: tab === t.key ? '#00361a' : '#717971', cursor: 'pointer',
               borderBottom: tab === t.key ? '3px solid #00361a' : '3px solid transparent',
               marginBottom: -1, display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -235,7 +235,7 @@ export default function AdminPortal() {
                   </div>
                 </div>
                 <div className="stat-value">{c.value}</div>
-                <div style={{ fontSize: 12, color: '#717971', marginTop: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>{c.sub}</div>
+                <div style={{ fontSize: 12, color: '#717971', marginTop: 8, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 500 }}>{c.sub}</div>
               </div>
             ))}
           </div>
@@ -271,7 +271,7 @@ export default function AdminPortal() {
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
                   {['', 'Hotel', 'Location', 'Star', 'Inventory', 'Status', 'Created', 'Actions'].map(h => (
-                    <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
+                    <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -294,14 +294,14 @@ export default function AdminPortal() {
                       </button>
                     </td>
                     <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: '#191c1d', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{h.name}</div>
-                      <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{h.email}</div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: '#191c1d', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>{h.name}</div>
+                      <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>{h.email}</div>
                     </td>
-                    <td style={{ padding: '14px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{h.locationLabel}</td>
+                    <td style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{h.locationLabel}</td>
                     <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <span className="badge badge-neutral">{STAR_LABELS[h.stars]}</span>
                     </td>
-                    <td style={{ padding: '14px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                    <td style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       {availableInventory(h.rooms)}/{totalInventory(h.rooms)}
                     </td>
                     <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
@@ -310,7 +310,7 @@ export default function AdminPortal() {
                         : <span className="badge badge-tertiary"><Clock size={11} strokeWidth={2.5} /> Pending</span>
                       }
                     </td>
-                    <td style={{ padding: '14px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, color: '#717971', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{timeAgo(h.createdAt)}</td>
+                    <td style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#717971', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{timeAgo(h.createdAt)}</td>
                     <td style={{ padding: '14px 16px', whiteSpace: 'nowrap', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                         {h.approved ? (
@@ -319,7 +319,7 @@ export default function AdminPortal() {
                             style={{
                               padding: '8px 14px', borderRadius: 9999, border: 'none',
                               background: '#fef3c7', color: '#6f3800',
-                              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11.5, fontWeight: 800,
+                              fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 11.5, fontWeight: 800,
                               cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
                               transition: 'all 0.18s',
                             }}
@@ -342,7 +342,7 @@ export default function AdminPortal() {
                           style={{
                             padding: '8px 14px', borderRadius: 9999, border: 'none',
                             background: '#ba1a1a', color: '#ffffff',
-                            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11.5, fontWeight: 800,
+                            fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 11.5, fontWeight: 800,
                             cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
                             transition: 'all 0.18s', boxShadow: '0 4px 12px rgba(186,26,26,0.25)',
                           }}
@@ -365,7 +365,7 @@ export default function AdminPortal() {
                   </Fragment>
                 ))}
                 {hotelsTabList.length === 0 && (
-                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '48px 20px', color: '#717971', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>No hotels yet.</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '48px 20px', color: '#717971', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>No hotels yet.</td></tr>
                 )}
               </tbody>
             </table>
@@ -378,8 +378,8 @@ export default function AdminPortal() {
             {expiredHotels.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '56px 24px' }}>
                 <CheckCircle2 size={36} color="#c1c9bf" style={{ display: 'block', margin: '0 auto 12px' }} />
-                <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 18, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No Expired Rates</p>
-                <p style={{ fontSize: 13, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#717971' }}>Every live listing has a valid tariff period.</p>
+                <p style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 18, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No Expired Rates</p>
+                <p style={{ fontSize: 13, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', color: '#717971' }}>Every live listing has a valid tariff period.</p>
               </div>
             ) : (
             <table style={{ width: '100%', minWidth: 960, tableLayout: 'fixed', borderCollapse: 'collapse' }}>
@@ -393,7 +393,7 @@ export default function AdminPortal() {
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg, #ba1a1a 0%, #93000a 100%)' }}>
                   {['', 'Hotel', 'Location', 'Tariff Expired', 'Actions'].map(h => (
-                    <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
+                    <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -416,10 +416,10 @@ export default function AdminPortal() {
                       </button>
                     </td>
                     <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: '#191c1d', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{h.name}</div>
-                      <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{h.email || 'No email on file'}</div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: '#191c1d', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>{h.name}</div>
+                      <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>{h.email || 'No email on file'}</div>
                     </td>
-                    <td style={{ padding: '14px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{h.locationLabel}</td>
+                    <td style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{h.locationLabel}</td>
                     <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <span className="badge badge-error"><AlertTriangle size={11} strokeWidth={2.5} /> {h.tariffEnd} · {daysExpired(h)}d ago</span>
                     </td>
@@ -439,7 +439,7 @@ export default function AdminPortal() {
                           style={{
                             padding: '8px 14px', borderRadius: 9999, border: 'none',
                             background: '#ba1a1a', color: '#ffffff',
-                            fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11.5, fontWeight: 800,
+                            fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 11.5, fontWeight: 800,
                             cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
                           }}
                           aria-label={`Delete ${h.name}`}
@@ -473,8 +473,8 @@ export default function AdminPortal() {
             {concerns.length === 0 && (
               <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
                 <MessageSquare size={40} color="#c1c9bf" style={{ marginBottom: 12, display: 'block', margin: '0 auto 12px' }} />
-                <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No Concerns</p>
-                <p style={{ fontSize: 14, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#717971' }}>Travel agents will raise concerns from their portal.</p>
+                <p style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No Concerns</p>
+                <p style={{ fontSize: 14, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', color: '#717971' }}>Travel agents will raise concerns from their portal.</p>
               </div>
             )}
             {concerns.map(c => (
@@ -486,8 +486,8 @@ export default function AdminPortal() {
                       <span className={`badge ${PRIORITY_BADGE[c.priority]}`}>{c.priority} priority</span>
                       <span className="badge badge-neutral">{c.category}</span>
                     </div>
-                    <h3 style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 17, fontWeight: 700, color: '#00361a', margin: 0 }}>{c.subject}</h3>
-                    <div style={{ fontSize: 12, color: '#717971', marginTop: 4, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
+                    <h3 style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 17, fontWeight: 700, color: '#00361a', margin: 0 }}>{c.subject}</h3>
+                    <div style={{ fontSize: 12, color: '#717971', marginTop: 4, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 500 }}>
                       <strong style={{ color: '#414942' }}>{c.hotelName}</strong> · {c.agentName} ({c.agentCompany}) · {timeAgo(c.createdAt)}
                     </div>
                   </div>
@@ -499,12 +499,12 @@ export default function AdminPortal() {
                   </select>
                 </div>
 
-                <p style={{ fontSize: 14, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.6, margin: '0 0 16px' }}>{c.description}</p>
+                <p style={{ fontSize: 14, color: '#414942', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', lineHeight: 1.6, margin: '0 0 16px' }}>{c.description}</p>
 
                 {c.adminResponse && (
                   <div className="card-section" style={{ padding: 14, marginBottom: 14 }}>
                     <div className="t-overline" style={{ marginBottom: 6 }}>Admin response · {timeAgo(c.adminResponseAt)}</div>
-                    <div style={{ fontSize: 13, color: '#191c1d', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.55 }}>{c.adminResponse}</div>
+                    <div style={{ fontSize: 13, color: '#191c1d', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', lineHeight: 1.55 }}>{c.adminResponse}</div>
                   </div>
                 )}
 
@@ -535,7 +535,7 @@ export default function AdminPortal() {
 
 const fieldLabel: React.CSSProperties = {
   display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase',
-  color: '#414942', marginBottom: 8, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
+  color: '#414942', marginBottom: 8, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
 }
 const inputStyle: React.CSSProperties = { padding: '11px 14px', fontSize: 13 }
 
@@ -583,8 +583,8 @@ function AddHotelForm({ onCreate, onCancel }: {
 
   return (
     <div className="card-elevated" style={{ padding: 28, marginBottom: 20 }}>
-      <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 20, fontWeight: 700, color: '#00361a', marginBottom: 6 }}>New Hotel Listing</div>
-      <p style={{ fontSize: 13, color: '#717971', margin: '0 0 22px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 500 }}>
+      <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 20, fontWeight: 700, color: '#00361a', marginBottom: 6 }}>New Hotel Listing</div>
+      <p style={{ fontSize: 13, color: '#717971', margin: '0 0 22px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 500 }}>
         Created directly, no vendor account needed. Add room rates after saving.
       </p>
 
@@ -630,7 +630,7 @@ function AddHotelForm({ onCreate, onCancel }: {
         <div>
           <label style={fieldLabel}>Email</label>
           <input type="text" value={draft.email} onChange={e => setDraft({ ...draft, email: e.target.value })} className="input-field" style={inputStyle} placeholder="reservations@hotel.in" />
-          <p style={{ fontSize: 11, color: '#717971', margin: '6px 0 0', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
+          <p style={{ fontSize: 11, color: '#717971', margin: '6px 0 0', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>
             If set, a login invite goes out to this address automatically so the hotel can self-manage rates.
           </p>
         </div>
@@ -639,7 +639,7 @@ function AddHotelForm({ onCreate, onCancel }: {
           <input type="text" value={draft.website} onChange={e => setDraft({ ...draft, website: e.target.value })} className="input-field" style={inputStyle} />
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 11 }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, fontWeight: 600, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', cursor: 'pointer' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, fontWeight: 600, color: '#414942', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', cursor: 'pointer' }}>
             <input type="checkbox" checked={draft.whatsappSameAsPhone} onChange={e => setDraft({ ...draft, whatsappSameAsPhone: e.target.checked })} />
             WhatsApp same as phone
           </label>
@@ -677,7 +677,7 @@ function AddHotelForm({ onCreate, onCancel }: {
                 padding: '8px 14px', borderRadius: 9999, border: 'none',
                 background: active ? 'linear-gradient(135deg, #00361a, #1a4d2e)' : '#f3f4f5',
                 color: active ? '#ffffff' : '#414942',
-                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, fontWeight: 600,
+                fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, fontWeight: 600,
                 cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
               }}>
                 {active ? <CheckCircle2 size={12} strokeWidth={2.5} /> : <Plus size={12} strokeWidth={2.5} />}
@@ -689,14 +689,14 @@ function AddHotelForm({ onCreate, onCancel }: {
       </div>
 
       <div style={{ marginTop: 22 }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, fontWeight: 600, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', cursor: 'pointer' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, fontWeight: 600, color: '#414942', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', cursor: 'pointer' }}>
           <input type="checkbox" checked={draft.approved} onChange={e => setDraft({ ...draft, approved: e.target.checked })} />
           Live on public board immediately (uncheck to save as a draft awaiting approval)
         </label>
       </div>
 
       {error && (
-        <p style={{ fontSize: 12, color: '#93000a', margin: '16px 0 0', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600 }}>
+        <p style={{ fontSize: 12, color: '#93000a', margin: '16px 0 0', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 600 }}>
           <XIcon size={13} strokeWidth={2.5} style={{ marginRight: 6, verticalAlign: 'middle' }} /> {error}
         </p>
       )}
@@ -864,10 +864,10 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
       }}>
         <div>
-          <div style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 800, color: '#00361a', marginBottom: 3 }}>
+          <div style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, fontWeight: 800, color: '#00361a', marginBottom: 3 }}>
             Hotel Login Access
           </div>
-          <div style={{ fontSize: 12, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
+          <div style={{ fontSize: 12, color: '#414942', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>
             {hasVendorAccount
               ? 'This hotel has its own vendor login and manages its rates directly.'
               : hotel.email
@@ -896,7 +896,7 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
                 padding: '8px 14px', borderRadius: 9999, border: 'none',
                 background: active ? 'linear-gradient(135deg, #00361a, #1a4d2e)' : '#f3f4f5',
                 color: active ? '#ffffff' : '#414942',
-                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, fontWeight: 600,
+                fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, fontWeight: 600,
                 cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
               }}>
                 {active ? <CheckCircle2 size={12} strokeWidth={2.5} /> : <Plus size={12} strokeWidth={2.5} />}
@@ -939,7 +939,7 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
 
       {hotel.rooms.length > 0 && (
         <div style={{ overflowX: 'auto', borderRadius: 10, border: '1px solid #edeeef', background: '#ffffff', marginBottom: 14 }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>
             <thead>
               <tr style={{ background: '#f8f9fa' }}>
                 {['Room', 'Category', 'Meal', 'EP', 'CP', 'MAP', 'AP', 'Extra Bed', 'Child WOB', 'GST', 'MMT ₹', 'Goibibo ₹', 'Inv', 'Status', ''].map(h => (
@@ -1003,7 +1003,7 @@ function HotelDetailPanel({ hotel, addToast, onRefresh }: {
             </div>
           </div>
           {roomError && (
-            <p style={{ fontSize: 12, color: '#93000a', margin: '14px 0 0', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 600 }}>
+            <p style={{ fontSize: 12, color: '#93000a', margin: '14px 0 0', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 600 }}>
               <XIcon size={13} strokeWidth={2.5} style={{ marginRight: 6, verticalAlign: 'middle' }} /> {roomError}
             </p>
           )}
@@ -1099,7 +1099,7 @@ function AdminRoomRow({ room, propertyType, onSave, onDelete }: {
             style={{
               padding: '6px 10px', borderRadius: 9999, border: 'none',
               background: '#ba1a1a', color: '#ffffff',
-              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11, fontWeight: 800,
+              fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 11, fontWeight: 800,
               cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4,
             }}
             aria-label="Delete room"
@@ -1120,8 +1120,8 @@ function EnquiriesPanel({ enquiries, onDelete }: { enquiries: Enquiry[]; onDelet
     return (
       <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
         <MessageCircle size={40} color="#c1c9bf" style={{ marginBottom: 12, display: 'block', margin: '0 auto 12px' }} />
-        <p style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No enquiries yet</p>
-        <p style={{ fontSize: 14, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#717971' }}>Travellers who hit &quot;Enquire on WhatsApp&quot; on the public board show up here.</p>
+        <p style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 22, fontWeight: 700, color: '#414942', marginBottom: 4 }}>No enquiries yet</p>
+        <p style={{ fontSize: 14, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', color: '#717971' }}>Travellers who hit &quot;Enquire on WhatsApp&quot; on the public board show up here.</p>
       </div>
     )
   }
@@ -1131,20 +1131,20 @@ function EnquiriesPanel({ enquiries, onDelete }: { enquiries: Enquiry[]; onDelet
         <thead>
           <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
             {['Sent', 'Traveller', 'Phone', 'Hotel', 'Stay', 'Party', 'Notes', 'WhatsApp', ''].map(h => (
-              <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
+              <th key={h} style={{ padding: '14px 16px', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', textAlign: 'left', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', whiteSpace: 'nowrap' }}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {enquiries.map(e => (
             <tr key={e.id} style={{ borderTop: '1px solid #edeeef' }}>
-              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, color: '#717971', whiteSpace: 'nowrap' }}>{timeAgo(e.createdAt)}</td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#191c1d', fontWeight: 700 }}>{e.travellerName}</td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#414942' }}>
+              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#717971', whiteSpace: 'nowrap' }}>{timeAgo(e.createdAt)}</td>
+              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#191c1d', fontWeight: 700 }}>{e.travellerName}</td>
+              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942' }}>
                 <a href={`tel:${e.travellerPhone}`} style={{ color: '#13677b', textDecoration: 'none' }}>{e.travellerPhone}</a>
               </td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, color: '#414942' }}>{e.hotelName}</td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
+              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942' }}>{e.hotelName}</td>
+              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
                 {e.checkIn && e.checkOut ? (
                   <>
                     {e.checkIn} → {e.checkOut}
@@ -1152,11 +1152,11 @@ function EnquiriesPanel({ enquiries, onDelete }: { enquiries: Enquiry[]; onDelet
                   </>
                 ) : <span style={{ color: '#9aa19f' }}>Flexible</span>}
               </td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
+              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
                 <BedDouble size={11} strokeWidth={2.4} style={{ verticalAlign: 'middle', marginRight: 4 }} />
                 {e.rooms} rm · {e.adults}A{e.children > 0 ? ` + ${e.children}C` : ''}
               </td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, color: '#414942', maxWidth: 260 }}>
+              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#414942', maxWidth: 260 }}>
                 {e.notes || <span style={{ color: '#9aa19f' }}>-</span>}
               </td>
               <td style={{ padding: '12px 16px' }}>
@@ -1168,7 +1168,7 @@ function EnquiriesPanel({ enquiries, onDelete }: { enquiries: Enquiry[]; onDelet
                     display: 'inline-flex', alignItems: 'center', gap: 6,
                     padding: '6px 12px', borderRadius: 9999, textDecoration: 'none',
                     background: 'linear-gradient(135deg, #25d366 0%, #128c7e 100%)',
-                    color: '#ffffff', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 11, fontWeight: 800,
+                    color: '#ffffff', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 11, fontWeight: 800,
                   }}
                 ><MessageCircle size={11} strokeWidth={2.6} /> Open chat</a>
               </td>

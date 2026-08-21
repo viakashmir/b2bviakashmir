@@ -9,9 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        headline: ['Trebuchet MS', 'Segoe UI', 'Tahoma', 'sans-serif'],
-        body: ['Trebuchet MS', 'Segoe UI', 'Tahoma', 'sans-serif'],
-        display: ['Trebuchet MS', 'Segoe UI', 'Tahoma', 'sans-serif'],
+        headline: ['Manrope', '-apple-system', 'Segoe UI', 'sans-serif'],
+        body: ['Inter', '-apple-system', 'Segoe UI', 'sans-serif'],
+        display: ['Manrope', '-apple-system', 'Segoe UI', 'sans-serif'],
       },
       colors: {
         primary: '#00361a',

@@ -136,7 +136,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
               <MessageCircle size={11} strokeWidth={2.6} color="#4ff08a" /> WhatsApp Enquiry
             </div>
             <h3 style={{
-              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 20, fontWeight: 800,
+              fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 20, fontWeight: 800,
               margin: 0, letterSpacing: '-0.01em',
             }}>
               {step === 'done' ? 'Opening WhatsApp…' : `Quick enquiry · ${hotel.name}`}
@@ -162,7 +162,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
             padding: '12px 24px', background: '#f8faf9',
             borderBottom: '1px solid #edeeef',
             display: 'flex', gap: 6, alignItems: 'center',
-            fontSize: 11, fontWeight: 700, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', color: '#717971',
+            fontSize: 11, fontWeight: 700, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', color: '#717971',
             letterSpacing: '0.04em',
           }}>
             <StepDot active={step === 'dates'}   done={['party','contact'].includes(step)} label="Dates"   />
@@ -179,7 +179,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
             <div style={{
               padding: '10px 14px', borderRadius: 10,
               background: '#ffdad6', color: '#93000a',
-              fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12.5, fontWeight: 600,
+              fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12.5, fontWeight: 600,
               marginBottom: 14,
             }}>{error}</div>
           )}
@@ -195,7 +195,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
                 <div style={{
                   marginTop: 12, padding: '8px 14px', borderRadius: 9999,
                   background: 'rgba(184,240,197,0.30)', color: '#00361a',
-                  fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, fontWeight: 700,
+                  fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, fontWeight: 700,
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                 }}>
                   <Check size={12} strokeWidth={3} /> {nights} night{nights === 1 ? '' : 's'} · we'll mention this in the message
@@ -215,7 +215,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
               <div style={{ marginTop: 18 }}>
                 <label style={{
                   display: 'block', fontSize: 11, fontWeight: 700, color: '#414942',
-                  marginBottom: 7, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
+                  marginBottom: 7, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
                 }}>Anything specific? <span style={{ color: '#9aa19f', fontWeight: 500 }}>(optional)</span></label>
                 <textarea
                   value={notes}
@@ -224,7 +224,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
                   rows={3}
                   style={{
                     width: '100%', padding: '11px 14px', borderRadius: 12,
-                    border: '1px solid rgba(0,54,26,0.14)', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
+                    border: '1px solid rgba(0,54,26,0.14)', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
                     fontSize: 13.5, color: '#191c1d', resize: 'vertical',
                   }}
                 />
@@ -246,7 +246,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
                     background: '#ffffff', padding: '4px 6px 4px 14px',
                   }}>
                     <span style={{
-                      fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 700,
+                      fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 14, fontWeight: 700,
                       color: '#414942', marginRight: 10, whiteSpace: 'nowrap',
                       display: 'inline-flex', alignItems: 'center', gap: 4,
                     }}>🇮🇳 +91</span>
@@ -260,13 +260,13 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
                       style={{
                         flex: 1, minWidth: 0,
                         background: 'transparent', border: 'none', outline: 'none',
-                        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 600,
+                        fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 14, fontWeight: 600,
                         color: '#191c1d', padding: '8px 0',
                         letterSpacing: '0.02em',
                       }}
                     />
                     <span style={{
-                      fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 10.5, fontWeight: 700,
+                      fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 10.5, fontWeight: 700,
                       color: phone.length === 10 ? '#1a5128' : '#9aa19f',
                       marginRight: 8, whiteSpace: 'nowrap',
                     }}>{phone.length}/10</span>
@@ -276,7 +276,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
               <div style={{
                 marginTop: 16, padding: 14, borderRadius: 12,
                 background: 'linear-gradient(135deg, rgba(184,240,197,0.30), rgba(255,220,196,0.18))',
-                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 12, color: '#414942', lineHeight: 1.5,
+                fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#414942', lineHeight: 1.5,
               }}>
                 Hitting <strong>Send via WhatsApp</strong> opens WhatsApp with a pre-filled message, you just tap send. We log this enquiry so the Via Kashmir team can follow up if the hotel doesn't reply within 24h.
               </div>
@@ -294,10 +294,10 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
                 <Check size={32} strokeWidth={3} />
               </div>
               <h4 style={{
-                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 18, fontWeight: 800,
+                fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 18, fontWeight: 800,
                 color: '#00361a', margin: '0 0 8px',
               }}>Your enquiry was sent</h4>
-              <p style={{ fontSize: 13, color: '#414942', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', lineHeight: 1.6, margin: '0 auto 18px', maxWidth: 360 }}>
+              <p style={{ fontSize: 13, color: '#414942', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', lineHeight: 1.6, margin: '0 auto 18px', maxWidth: 360 }}>
                 WhatsApp should have opened in a new tab. If it didn't, tap the button below.
               </p>
               {waLink && (
@@ -309,7 +309,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
                     display: 'inline-flex', alignItems: 'center', gap: 8,
                     padding: '12px 22px', borderRadius: 9999, textDecoration: 'none',
                     background: 'linear-gradient(135deg, #25d366 0%, #128c7e 100%)',
-                    color: '#ffffff', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 800, fontSize: 13.5,
+                    color: '#ffffff', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 800, fontSize: 13.5,
                     boxShadow: '0 10px 30px rgba(37,211,102,0.36)',
                   }}
                 ><MessageCircle size={14} strokeWidth={2.6} /> Open WhatsApp again</a>
@@ -331,7 +331,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
               style={{
                 padding: '10px 16px', borderRadius: 9999, border: 'none',
                 background: 'transparent', color: step === 'dates' ? '#c1c9bf' : '#414942',
-                fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 13, fontWeight: 700,
+                fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, fontWeight: 700,
                 cursor: step === 'dates' ? 'default' : 'pointer',
                 display: 'inline-flex', alignItems: 'center', gap: 5,
               }}
@@ -346,7 +346,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
                 background: submitting
                   ? '#9aa19f'
                   : 'linear-gradient(135deg, #25d366 0%, #128c7e 100%)',
-                color: '#ffffff', fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontWeight: 800, fontSize: 13.5,
+                color: '#ffffff', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontWeight: 800, fontSize: 13.5,
                 cursor: submitting ? 'wait' : 'pointer',
                 display: 'inline-flex', alignItems: 'center', gap: 7,
                 boxShadow: '0 8px 24px rgba(37,211,102,0.30)',
@@ -369,7 +369,7 @@ export default function EnquireWhatsAppModal({ hotel, onClose }: Props) {
 const fieldStyle: React.CSSProperties = {
   width: '100%', padding: '12px 14px', borderRadius: 12,
   border: '1px solid rgba(0,54,26,0.14)',
-  fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 14, fontWeight: 600, color: '#191c1d',
+  fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 14, fontWeight: 600, color: '#191c1d',
 }
 
 function FieldWrap({ label, children }: { label: string; children: React.ReactNode }) {
@@ -377,7 +377,7 @@ function FieldWrap({ label, children }: { label: string; children: React.ReactNo
     <div>
       <label style={{
         display: 'block', fontSize: 11, fontWeight: 700, color: '#414942',
-        marginBottom: 6, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
+        marginBottom: 6, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
       }}>{label}</label>
       {children}
     </div>
@@ -388,13 +388,13 @@ function SectionTitle({ Icon, title, hint }: { Icon: typeof CalendarDays; title:
   return (
     <div style={{ marginBottom: 14 }}>
       <h4 style={{
-        fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 18, fontWeight: 800,
+        fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 18, fontWeight: 800,
         color: '#00361a', margin: 0, display: 'inline-flex', alignItems: 'center', gap: 8,
       }}>
         <Icon size={18} strokeWidth={2.3} color="#1a5128" />
         {title}
       </h4>
-      {hint && <div style={{ fontSize: 12.5, color: '#717971', marginTop: 4, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif' }}>{hint}</div>}
+      {hint && <div style={{ fontSize: 12.5, color: '#717971', marginTop: 4, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>{hint}</div>}
     </div>
   )
 }
@@ -425,7 +425,7 @@ function CounterField({ label, Icon, value, onChange, min = 0, max = 99 }: {
       <label style={{
         display: 'flex', alignItems: 'center', gap: 6,
         fontSize: 11, fontWeight: 700, color: '#414942',
-        marginBottom: 7, fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif',
+        marginBottom: 7, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif',
       }}><Icon size={11} strokeWidth={2.3} /> {label}</label>
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6,
@@ -442,7 +442,7 @@ function CounterField({ label, Icon, value, onChange, min = 0, max = 99 }: {
             cursor: value <= min ? 'default' : 'pointer', fontSize: 16, fontWeight: 800,
           }}
         >−</button>
-        <span style={{ fontFamily: '"Trebuchet MS", "Segoe UI", Tahoma, sans-serif', fontSize: 16, fontWeight: 800, color: '#00361a', minWidth: 18, textAlign: 'center' }}>{value}</span>
+        <span style={{ fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 16, fontWeight: 800, color: '#00361a', minWidth: 18, textAlign: 'center' }}>{value}</span>
         <button
           type="button"
           onClick={() => onChange(Math.min(max, value + 1))}
