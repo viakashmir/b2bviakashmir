@@ -289,32 +289,23 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 .spin { animation: spin 0.7s linear infinite; }
 
-/* Availability indicator - Kashmiri saffron palette so it pops on
-   dark green card headers. Blinking amber when low, red when sold out. */
-@keyframes blink-amber {
-  0%, 100% { background: rgba(243,215,191,0.18); color: #f3d7bf; box-shadow: 0 0 0 0 rgba(220,146,87,0.45); }
-  50%      { background: rgba(220,146,87,0.40); color: #ffffff;  box-shadow: 0 0 0 6px rgba(220,146,87,0.20); }
-}
+/* Room-count availability pill on each rate cell. These sit on the light
+   rate-cell surface, so they use solid, high-contrast tints (green = plenty,
+   amber = low, red = sold out) that stay clearly legible. */
 .avail-green {
-  background: rgba(243,215,191,0.18);
-  color: #f3d7bf;
+  background: #d7f0dd;
+  color: #0d5c2e;
+  box-shadow: inset 0 0 0 1px rgba(13,92,46,0.14);
 }
 .avail-amber {
-  animation: blink-amber 1.2s ease-in-out infinite;
+  background: #ffe6c9;
+  color: #8a4300;
+  box-shadow: inset 0 0 0 1px rgba(138,67,0,0.16);
 }
 .avail-red {
-  background: rgba(255,180,171,0.18);
-  color: #ffb4ab;
-}
-/* When the same indicators appear on light backgrounds (the per-row
-   inventory pill in the rate table), use the deeper saffron variants. */
-.card-elevated > div:not(.hotel-card-header) .avail-green {
-  background: rgba(243,215,191,0.55);
-  color: #6f3800;
-}
-.card-elevated > div:not(.hotel-card-header) .avail-red {
-  background: rgba(186,26,26,0.10);
+  background: #ffdad6;
   color: #93000a;
+  box-shadow: inset 0 0 0 1px rgba(147,0,10,0.14);
 }
 
 /* ===========================
@@ -492,6 +483,58 @@ body {
   .hotel-card-body { padding: 16px 18px !important; }
   .hotel-card-footer { padding: 14px 18px !important; flex-direction: column; align-items: stretch !important; gap: 12px !important; }
   .hotel-card-footer button { width: 100%; }
+}
+
+/* Compact admin/vendor action buttons inside data tables */
+.tbl-action { padding: 7px 12px; border-radius: 10px; border: none; font-family: var(--font-display); font-size: 11.5px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; transition: all 0.18s; }
+
+/* ===========================
+   RESPONSIVE DATA TABLES
+   Desktop keeps the fixed-column layout; on phones the admin/vendor
+   tables collapse into stacked cards (via data-label) so action buttons
+   are always fully visible instead of scrolling off-screen.
+   =========================== */
+@media (max-width: 640px) {
+  .card-elevated.table-scroll { overflow: visible !important; background: none !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
+  table.rtable { min-width: 0 !important; width: 100%; border-collapse: collapse; }
+  table.rtable colgroup { display: none; }
+  table.rtable thead { display: none; }
+  table.rtable tbody { display: block; }
+  table.rtable > tbody > tr { display: block; position: relative; }
+  table.rtable > tbody > tr:not(.rt-sub) {
+    background: #ffffff !important;
+    border: 1px solid #e7e8e9; border-radius: 14px;
+    margin-bottom: 14px; overflow: hidden;
+    box-shadow: 0 1px 5px rgba(25,28,29,0.06);
+  }
+  table.rtable > tbody > tr > td {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; width: 100%;
+    padding: 10px 16px !important;
+    background: none !important;
+    border-bottom: 1px solid #f3f4f5;
+    text-align: right; white-space: normal;
+  }
+  table.rtable > tbody > tr > td:last-child { border-bottom: none; }
+  table.rtable td[data-label]::before {
+    content: attr(data-label);
+    font-family: var(--font-body);
+    font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #717971;
+    text-align: left; flex-shrink: 0;
+  }
+  table.rtable td.rt-title { display: block; text-align: left; background: #f8f9fa !important; padding-right: 52px !important; }
+  table.rtable td.rt-expand { position: absolute; top: 8px; right: 10px; width: auto; padding: 6px !important; border: none !important; justify-content: flex-end; }
+  table.rtable td.rt-actions { display: flex; gap: 10px; padding: 12px 16px !important; }
+  table.rtable td.rt-actions > div { display: flex !important; gap: 10px; flex: 1; }
+  table.rtable td.rt-actions > a { flex: 1; }
+  table.rtable td.rt-actions button,
+  table.rtable td.rt-actions a { flex: 1; justify-content: center; }
+  table.rtable td[colspan] { display: block !important; text-align: center; border-bottom: none !important; }
+  table.rtable > tbody > tr.rt-sub > td { display: block; padding: 0 !important; border: none !important; background: none !important; }
+}
+@media (max-width: 900px) {
+  html, body { overflow-x: hidden; max-width: 100%; }
 }
 
 /* ===========================
