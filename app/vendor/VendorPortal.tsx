@@ -431,7 +431,7 @@ export default function VendorPortal() {
             </div>
 
             <div className="card-elevated table-scroll" style={{ overflow: 'auto', marginBottom: 32 }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <table className="rtable" style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
                     {['Room', 'Category', 'Meal', 'Double ₹', 'CNB ₹', 'Extra Bed ₹', 'Avail.', 'Status', ''].map((h, i) => (
@@ -640,34 +640,34 @@ function RoomRow({ room, propertyType, saved, onSave, onDelete, statusClass }: {
       onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f3f4f5'}
       onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
     >
-      <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+      <td className="rt-title" style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
         <input value={merged.type} onChange={e => change('type', e.target.value)} className="editable-cell" style={{ textAlign: 'left', width: 140 }} />
         <div style={{ fontSize: 11, color: '#717971', fontWeight: 500, marginTop: 3, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>{MEAL_LABELS[merged.meal]}</div>
       </td>
-      <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+      <td data-label="Category" style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
         <select className="input-field" value={merged.category} onChange={e => change('category', e.target.value)} style={{ padding: '6px 10px', fontSize: 12, width: 'auto' }}>
           {categoriesFor(propertyType).map(c => <option key={c}>{c}</option>)}
         </select>
       </td>
-      <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+      <td data-label="Meal" style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
         <select className="input-field" value={merged.meal} onChange={e => change('meal', e.target.value)} style={{ padding: '6px 10px', fontSize: 12, width: 'auto' }}>
           <option value="CP">CP</option><option value="MAP">MAP</option><option value="AP">AP</option><option value="EP">EP</option>
         </select>
       </td>
-      {(['double','cnb','extraBed'] as const).map(field => (
-        <td key={field} style={{ padding: '14px 16px', textAlign: 'right', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+      {([['double','Double ₹'],['cnb','CNB ₹'],['extraBed','Extra Bed ₹']] as const).map(([field, label]) => (
+        <td key={field} data-label={label} style={{ padding: '14px 16px', textAlign: 'right', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
           <input className="editable-cell" type="number" value={(merged as Record<string, unknown>)[field] as number} min={0} onChange={e => change(field, parseInt(e.target.value) || 0)} />
         </td>
       ))}
-      <td style={{ padding: '14px 16px', textAlign: 'right', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+      <td data-label="Avail." style={{ padding: '14px 16px', textAlign: 'right', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
         <input className="editable-cell inv" type="number" value={merged.inventory} min={0} onChange={e => change('inventory', parseInt(e.target.value) || 0)} />
       </td>
-      <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+      <td data-label="Status" style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
         <select className={`status-select ${statusClass(merged.status)}`} value={merged.status} onChange={e => change('status', e.target.value)}>
           <option>Available</option><option>Limited</option><option>Sold Out</option>
         </select>
       </td>
-      <td style={{ padding: '14px 16px', whiteSpace: 'nowrap', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+      <td className="rt-actions" style={{ padding: '14px 16px', whiteSpace: 'nowrap', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <button
             onClick={() => { onSave(draft); setDraft({}) }}

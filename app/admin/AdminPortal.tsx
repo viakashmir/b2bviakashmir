@@ -257,7 +257,7 @@ export default function AdminPortal() {
             )}
 
           <div className="card-elevated table-scroll" style={{ overflow: 'auto' }}>
-            <table style={{ width: '100%', minWidth: 1040, tableLayout: 'fixed', borderCollapse: 'collapse' }}>
+            <table className="rtable" style={{ width: '100%', minWidth: 1040, tableLayout: 'fixed', borderCollapse: 'collapse' }}>
               <colgroup>
                 <col style={{ width: 44 }} />
                 <col style={{ width: 230 }} />
@@ -279,7 +279,7 @@ export default function AdminPortal() {
                 {hotelsTabList.map(h => (
                   <Fragment key={h.id}>
                   <tr>
-                    <td style={{ padding: '14px 8px', width: 36, background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                    <td className="rt-expand" style={{ padding: '14px 8px', width: 36, background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <button
                         onClick={() => setExpandedHotelId(prev => prev === h.id ? null : h.id)}
                         title="View details submitted by hotel"
@@ -293,25 +293,25 @@ export default function AdminPortal() {
                         {expandedHotelId === h.id ? <ChevronUp size={14} strokeWidth={2.4} /> : <ChevronDown size={14} strokeWidth={2.4} />}
                       </button>
                     </td>
-                    <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                    <td className="rt-title" style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <div style={{ fontWeight: 700, fontSize: 14, color: '#191c1d', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>{h.name}</div>
-                      <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>{h.email}</div>
+                      <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', wordBreak: 'break-word' }}>{h.email}</div>
                     </td>
-                    <td style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{h.locationLabel}</td>
-                    <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
-                      <span className="badge badge-neutral">{STAR_LABELS[h.stars]}</span>
+                    <td data-label="Location" style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{h.locationLabel}</td>
+                    <td data-label="Star" style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                      <span className="badge badge-neutral" style={{ whiteSpace: 'nowrap' }}>{STAR_LABELS[h.stars]}</span>
                     </td>
-                    <td style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                    <td data-label="Inventory" style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       {availableInventory(h.rooms)}/{totalInventory(h.rooms)}
                     </td>
-                    <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                    <td data-label="Status" style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       {h.approved
                         ? <span className="badge badge-success"><CheckCircle2 size={11} strokeWidth={2.5} /> Approved</span>
                         : <span className="badge badge-tertiary"><Clock size={11} strokeWidth={2.5} /> Pending</span>
                       }
                     </td>
-                    <td style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#717971', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{timeAgo(h.createdAt)}</td>
-                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                    <td data-label="Created" style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#717971', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{timeAgo(h.createdAt)}</td>
+                    <td className="rt-actions" style={{ padding: '14px 16px', whiteSpace: 'nowrap', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                         {h.approved ? (
                           <button
@@ -356,7 +356,7 @@ export default function AdminPortal() {
                     </td>
                   </tr>
                   {expandedHotelId === h.id && (
-                    <tr>
+                    <tr className="rt-sub">
                       <td colSpan={8} style={{ padding: 0, background: '#fafbfa', borderBottom: '1px solid #edeeef' }}>
                         <HotelDetailPanel key={`${h.id}:${h.updatedAt}`} hotel={h} addToast={addToast} onRefresh={refresh} />
                       </td>
@@ -382,7 +382,7 @@ export default function AdminPortal() {
                 <p style={{ fontSize: 13, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', color: '#717971' }}>Every live listing has a valid tariff period.</p>
               </div>
             ) : (
-            <table style={{ width: '100%', minWidth: 960, tableLayout: 'fixed', borderCollapse: 'collapse' }}>
+            <table className="rtable" style={{ width: '100%', minWidth: 960, tableLayout: 'fixed', borderCollapse: 'collapse' }}>
               <colgroup>
                 <col style={{ width: 44 }} />
                 <col style={{ width: 250 }} />
@@ -401,7 +401,7 @@ export default function AdminPortal() {
                 {expiredHotels.map(h => (
                   <Fragment key={h.id}>
                   <tr>
-                    <td style={{ padding: '14px 8px', width: 36, background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                    <td className="rt-expand" style={{ padding: '14px 8px', width: 36, background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <button
                         onClick={() => setExpandedHotelId(prev => prev === h.id ? null : h.id)}
                         title="Update tariff dates & rates"
@@ -415,15 +415,15 @@ export default function AdminPortal() {
                         {expandedHotelId === h.id ? <ChevronUp size={14} strokeWidth={2.4} /> : <ChevronDown size={14} strokeWidth={2.4} />}
                       </button>
                     </td>
-                    <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                    <td className="rt-title" style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <div style={{ fontWeight: 700, fontSize: 14, color: '#191c1d', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>{h.name}</div>
-                      <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif' }}>{h.email || 'No email on file'}</div>
+                      <div style={{ fontSize: 11, color: '#717971', marginTop: 3, fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', wordBreak: 'break-word' }}>{h.email || 'No email on file'}</div>
                     </td>
-                    <td style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{h.locationLabel}</td>
-                    <td style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                    <td data-label="Location" style={{ padding: '14px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>{h.locationLabel}</td>
+                    <td data-label="Tariff Expired" style={{ padding: '14px 16px', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <span className="badge badge-error"><AlertTriangle size={11} strokeWidth={2.5} /> {h.tariffEnd} · {daysExpired(h)}d ago</span>
                     </td>
-                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
+                    <td className="rt-actions" style={{ padding: '14px 16px', whiteSpace: 'nowrap', background: 'linear-gradient(to bottom, transparent calc(100% - 1px), #edeeef 100%)' }}>
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                         <button
                           onClick={() => requestRates(h.id)}
@@ -450,7 +450,7 @@ export default function AdminPortal() {
                     </td>
                   </tr>
                   {expandedHotelId === h.id && (
-                    <tr>
+                    <tr className="rt-sub">
                       <td colSpan={5} style={{ padding: 0, background: '#fafbfa', borderBottom: '1px solid #edeeef' }}>
                         <HotelDetailPanel key={`${h.id}:${h.updatedAt}`} hotel={h} addToast={addToast} onRefresh={refresh} />
                       </td>
@@ -1127,7 +1127,7 @@ function EnquiriesPanel({ enquiries, onDelete }: { enquiries: Enquiry[]; onDelet
   }
   return (
     <div className="card-elevated table-scroll" style={{ overflow: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <table className="rtable" style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ background: 'linear-gradient(135deg, #00361a 0%, #1a4d2e 100%)' }}>
             {['Sent', 'Traveller', 'Phone', 'Hotel', 'Stay', 'Party', 'Notes', 'WhatsApp', ''].map(h => (
@@ -1138,13 +1138,13 @@ function EnquiriesPanel({ enquiries, onDelete }: { enquiries: Enquiry[]; onDelet
         <tbody>
           {enquiries.map(e => (
             <tr key={e.id} style={{ borderTop: '1px solid #edeeef' }}>
-              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#717971', whiteSpace: 'nowrap' }}>{timeAgo(e.createdAt)}</td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#191c1d', fontWeight: 700 }}>{e.travellerName}</td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942' }}>
+              <td data-label="Sent" style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#717971', whiteSpace: 'nowrap' }}>{timeAgo(e.createdAt)}</td>
+              <td className="rt-title" style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#191c1d', fontWeight: 700 }}>{e.travellerName}</td>
+              <td data-label="Phone" style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942' }}>
                 <a href={`tel:${e.travellerPhone}`} style={{ color: '#13677b', textDecoration: 'none' }}>{e.travellerPhone}</a>
               </td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942' }}>{e.hotelName}</td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
+              <td data-label="Hotel" style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 13, color: '#414942' }}>{e.hotelName}</td>
+              <td data-label="Stay" style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
                 {e.checkIn && e.checkOut ? (
                   <>
                     {e.checkIn} → {e.checkOut}
@@ -1152,14 +1152,14 @@ function EnquiriesPanel({ enquiries, onDelete }: { enquiries: Enquiry[]; onDelet
                   </>
                 ) : <span style={{ color: '#9aa19f' }}>Flexible</span>}
               </td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
+              <td data-label="Party" style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#414942', whiteSpace: 'nowrap' }}>
                 <BedDouble size={11} strokeWidth={2.4} style={{ verticalAlign: 'middle', marginRight: 4 }} />
                 {e.rooms} rm · {e.adults}A{e.children > 0 ? ` + ${e.children}C` : ''}
               </td>
-              <td style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#414942', maxWidth: 260 }}>
+              <td data-label="Notes" style={{ padding: '12px 16px', fontFamily: '"Manrope", -apple-system, "Segoe UI", sans-serif', fontSize: 12, color: '#414942', maxWidth: 260 }}>
                 {e.notes || <span style={{ color: '#9aa19f' }}>-</span>}
               </td>
-              <td style={{ padding: '12px 16px' }}>
+              <td className="rt-actions" style={{ padding: '12px 16px' }}>
                 <a
                   href={e.whatsappLink}
                   target="_blank"
@@ -1172,7 +1172,7 @@ function EnquiriesPanel({ enquiries, onDelete }: { enquiries: Enquiry[]; onDelet
                   }}
                 ><MessageCircle size={11} strokeWidth={2.6} /> Open chat</a>
               </td>
-              <td style={{ padding: '12px 16px' }}>
+              <td className="rt-actions" data-label="Delete" style={{ padding: '12px 16px' }}>
                 <button
                   onClick={() => onDelete(e.id, e.travellerName)}
                   style={{
